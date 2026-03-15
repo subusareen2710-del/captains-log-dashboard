@@ -231,64 +231,6 @@
   .mood-btn.selected { border-color: var(--red); background: var(--red-light); transform: scale(1.08); }
   .mood-label { text-align: center; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 10px; min-height: 18px; }
 
-  /* ======== GOAL PILLARS (Straw Hat Crew themed) ======== */
-  .pillar-card {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
-    transition: box-shadow 0.2s, transform 0.2s;
-  }
-  .pillar-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
-  .pillar-card::after {
-    content: attr(data-crew);
-    position: absolute;
-    bottom: 6px;
-    right: 10px;
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    opacity: 0.35;
-    color: var(--text);
-  }
-  .pillar-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    border-radius: var(--radius) var(--radius) 0 0;
-  }
-  .pillar-career::before { background: linear-gradient(90deg, var(--red), var(--orange)); }
-  .pillar-finance::before { background: linear-gradient(90deg, var(--gold), #f5d020); }
-  .pillar-physical::before { background: linear-gradient(90deg, var(--teal), #26d0ce); }
-  .pillar-mental::before { background: linear-gradient(90deg, var(--navy), var(--ocean)); }
-
-  .pillar-icon { font-size: 1.8rem; margin-bottom: 8px; }
-  .pillar-name { font-size: 0.68rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 4px; }
-  .pillar-focus { font-size: 0.83rem; font-weight: 700; color: var(--text); margin-bottom: 12px; min-height: 34px; line-height: 1.4; }
-  .progress-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; height: 7px; overflow: hidden; margin-bottom: 6px; }
-  .progress-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
-  .pillar-career .progress-fill { background: linear-gradient(90deg, var(--red), var(--orange)); }
-  .pillar-finance .progress-fill { background: linear-gradient(90deg, var(--gold), #f5d020); }
-  .pillar-physical .progress-fill { background: linear-gradient(90deg, var(--teal), #26d0ce); }
-  .pillar-mental .progress-fill { background: linear-gradient(90deg, var(--navy), var(--ocean)); }
-  .pillar-percent { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 10px; }
-  .pillar-input { display: flex; align-items: center; gap: 8px; }
-  .pillar-input input[type="range"] { flex: 1; height: 4px; cursor: pointer; }
-  .pillar-career .pillar-input input { accent-color: var(--red); }
-  .pillar-finance .pillar-input input { accent-color: var(--gold); }
-  .pillar-physical .pillar-input input { accent-color: var(--teal); }
-  .pillar-mental .pillar-input input { accent-color: var(--navy); }
-  .pillar-val { font-size: 0.78rem; font-weight: 900; min-width: 28px; text-align: right; }
-  .pillar-career .pillar-val { color: var(--red); }
-  .pillar-finance .pillar-val { color: var(--gold); }
-  .pillar-physical .pillar-val { color: var(--teal); }
-  .pillar-mental .pillar-val { color: var(--navy); }
-
   /* ======== PL-300 ======== */
   .pl300-progress { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; height: 10px; overflow: hidden; margin-bottom: 10px; }
   .pl300-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--gold)); border-radius: 6px; transition: width 0.4s; }
@@ -1092,55 +1034,6 @@
   </div>
 </div>
 
-<div class="section-label">⚓ Your Four Seas — Goal Pillars</div>
-
-<!-- GOAL PILLARS -->
-<div class="grid-4" style="margin-bottom:18px;">
-  <div class="pillar-card pillar-career" data-crew="Luffy's Path">
-    <div class="pillar-icon">💼</div>
-    <div class="pillar-name">Career</div>
-    <div class="pillar-focus">PL-300 + Ops/PM roles with sponsorship</div>
-    <div class="progress-bar"><div class="progress-fill" id="career-fill" style="width:0%"></div></div>
-    <div class="pillar-percent"><span>Progress</span><span id="career-pct">0%</span></div>
-    <div class="pillar-input">
-      <input type="range" min="0" max="100" value="0" id="career-range" oninput="updatePillar('career',this.value)">
-      <span class="pillar-val" id="career-val">0</span>
-    </div>
-  </div>
-  <div class="pillar-card pillar-finance" data-crew="Nami's Treasury">
-    <div class="pillar-icon">₿</div>
-    <div class="pillar-name">Financial</div>
-    <div class="pillar-focus">Crypto/DeFi knowledge + smart tracking</div>
-    <div class="progress-bar"><div class="progress-fill" id="finance-fill" style="width:0%"></div></div>
-    <div class="pillar-percent"><span>Progress</span><span id="finance-pct">0%</span></div>
-    <div class="pillar-input">
-      <input type="range" min="0" max="100" value="0" id="finance-range" oninput="updatePillar('finance',this.value)">
-      <span class="pillar-val" id="finance-val">0</span>
-    </div>
-  </div>
-  <div class="pillar-card pillar-physical" data-crew="Zoro's Discipline">
-    <div class="pillar-icon">🏋️</div>
-    <div class="pillar-name">Physical</div>
-    <div class="pillar-focus">Consistent lifting — build identity around it</div>
-    <div class="progress-bar"><div class="progress-fill" id="physical-fill" style="width:0%"></div></div>
-    <div class="pillar-percent"><span>Progress</span><span id="physical-pct">0%</span></div>
-    <div class="pillar-input">
-      <input type="range" min="0" max="100" value="0" id="physical-range" oninput="updatePillar('physical',this.value)">
-      <span class="pillar-val" id="physical-val">0</span>
-    </div>
-  </div>
-  <div class="pillar-card pillar-mental" data-crew="Robin's Calm">
-    <div class="pillar-icon">🧠</div>
-    <div class="pillar-name">Mental</div>
-    <div class="pillar-focus">Reduce chaos — build calm, structured days</div>
-    <div class="progress-bar"><div class="progress-fill" id="mental-fill" style="width:0%"></div></div>
-    <div class="pillar-percent"><span>Progress</span><span id="mental-pct">0%</span></div>
-    <div class="pillar-input">
-      <input type="range" min="0" max="100" value="0" id="mental-range" oninput="updatePillar('mental',this.value)">
-      <span class="pillar-val" id="mental-val">0</span>
-    </div>
-  </div>
-</div>
 
 <div class="section-label">🌊 Clear the Fog — 5-Minute Reset Before You Plan</div>
 
@@ -1477,7 +1370,7 @@ function applyFirestoreData(data) {
     try { renderHabits(); } catch(e) {}
     try { renderWins(); } catch(e) {}
     try { updatePL300(); } catch(e) {}
-    try { ['career','finance','physical','mental'].forEach(n => { const v = load('pillar_'+n,0); document.getElementById(n+'-range').value=v; updatePillar(n,v); }); } catch(e) {}
+  
     try { const bd = load('brainDump',''); if (bd) document.getElementById('brain-dump').value = bd; } catch(e) {}
     try {
       const b = load('buckets', null);
@@ -1541,19 +1434,6 @@ function selectMood(btn, label) {
   });
 })();
 
-// ===================== GOAL PILLARS =====================
-function updatePillar(name, val) {
-  val = parseInt(val);
-  document.getElementById(name+'-fill').style.width = val+'%';
-  document.getElementById(name+'-pct').textContent = val+'%';
-  document.getElementById(name+'-val').textContent = val;
-  save('pillar_'+name, val);
-}
-['career','finance','physical','mental'].forEach(n => {
-  const v = load('pillar_'+n, 0);
-  document.getElementById(n+'-range').value = v;
-  updatePillar(n, v);
-});
 
 // ===================== PL-300 =====================
 function toggleModule(el) { el.classList.toggle('done'); updatePL300(); savePL300(); }
@@ -2037,12 +1917,7 @@ function buildTodaySnapshot() {
   const intentionData = load('intention', null);
   const winsData = load('wins_' + today, []);
   const oneThing = load('one_thing_' + today, null);
-  const pillars = {
-    career:   load('pillar_career', 0),
-    finance:  load('pillar_finance', 0),
-    physical: load('pillar_physical', 0),
-    mental:   load('pillar_mental', 0),
-  };
+
   return {
     date: today,
     mood: moodData ? moodData.label : null,
@@ -2051,7 +1926,6 @@ function buildTodaySnapshot() {
     habitsDone,
     wins: winsData,
     oneThing,
-    pillars,
   };
 }
 
@@ -2123,9 +1997,6 @@ function renderArchive() {
           <div class="log-habit-mini-bar"><div class="log-habit-mini-fill" style="width:${pct}%"></div></div>
           <div class="log-habit-pct">${pct}%</div>
         </div>
-        ${s.pillars ? `<div style="font-size:0.68rem;font-weight:700;color:var(--text-muted);margin-bottom:6px;">
-          💼${s.pillars.career}% · ₿${s.pillars.finance}% · 🏋️${s.pillars.physical}% · 🧠${s.pillars.mental}%
-        </div>` : ''}
         <div class="log-wins">${winsHtml}</div>
       </div>`;
   }).join('');
