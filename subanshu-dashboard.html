@@ -1427,9 +1427,851 @@
 
 </div><!-- /tab-log -->
 
+<script>
+
+// ===================== TAB NAVIGATION =====================
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  // Auto-open archive when Log tab is selected
+  if (name === 'log') {
+    const body = document.getElementById('archive-body');
+    const icon = document.getElementById('archive-toggle-icon');
+    if (!body.classList.contains('open')) {
+      body.classList.add('open');
+      if (icon) icon.classList.add('open');
+      renderArchive();
+    }
+  }
+}
 
 
+// ===================== DATE & TIME =====================
+function updateDateTime() {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = document.getElementById('header-date');
+  if (d) d.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;
+  const badge = document.getElementById('evening-badge');
+  if (now.getHours() >= 21 && now.getHours() < 23) badge.style.display = 'flex';
+  const mt = document.getElementById('mood-time');
+  if (mt) mt.textContent = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+updateDateTime();
+setInterval(updateDateTime, 30000);
+
+// ===================== FIREBASE + LOCAL STORAGE SYNC =====================
+const FB_CONFIG = {
+  apiKey: "AIzaSyANpS7-0FwYHSZPapRy961cBgHLBd9hPu4",
+  authDomain: "daily-planner-e61fc.firebaseapp.com",
+  projectId: "daily-planner-e61fc",
+  storageBucket: "daily-planner-e61fc.firebasestorage.app",
+  messagingSenderId: "912213843115",
+  appId: "1:912213843115:web:4aba43a5f506297c356bee"
+};
+firebase.initializeApp(FB_CONFIG);
+const db = firebase.firestore();
+db.enablePersistence().catch(() => {});
+const FS_DOC = db.collection('dashboard').doc('main');
+
+let _syncTimer = null;
+let _ignoreNextSnapshot = false;
+
+function setSyncStatus(s) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const states = { synced:'☁️ Synced', syncing:'↻ Syncing...', offline:'📴 Offline', error:'⚠️ Sync error', connecting:'⏳ Connecting...' };
+  const colors = { synced:'var(--teal)', syncing:'var(--text-muted)', offline:'var(--text-muted)', error:'var(--red)', connecting:'var(--text-muted)' };
+  el.textContent = states[s] || s;
+  el.style.color = colors[s] || 'var(--text-muted)';
+}
+
+function save(key, val) {
+  try { localStorage.setItem('sub_' + key, JSON.stringify(val)); } catch(e) {}
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(pushAllToFirestore, 1200);
+  setSyncStatus('syncing');
+}
+
+function load(key, def) {
+  try { const v = localStorage.getItem('sub_' + key); return v !== null ? JSON.parse(v) : def; } catch(e) { return def; }
+}
+
+function pushAllToFirestore() {
+  const data = { _ts: Date.now() };
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k.startsWith('sub_')) continue;
+    try { data[k.slice(4)] = JSON.parse(localStorage.getItem(k)); } catch(e) {}
+  }
+  _ignoreNextSnapshot = true;
+  FS_DOC.set(data, { merge: true })
+    .then(() => { setSyncStatus('synced'); setTimeout(() => _ignoreNextSnapshot = false, 1500); })
+    .catch(() => { setSyncStatus('error'); _ignoreNextSnapshot = false; });
+}
+
+function applyFirestoreData(data) {
+  let changed = false;
+  Object.keys(data).forEach(k => {
+    if (k === '_ts') return;
+    const local = localStorage.getItem('sub_' + k);
+    const incoming = JSON.stringify(data[k]);
+    if (local !== incoming) {
+      try { localStorage.setItem('sub_' + k, incoming); changed = true; } catch(e) {}
+    }
+  });
+  if (changed) {
+    // Re-render all live sections
+    try { renderHabits(); } catch(e) {}
+    try { renderWins(); } catch(e) {}
+    try { updatePL300(); } catch(e) {}
+  
+    try { const bd = load('brainDump',''); if (bd) document.getElementById('brain-dump').value = bd; } catch(e) {}
+    try {
+      const b = load('buckets', null);
+      if (b) ['urgent','week','later','drop'].forEach(bk => {
+        const el = document.getElementById('bucket-'+bk);
+        if (el && b[bk] && b[bk].length) el.innerHTML = b[bk].map(t=>`<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('');
+      });
+    } catch(e) {}
+  }
+}
+
+// Real-time listener — sync from Firestore to this device
+FS_DOC.onSnapshot(doc => {
+  if (_ignoreNextSnapshot) { _ignoreNextSnapshot = false; return; }
+  if (!doc.exists) { setSyncStatus('synced'); return; }
+  const data = doc.data();
+  const fsTs = data._ts || 0;
+  const localTs = parseInt(localStorage.getItem('sub__ts') || '0');
+  setSyncStatus('synced');
+  if (fsTs > localTs) applyFirestoreData(data);
+}, err => {
+  if (err.code === 'unavailable') setSyncStatus('offline');
+  else setSyncStatus('error');
+});
+
+// PWA service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ===================== INTENTION =====================
+function saveIntention() {
+  const v = document.getElementById('intention-input').value.trim();
+  if (v) { save('intention', {text:v,date:new Date().toDateString()}); document.getElementById('intention-input').style.borderBottom = '2px solid var(--red)'; }
+}
+(function(){
+  const s = load('intention', null);
+  if (s && s.date === new Date().toDateString()) document.getElementById('intention-input').value = s.text;
+})();
+
+// ===================== MOOD =====================
+function selectMood(btn, label) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const r = {
+    '🔥 Fired up': "Let's go. Channel that energy — pick ONE priority and charge.",
+    '😤 Focused': "Perfect headspace. Lock in and protect your attention.",
+    '😐 Neutral': "That's fine. Start with one easy task to build momentum.",
+    '😴 Tired': "Be honest. Do what you can. Rest is not failure.",
+    '😰 Anxious': "Breathe. Pick the smallest next action. Just one thing.",
+    '🤯 Scattered': "Let's focus on one thing — which matters most right now?"
+  };
+  document.getElementById('mood-label').textContent = r[label] || label;
+  save('mood', {label, date: new Date().toDateString()});
+}
+(function(){
+  const s = load('mood', null);
+  if (!s || s.date !== new Date().toDateString()) return;
+  document.querySelectorAll('.mood-btn').forEach(b => {
+    if (b.getAttribute('title') && s.label.includes(b.getAttribute('title'))) b.classList.add('selected');
+  });
+})();
 
 
+// ===================== PL-300 =====================
+function toggleModule(el) { el.classList.toggle('done'); updatePL300(); savePL300(); }
+function updatePL300() {
+  const all = document.querySelectorAll('.module-item');
+  const done = document.querySelectorAll('.module-item.done').length;
+  const pct = Math.round((done/all.length)*100);
+  document.getElementById('pl300-bar').style.width = pct+'%';
+  document.getElementById('pl300-done').textContent = done;
+  document.getElementById('pl300-pct-label').textContent = pct+'% done';
+  const left = all.length - done;
+  document.getElementById('pl300-eta').textContent = left > 0 ? `~${left} week${left!==1?'s':''} left` : '🎉 Book your exam!';
+}
+function savePL300() {
+  const states = Array.from(document.querySelectorAll('.module-item')).map(el => el.classList.contains('done'));
+  save('pl300', states);
+}
+(function(){
+  const states = load('pl300', []);
+  const items = document.querySelectorAll('.module-item');
+  states.forEach((done, i) => { if (done && items[i]) items[i].classList.add('done'); });
+  updatePL300();
+})();
+
+// ===================== BRAIN DUMP =====================
+const URGENT_WORDS = ['today','urgent','deadline','asap','due','now','must','call','email','reply','respond','submit','apply','interview','doctor','pay','bill','expire','meeting','tomorrow'];
+const WEEK_WORDS = ['week','this week','review','prepare','schedule','plan','update','follow','send','check','complete','finish','research','draft','meet','write'];
+const LATER_WORDS = ['next month','next week','eventually','future','one day','when','once','consider','explore','look into'];
+const DROP_WORDS = ['maybe','someday','probably','just','might','could if','spare','binge','scroll','random'];
+
+function classify(task) {
+  const t = task.toLowerCase();
+  if (URGENT_WORDS.some(w => t.includes(w))) return 'urgent';
+  if (DROP_WORDS.some(w => t.includes(w)) && !URGENT_WORDS.some(w => t.includes(w)) && !WEEK_WORDS.some(w => t.includes(w))) return 'drop';
+  if (LATER_WORDS.some(w => t.includes(w))) return 'later';
+  if (WEEK_WORDS.some(w => t.includes(w))) return 'week';
+  return 'week';
+}
+
+function sortTasks() {
+  const tasks = document.getElementById('brain-dump').value.split('\n').map(t => t.trim()).filter(t => t.length > 1);
+  if (!tasks.length) {
+    const bd = document.getElementById('brain-dump');
+    bd.style.borderColor = 'var(--red)';
+    bd.placeholder = 'Empty your head first, Captain — one task per line!';
+    setTimeout(() => { bd.style.borderColor = ''; bd.placeholder = 'Empty your head, Captain...\nOne task per line.'; }, 2500);
+    return;
+  }
+  const buckets = {urgent:[], week:[], later:[], drop:[]};
+  tasks.forEach(t => buckets[classify(t)].push(t));
+  ['urgent','week','later','drop'].forEach(b => {
+    const el = document.getElementById('bucket-'+b);
+    el.innerHTML = buckets[b].length
+      ? buckets[b].map(t => `<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('')
+      : '<div class="bucket-empty">Nothing here</div>';
+  });
+  save('buckets', buckets);
+
+  // Feed urgent (then week) tasks into One Thing picker
+  const oneThingPool = [...buckets.urgent, ...buckets.week];
+  showOneThing(oneThingPool);
+}
+
+function clearBuckets() {
+  ['urgent','week','later','drop'].forEach(b => { document.getElementById('bucket-'+b).innerHTML = '<div class="bucket-empty">Nothing yet</div>'; });
+  document.getElementById('brain-dump').value = '';
+  save('buckets', null);
+  save('brainDump', '');
+}
+
+// Auto-save raw brain dump text as you type → syncs to Firestore → weekly task reads it
+(function(){
+  const bd = document.getElementById('brain-dump');
+  const saved = load('brainDump', '');
+  if (saved) bd.value = saved;
+  let _bdTimer = null;
+  bd.addEventListener('input', () => {
+    clearTimeout(_bdTimer);
+    _bdTimer = setTimeout(() => save('brainDump', bd.value), 800);
+  });
+})();
+
+(function(){
+  const b = load('buckets', null);
+  if (!b) return;
+  ['urgent','week','later','drop'].forEach(bk => {
+    const el = document.getElementById('bucket-'+bk);
+    if (b[bk] && b[bk].length) el.innerHTML = b[bk].map(t => `<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('');
+  });
+  // Restore one thing picker if tasks exist
+  const oneThingPool = [...(b.urgent||[]), ...(b.week||[])];
+  if (oneThingPool.length) showOneThing(oneThingPool);
+})();
+
+// ===================== FOCUS TIMER =====================
+let timerSeconds = 25*60, timerMax = 25*60, timerRunning = false, timerInterval = null, sessionCount = 0;
+function setTimerMode(mins) {
+  resetTimer();
+  timerMax = mins*60; timerSeconds = timerMax;
+  updateTimerDisplay();
+  const labels = {'25':'Pomodoro','50':'Deep Work — Gear Fourth','15':'Quick Sprint'};
+  document.getElementById('timer-label').textContent = labels[mins] || 'Focus';
+}
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds/60), s = timerSeconds%60;
+  document.getElementById('timer-display').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function startTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('timer-start-btn').textContent = '▶ Resume';
+    document.getElementById('timer-start-btn').className = 'timer-btn timer-start';
+  } else {
+    timerRunning = true;
+    document.getElementById('timer-start-btn').textContent = '⏸ Pause';
+    document.getElementById('timer-start-btn').className = 'timer-btn timer-pause';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateTimerDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        sessionCount++;
+        document.getElementById('session-count').textContent = sessionCount;
+        const dots = document.querySelectorAll('.session-dot');
+        if (sessionCount <= 4) dots[sessionCount-1].classList.add('filled');
+        document.getElementById('timer-start-btn').textContent = '▶ Start';
+        document.getElementById('timer-start-btn').className = 'timer-btn timer-start';
+        timerSeconds = timerMax; updateTimerDisplay();
+        const doneMsg = document.getElementById('timer-done-msg');
+        doneMsg.style.display = 'block';
+        setTimeout(() => { doneMsg.style.display = 'none'; }, 5000);
+      }
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerSeconds = timerMax;
+  updateTimerDisplay();
+  document.getElementById('timer-start-btn').textContent = '▶ Start';
+  document.getElementById('timer-start-btn').className = 'timer-btn timer-start';
+}
+
+// ===================== WIN LOG =====================
+let wins = load('wins_'+new Date().toDateString(), []);
+function renderWins() {
+  const list = document.getElementById('win-list');
+  document.getElementById('win-count').textContent = wins.length + (wins.length===1?' win':' wins');
+  if (!wins.length) { list.innerHTML = '<div class="win-empty" id="win-empty">No victories yet. Go find your One Piece.</div>'; return; }
+  list.innerHTML = wins.map((w,i) => `<div class="win-item"><span class="win-star">⭐</span><span>${w}</span><span class="win-del" onclick="removeWin(${i})">✕</span></div>`).join('');
+}
+function addWin() {
+  const inp = document.getElementById('win-input');
+  const v = inp.value.trim();
+  if (!v) return;
+  wins.push(v); save('wins_'+new Date().toDateString(), wins);
+  renderWins(); inp.value = '';
+}
+function removeWin(i) { wins.splice(i,1); save('wins_'+new Date().toDateString(), wins); renderWins(); }
+renderWins();
+
+// ===================== MINDFUL BREATHING =====================
+const BREATH_PHASES = [
+  { name: 'Inhale',  dur: 4, cls: 'phase-in',    pill: 'pp-in'    },
+  { name: 'Hold',    dur: 4, cls: 'phase-hold',   pill: 'pp-hold'  },
+  { name: 'Exhale',  dur: 4, cls: 'phase-out',    pill: 'pp-out'   },
+  { name: 'Hold',    dur: 4, cls: 'phase-hold2',  pill: 'pp-hold2' },
+];
+const MINDFUL_QUOTES = [
+  '"I don\'t want to conquer anything. I just think the guy with the most freedom in this whole ocean... is the Pirate King."',
+  '"Bring on the hardship. It\'s preferred in a path of carnage." — Roronoa Zoro',
+  '"Power isn\'t determined by your size, but by the size of your heart and dreams." — Monkey D. Luffy',
+  '"When do you think people die? When they are shot through the heart? No. When they have a disease? No... When they\'re forgotten." — Dr. Hiluluk',
+  '"No matter how hard or impossible it is, never lose sight of your goal." — Monkey D. Luffy',
+  '"One may stray from the path of a man. One may stray from the path of a woman. But there is no straying from the path of a human." — Bentham',
+];
+
+let breathRunning = false;
+let breathPhaseIdx = 0;
+let breathPhaseCount = 0;
+let breathTotalSeconds = 5 * 60;
+let breathTotalInterval = null;
+let breathPhaseInterval = null;
+let breathCycleTimeout = null;
+
+function toggleBreathing() {
+  if (breathRunning) {
+    stopBreathing();
+  } else {
+    startBreathing();
+  }
+}
+
+function startBreathing() {
+  breathRunning = true;
+  const btn = document.getElementById('breath-start-btn');
+  btn.textContent = '⏹ Stop';
+  btn.classList.add('active');
+  document.getElementById('breath-complete-msg').style.display = 'none';
+
+  // Randomise quote
+  const q = MINDFUL_QUOTES[Math.floor(Math.random() * MINDFUL_QUOTES.length)];
+  document.getElementById('mindful-quote').textContent = q;
+
+  // Total countdown
+  breathTotalInterval = setInterval(() => {
+    breathTotalSeconds--;
+    const m = Math.floor(breathTotalSeconds / 60);
+    const s = breathTotalSeconds % 60;
+    const el = document.getElementById('breath-total-timer');
+    if (el) el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    if (breathTotalSeconds <= 0) { finishBreathing(); }
+  }, 1000);
+
+  runPhase(0);
+}
+
+function runPhase(idx) {
+  if (!breathRunning) return;
+  const phase = BREATH_PHASES[idx % BREATH_PHASES.length];
+  const circle = document.getElementById('breath-circle');
+  const phaseEl = document.getElementById('breath-phase');
+  const countEl = document.getElementById('breath-count');
+
+  // Update pill highlights
+  ['pp-in','pp-hold','pp-out','pp-hold2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = el.className.replace(' active-phase','');
+  });
+  const activePill = document.getElementById(phase.pill);
+  if (activePill) activePill.classList.add('active-phase');
+
+  // Update animation class
+  circle.className = 'breath-circle ' + phase.cls;
+  phaseEl.textContent = phase.name;
+
+  let count = phase.dur;
+  countEl.textContent = count;
+  clearInterval(breathPhaseInterval);
+  breathPhaseInterval = setInterval(() => {
+    count--;
+    countEl.textContent = count > 0 ? count : '';
+    if (count <= 0) {
+      clearInterval(breathPhaseInterval);
+    }
+  }, 1000);
+
+  breathCycleTimeout = setTimeout(() => {
+    if (breathRunning) runPhase(idx + 1);
+  }, phase.dur * 1000);
+}
+
+function stopBreathing() {
+  breathRunning = false;
+  clearInterval(breathTotalInterval);
+  clearInterval(breathPhaseInterval);
+  clearTimeout(breathCycleTimeout);
+  const btn = document.getElementById('breath-start-btn');
+  btn.textContent = '▶ Begin Reset';
+  btn.classList.remove('active');
+  const circle = document.getElementById('breath-circle');
+  circle.className = 'breath-circle';
+  document.getElementById('breath-phase').textContent = 'Tap to begin';
+  document.getElementById('breath-count').textContent = '—';
+  ['pp-in','pp-hold','pp-out','pp-hold2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active-phase');
+  });
+  breathTotalSeconds = 5 * 60;
+  const tEl = document.getElementById('breath-total-timer');
+  if (tEl) tEl.textContent = '5:00';
+}
+
+function finishBreathing() {
+  stopBreathing();
+  document.getElementById('breath-complete-msg').style.display = 'block';
+  document.getElementById('breath-start-btn').style.display = 'none';
+}
+
+function toggleLofi() {
+  const c = document.getElementById('lofi-embed-container');
+  c.classList.toggle('open');
+}
+
+// ===================== ONE THING PICKER =====================
+function showOneThing(tasks) {
+  const wrap = document.getElementById('one-thing-wrap');
+  const opts = document.getElementById('one-thing-options');
+  const locked = document.getElementById('one-thing-locked');
+  const saved = load('one_thing_' + new Date().toDateString(), null);
+
+  if (!tasks || tasks.length === 0) { wrap.classList.remove('show'); return; }
+  wrap.classList.add('show');
+
+  if (saved) {
+    opts.style.display = 'none';
+    locked.classList.add('show');
+    document.getElementById('one-thing-display').textContent = '🎯 ' + saved;
+    return;
+  }
+
+  locked.classList.remove('show');
+  opts.style.display = 'flex';
+  opts.style.flexDirection = 'column';
+
+  // Show top urgent tasks, fallback to week tasks
+  const shown = tasks.slice(0, 5);
+  opts.innerHTML = shown.map(t => `<div class="one-thing-option" onclick="lockOneThing('${t.replace(/'/g,"&#39;")}')">${t}</div>`).join('');
+}
+
+function lockOneThing(task) {
+  save('one_thing_' + new Date().toDateString(), task);
+  const opts = document.getElementById('one-thing-options');
+  const locked = document.getElementById('one-thing-locked');
+  opts.style.display = 'none';
+  locked.classList.add('show');
+  document.getElementById('one-thing-display').textContent = '🎯 ' + task;
+}
+
+function resetOneThing() {
+  save('one_thing_' + new Date().toDateString(), null);
+  document.getElementById('one-thing-locked').classList.remove('show');
+  document.getElementById('one-thing-options').style.display = 'flex';
+}
+
+// ===================== DAILY HABITS =====================
+const DEFAULT_HABITS = [
+  { id: 'h1', emoji: '🎯', name: 'Set morning intention' },
+  { id: 'h2', emoji: '📚', name: 'PL-300 study (30 min)' },
+  { id: 'h3', emoji: '🏋️', name: 'Gym / workout' },
+  { id: 'h4', emoji: '💰', name: 'Crypto morning check' },
+  { id: 'h5', emoji: '📋', name: 'Brain dump + sort tasks' },
+  { id: 'h6', emoji: '💼', name: '1 job action (apply/LinkedIn)' },
+  { id: 'h7', emoji: '📵', name: 'No doomscroll before noon' },
+  { id: 'h8', emoji: '🌙', name: '9PM wind-down' },
+];
+
+let selectedEmoji = '📌';
+const todayKey = new Date().toDateString();
+
+function getHabits() { return load('habits_list', DEFAULT_HABITS); }
+function getChecked() { return load('habits_checked_' + todayKey, {}); }
+function getStreaks() { return load('habits_streaks', {}); }
+
+function saveHabits(h) { save('habits_list', h); }
+function saveChecked(c) { save('habits_checked_' + todayKey, c); }
+function saveStreaks(s) { save('habits_streaks', s); }
+
+function renderHabits() {
+  const habits = getHabits();
+  const checked = getChecked();
+  const streaks = getStreaks();
+  const grid = document.getElementById('habit-grid');
+  const done = habits.filter(h => checked[h.id]).length;
+  const total = habits.length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById('daily-progress-fill').style.width = pct + '%';
+  document.getElementById('daily-progress-label').textContent = pct + '% complete';
+  document.getElementById('habit-done-count').textContent = `${done}/${total} done`;
+  const allDoneMsg = document.getElementById('all-done-msg');
+  allDoneMsg.style.display = (done === total && total > 0) ? 'block' : 'none';
+
+  grid.innerHTML = habits.map((h, idx) => {
+    const isDone = !!checked[h.id];
+    const streak = streaks[h.id] || 0;
+    const streakClass = streak >= 3 ? 'hot' : '';
+    const streakText = streak > 0
+      ? `${streak >= 3 ? '🔥' : '⚡'} ${streak} day streak`
+      : 'Start your streak!';
+    return `
+      <div class="habit-tile${isDone ? ' done' : ''}" id="tile-${h.id}" onclick="toggleHabit('${h.id}', event)">
+        <div class="habit-check">${isDone ? '✓' : ''}</div>
+        <div class="habit-info">
+          <span class="habit-name">${h.emoji} ${h.name}</span>
+          <span class="habit-streak ${streakClass}">${streakText}</span>
+        </div>
+        <div class="habit-actions" onclick="event.stopPropagation()">
+          <button class="habit-action-btn" onclick="startEditHabit('${h.id}')" title="Rename">✏️</button>
+          <button class="habit-action-btn" onclick="deleteHabit('${h.id}')" title="Delete">✕</button>
+        </div>
+        <div class="habit-edit-inline" id="edit-${h.id}">
+          <input class="habit-edit-field" id="editfield-${h.id}" value="${h.name}" maxlength="40" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')saveEditHabit('${h.id}');if(event.key==='Escape')cancelEditHabit('${h.id}')" />
+          <button class="habit-save-btn" onclick="saveEditHabit('${h.id}')" title="Save">✓</button>
+          <button class="habit-cancel-btn" onclick="cancelEditHabit('${h.id}')" title="Cancel">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleHabit(id, event) {
+  if (event && event.target.closest('.habit-edit-inline')) return;
+  const checked = getChecked();
+  const streaks = getStreaks();
+  const wasChecked = !!checked[id];
+  if (wasChecked) {
+    delete checked[id];
+    // Don't break streak on uncheck — that's harsh
+  } else {
+    checked[id] = true;
+    // Update streak: check if was checked yesterday
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    const yesterdayKey = yest.toDateString();
+    const yesterdayChecked = load('habits_checked_' + yesterdayKey, {});
+    if (yesterdayChecked[id]) {
+      streaks[id] = (streaks[id] || 0) + 1;
+    } else {
+      streaks[id] = 1; // start fresh streak
+    }
+    saveStreaks(streaks);
+  }
+  saveChecked(checked);
+  renderHabits();
+}
+
+function deleteHabit(id) {
+  const habits = getHabits().filter(h => h.id !== id);
+  saveHabits(habits);
+  renderHabits();
+}
+
+function startEditHabit(id) {
+  document.querySelectorAll('.habit-edit-inline').forEach(el => el.classList.remove('show'));
+  const el = document.getElementById('edit-' + id);
+  if (el) { el.classList.add('show'); el.querySelector('input').focus(); }
+}
+
+function saveEditHabit(id) {
+  const field = document.getElementById('editfield-' + id);
+  const val = field ? field.value.trim() : '';
+  if (!val) return;
+  const habits = getHabits();
+  const h = habits.find(h => h.id === id);
+  if (h) { h.name = val; saveHabits(habits); }
+  renderHabits();
+}
+
+function cancelEditHabit(id) {
+  const el = document.getElementById('edit-' + id);
+  if (el) el.classList.remove('show');
+}
+
+function pickEmoji(el, emoji) {
+  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedEmoji = emoji;
+  document.getElementById('selected-emoji').textContent = emoji;
+}
+
+function addHabit() {
+  const inp = document.getElementById('new-habit-input');
+  const name = inp.value.trim();
+  if (!name) return;
+  const habits = getHabits();
+  habits.push({ id: 'h' + Date.now(), emoji: selectedEmoji, name });
+  saveHabits(habits);
+  renderHabits();
+  inp.value = '';
+}
+
+function resetHabitsNow() {
+  saveChecked({});
+  renderHabits();
+}
+
+renderHabits();
+
+// ===================== CAPTAIN'S LOG ARCHIVE =====================
+const MOOD_EMOJI = { '🔥 Fired up':'🔥', '😤 Focused':'😤', '😐 Neutral':'😐', '😴 Tired':'😴', '😰 Anxious':'😰', '🤯 Scattered':'🤯' };
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function getSnapshots() { return load('log_snapshots', {}); }
+function saveSnapshots(s) { save('log_snapshots', s); }
+
+function buildTodaySnapshot() {
+  const today = new Date().toDateString();
+  const habits = getHabits();
+  const checked = getChecked();
+  const habitsDone = habits.filter(h => checked[h.id]).length;
+  const moodData = load('mood', null);
+  const intentionData = load('intention', null);
+  const winsData = load('wins_' + today, []);
+  const oneThing = load('one_thing_' + today, null);
+
+  return {
+    date: today,
+    mood: moodData ? moodData.label : null,
+    intention: intentionData ? intentionData.text : null,
+    habitsTotal: habits.length,
+    habitsDone,
+    wins: winsData,
+    oneThing,
+  };
+}
+
+function saveTodaySnapshot() {
+  const snap = buildTodaySnapshot();
+  const all = getSnapshots();
+  all[snap.date] = snap;
+  saveSnapshots(all);
+  renderArchive();
+  const flash = document.getElementById('save-flash');
+  flash.style.display = 'flex';
+  setTimeout(() => { flash.style.display = 'none'; }, 2500);
+}
+
+// Auto-save snapshot on page load if we have meaningful data
+(function autoSnapshot() {
+  const today = new Date().toDateString();
+  const winsData = load('wins_' + today, []);
+  const moodData = load('mood', null);
+  if ((winsData.length > 0 || moodData) && moodData && moodData.date === today) {
+    const all = getSnapshots();
+    // Always update today's auto-snapshot silently
+    all[today] = buildTodaySnapshot();
+    all[today]._auto = true;
+    saveSnapshots(all);
+  }
+})();
+
+function toggleArchive() {
+  const body = document.getElementById('archive-body');
+  const icon = document.getElementById('archive-toggle-icon');
+  const isOpen = body.classList.toggle('open');
+  icon.classList.toggle('open', isOpen);
+  if (isOpen) renderArchive();
+}
+
+function renderArchive() {
+  const all = getSnapshots();
+  const dates = Object.keys(all).sort((a, b) => new Date(b) - new Date(a));
+
+  renderWeekStrip(all);
+  renderWeekStats(all);
+
+  const container = document.getElementById('log-entries');
+  if (dates.length === 0) {
+    container.innerHTML = '<div class="archive-empty">No past logs yet. Hit "Save Today" at the end of your day to start your archive.</div>';
+    return;
+  }
+
+  container.innerHTML = dates.map(d => {
+    const s = all[d];
+    const dateObj = new Date(d);
+    const pct = s.habitsTotal ? Math.round((s.habitsDone / s.habitsTotal) * 100) : 0;
+    const moodEmoji = s.mood ? (MOOD_EMOJI[s.mood] || '❓') : '—';
+    const winsHtml = s.wins && s.wins.length
+      ? s.wins.map(w => `<span class="log-win-chip">⭐ ${w}</span>`).join('')
+      : '<span class="log-no-wins">No wins logged</span>';
+    const isToday = d === new Date().toDateString();
+    return `
+      <div class="log-entry">
+        <div class="log-entry-header">
+          <div class="log-entry-date">${DAY_NAMES[dateObj.getDay()]}, ${dateObj.getDate()} ${MONTH_NAMES[dateObj.getMonth()]} ${dateObj.getFullYear()} ${isToday ? '· <span style="color:var(--red)">Today</span>' : ''}</div>
+          <div class="log-entry-mood">${moodEmoji} ${s.mood || 'No mood logged'}</div>
+        </div>
+        ${s.intention ? `<div class="log-intention">"${s.intention}"</div>` : ''}
+        ${s.oneThing ? `<div class="log-one-thing">🎯 One Thing: ${s.oneThing}</div>` : ''}
+        <div class="log-habit-bar-row">
+          <div style="font-size:0.68rem;font-weight:800;color:var(--text-muted);white-space:nowrap;">Habits ${s.habitsDone}/${s.habitsTotal}</div>
+          <div class="log-habit-mini-bar"><div class="log-habit-mini-fill" style="width:${pct}%"></div></div>
+          <div class="log-habit-pct">${pct}%</div>
+        </div>
+        <div class="log-wins">${winsHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderWeekStrip(all) {
+  const strip = document.getElementById('week-strip');
+  const today = new Date();
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    days.push(d);
+  }
+  strip.innerHTML = days.map(d => {
+    const key = d.toDateString();
+    const snap = all[key];
+    const isToday = key === today.toDateString();
+    const pct = snap && snap.habitsTotal ? Math.round((snap.habitsDone / snap.habitsTotal) * 100) : 0;
+    const moodEmoji = snap && snap.mood ? (MOOD_EMOJI[snap.mood] || '?') : '';
+    return `<div class="week-day-card ${snap ? 'has-data' : ''} ${isToday ? 'today-card' : ''}" ${snap ? `onclick="document.getElementById('archive-body').classList.add('open')"` : ''}>
+      <div class="week-day-name">${DAY_NAMES[d.getDay()]}</div>
+      <div class="week-day-date">${d.getDate()} ${MONTH_NAMES[d.getMonth()]}</div>
+      ${snap ? `
+        <div class="week-day-mood">${moodEmoji}</div>
+        <div class="week-habit-ring">
+          <div class="ring-fill" style="height:${pct}%"></div>
+          <span>${pct}%</span>
+        </div>
+        <div class="week-win-count">${snap.wins ? snap.wins.length : 0} ⭐</div>
+      ` : `<div class="week-empty-label">${isToday ? 'Today' : 'No log'}</div>`}
+    </div>`;
+  }).join('');
+}
+
+function renderWeekStats(all) {
+  const today = new Date();
+  const weekSnaps = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const snap = all[d.toDateString()];
+    if (snap) weekSnaps.push(snap);
+  }
+  if (!weekSnaps.length) return;
+
+  const avgHabits = weekSnaps.length
+    ? Math.round(weekSnaps.reduce((a, s) => a + (s.habitsTotal ? s.habitsDone / s.habitsTotal * 100 : 0), 0) / weekSnaps.length)
+    : 0;
+  const totalWins = weekSnaps.reduce((a, s) => a + (s.wins ? s.wins.length : 0), 0);
+  const moodCount = {};
+  weekSnaps.forEach(s => { if (s.mood) moodCount[s.mood] = (moodCount[s.mood] || 0) + 1; });
+  const topMood = Object.keys(moodCount).sort((a,b) => moodCount[b]-moodCount[a])[0];
+  const topMoodEmoji = topMood ? (MOOD_EMOJI[topMood] || '?') : '—';
+
+  document.getElementById('ws-habit-avg').textContent = weekSnaps.length ? avgHabits + '%' : '—';
+  document.getElementById('ws-wins-total').textContent = weekSnaps.length ? totalWins : '—';
+  document.getElementById('ws-days-logged').textContent = weekSnaps.length + '/7';
+  document.getElementById('ws-top-mood').textContent = topMoodEmoji;
+}
+
+function exportAllData() {
+  const all = getSnapshots();
+  const dataStr = JSON.stringify({ exported: new Date().toISOString(), logs: all }, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `captains-log-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===================== TRAINING HUB PROGRESS SYNC =====================
+(function syncTrainingProgress() {
+  try {
+    const checked = JSON.parse(localStorage.getItem('th_checked') || '{}');
+    const doneCount = Object.values(checked).filter(Boolean).length;
+    // Total curated videos: 29 PBI + 25 Excel = 54
+    const TOTAL_CURATED = 54;
+    const pct = Math.min(100, Math.round(doneCount / TOTAL_CURATED * 100));
+    const bar = document.getElementById('dashboard-training-bar');
+    const label = document.getElementById('dashboard-training-pct');
+    if (bar) bar.style.width = pct + '%';
+    if (label) label.textContent = doneCount + ' videos · ' + pct + '% done';
+  } catch(e) {}
+})();
+
+// ===================== CRYPTO =====================
+async function loadCrypto() {
+  const c = document.getElementById('crypto-container');
+  c.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.82rem;font-weight:700;padding:10px 0;">Charting the seas... 🌊</div>';
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,chainlink&vs_currencies=gbp&include_24hr_change=true');
+    const data = await res.json();
+    const coins = [
+      {id:'bitcoin', name:'Bitcoin', ticker:'BTC', icon:'₿', color:'#f7931a', bg:'#fff7eb'},
+      {id:'ethereum', name:'Ethereum', ticker:'ETH', icon:'Ξ', color:'#627eea', bg:'#eef0ff'},
+      {id:'solana', name:'Solana', ticker:'SOL', icon:'◎', color:'#9945ff', bg:'#f5eeff'},
+      {id:'chainlink', name:'Chainlink', ticker:'LINK', icon:'⬡', color:'#1a6ada', bg:'#eef4ff'},
+    ];
+    c.innerHTML = coins.map(coin => {
+      const p = data[coin.id];
+      if (!p) return '';
+      const price = p.gbp ? '£' + p.gbp.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}) : 'N/A';
+      const chg = p.gbp_24h_change ? p.gbp_24h_change.toFixed(2) : '0.00';
+      const pos = parseFloat(chg) >= 0;
+      return `<div class="crypto-row">
+        <div class="crypto-icon" style="background:${coin.bg};color:${coin.color}">${coin.icon}</div>
+        <div class="crypto-name"><strong>${coin.name}</strong><span>${coin.ticker}</span></div>
+        <div class="crypto-price ${pos?'positive':'negative'}">${price}<small>${pos?'+':''}${chg}%</small></div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    c.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.8rem;font-weight:700;padding:10px 0;">Sea fog — check your connection</div>';
+  }
+}
+
+</script>
 </body>
 </html>
