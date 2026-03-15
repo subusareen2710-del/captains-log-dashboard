@@ -1,0 +1,83 @@
+name: Validate Dashboard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: HTML & Asset Validation
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          for f in subanshu-dashboard.html training-hub.html manifest.json sw.js index.html _redirects; do
+            [ -f "$f" ] || { echo "MISSING: $f"; exit 1; }
+          done
+          echo "✅ All required files present"
+
+      - name: Validate manifest.json
+        run: |
+          python3 -c "import json; json.load(open('manifest.json'))" && echo "✅ manifest.json is valid JSON"
+
+      - name: Check Firebase config intact
+        run: |
+          grep -q "AIzaSy" subanshu-dashboard.html || { echo "❌ Firebase API key missing in dashboard"; exit 1; }
+          grep -q "AIzaSy" training-hub.html || { echo "❌ Firebase API key missing in training hub"; exit 1; }
+          echo "✅ Firebase config present"
+
+      - name: Check service worker registration
+        run: |
+          grep -q "register('sw.js')" subanshu-dashboard.html || { echo "❌ SW registration missing"; exit 1; }
+          echo "✅ Service worker registration present"
+
+      - name: Check balanced script tags
+        run: |
+          python3 - <<'EOF'
+          import re, sys
+          for fname in ['subanshu-dashboard.html', 'training-hub.html']:
+              src = open(fname).read()
+              opens = len(re.findall(r'<script', src))
+              closes = len(re.findall(r'</script>', src))
+              if opens != closes:
+                  print(f"❌ {fname}: mismatched <script> tags ({opens} open, {closes} close)")
+                  sys.exit(1)
+              print(f"✅ {fname}: script tags balanced ({opens}/{closes})")
+          EOF
+
+      - name: Check no placeholder text
+        run: |
+          for f in subanshu-dashboard.html training-hub.html; do
+            if grep -q "YOUR_\|PLACEHOLDER\b" "$f"; then
+              echo "❌ Placeholder text found in $f"
+              exit 1
+            fi
+          done
+          echo "✅ No placeholder text found"
+
+      - name: Check YouTube links are real URLs
+        run: |
+          python3 - <<'EOF'
+          import re
+          src = open('training-hub.html').read()
+          links = re.findall(r'href="(https://[^"]+)"', src)
+          bad = [l for l in links if 'youtube' in l and 'watch?v=' not in l and 'youtube.com/@' not in l and 'youtu.be' not in l and 'youtube.com/playlist' not in l]
+          if bad:
+              print(f"⚠️  Non-standard YouTube links: {bad[:5]}")
+          else:
+              print(f"✅ YouTube links look valid ({len(links)} total links checked)")
+          EOF
+
+      - name: Validate sw.js cache version
+        run: |
+          grep -q "CACHE = 'captains-log" sw.js || { echo "❌ Cache version string missing in sw.js"; exit 1; }
+          grep -q "subanshu-dashboard.html" sw.js || { echo "❌ Dashboard not in SW cache list"; exit 1; }
+          echo "✅ Service worker cache config valid"
+
+      - name: All checks passed
+        run: echo "🏴‍☠️ All validation checks passed — safe to deploy, Captain!"

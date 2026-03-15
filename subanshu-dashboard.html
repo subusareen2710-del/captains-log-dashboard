@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Captain Subanshu's Log 🏴‍☠️</title>
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a3a6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Captain's Log">
+<link rel="apple-touch-icon" href="icon-512.svg">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #fdf6ec;
+    --surface: #ffffff;
+    --surface2: #fef9f3;
+    --border: #f0dfc5;
+    --border2: #e8cfa8;
+
+    /* One Piece palette */
+    --red: #e63228;
+    --red-light: #fff0ef;
+    --gold: #f5a623;
+    --gold-light: #fffbef;
+    --navy: #1a3a6b;
+    --navy-light: #eef2fb;
+    --teal: #00a89c;
+    --teal-light: #edfaf9;
+    --ocean: #1e88e5;
+    --orange: #f97316;
+
+    --text: #2c1810;
+    --text-muted: #8b6e5a;
+    --text-dim: #c9b09a;
+
+    --radius: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 2px 12px rgba(44,24,16,0.07);
+    --shadow-hover: 0 6px 20px rgba(44,24,16,0.13);
+  }
+
+  body {
+    font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(245,166,35,0.06) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(230,50,40,0.05) 0%, transparent 40%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L32 18 L45 12 L38 24 L52 26 L40 33 L48 45 L35 40 L30 53 L25 40 L12 45 L20 33 L8 26 L22 24 L15 12 L28 18 Z' fill='none' stroke='%23f5a623' stroke-width='0.4' opacity='0.15'/%3E%3C/svg%3E");
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+    line-height: 1.5;
+  }
+
+  /* ======== HEADER ======== */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .luffy-hat {
+    font-size: 2.8rem;
+    line-height: 1;
+    filter: drop-shadow(2px 3px 0px rgba(230,50,40,0.3));
+    animation: wobble 3s ease-in-out infinite;
+  }
+  @keyframes wobble {
+    0%,100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+  .header-titles h1 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .header-titles h1 span { color: var(--red); }
+  .header-titles .subtitle {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .date-badge {
+    background: var(--navy);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .evening-badge {
+    background: linear-gradient(135deg, var(--navy), #2d5a9e);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    gap: 5px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+  /* ======== WANTED POSTER INTENTION ======== */
+  .intention-bar {
+    background: var(--gold-light);
+    border: 2px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .intention-bar::before {
+    content: '🏴‍☠️';
+    position: absolute;
+    right: -8px;
+    bottom: -10px;
+    font-size: 3rem;
+    opacity: 0.08;
+  }
+  .intention-bar label {
+    color: var(--navy);
+    font-weight: 900;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .intention-bar input {
+    flex: 1;
+    min-width: 200px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+  }
+  .intention-bar input::placeholder { color: var(--text-dim); font-weight: 600; }
+  .intention-save {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .intention-save:hover { background: var(--red); transform: scale(1.04); }
+
+  /* ======== GRID ======== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 18px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 18px; }
+  @media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+  /* ======== CARD ======== */
+  .card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow-hover); }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .card-title .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  /* ======== MOOD ======== */
+  .mood-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .mood-btn {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .mood-btn:hover { border-color: var(--gold); transform: scale(1.1); background: var(--gold-light); }
+  .mood-btn.selected { border-color: var(--red); background: var(--red-light); transform: scale(1.08); }
+  .mood-label { text-align: center; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 10px; min-height: 18px; }
+
+  /* ======== GOAL PILLARS (Straw Hat Crew themed) ======== */
+  .pillar-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .pillar-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .pillar-card::after {
+    content: attr(data-crew);
+    position: absolute;
+    bottom: 6px;
+    right: 10px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.35;
+    color: var(--text);
+  }
+  .pillar-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .pillar-career::before { background: linear-gradient(90deg, var(--red), var(--orange)); }
+  .pillar-finance::before { background: linear-gradient(90deg, var(--gold), #f5d020); }
+  .pillar-physical::before { background: linear-gradient(90deg, var(--teal), #26d0ce); }
+  .pillar-mental::before { background: linear-gradient(90deg, var(--navy), var(--ocean)); }
+
+  .pillar-icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .pillar-name { font-size: 0.68rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 4px; }
+  .pillar-focus { font-size: 0.83rem; font-weight: 700; color: var(--text); margin-bottom: 12px; min-height: 34px; line-height: 1.4; }
+  .progress-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; height: 7px; overflow: hidden; margin-bottom: 6px; }
+  .progress-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+  .pillar-career .progress-fill { background: linear-gradient(90deg, var(--red), var(--orange)); }
+  .pillar-finance .progress-fill { background: linear-gradient(90deg, var(--gold), #f5d020); }
+  .pillar-physical .progress-fill { background: linear-gradient(90deg, var(--teal), #26d0ce); }
+  .pillar-mental .progress-fill { background: linear-gradient(90deg, var(--navy), var(--ocean)); }
+  .pillar-percent { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 10px; }
+  .pillar-input { display: flex; align-items: center; gap: 8px; }
+  .pillar-input input[type="range"] { flex: 1; height: 4px; cursor: pointer; }
+  .pillar-career .pillar-input input { accent-color: var(--red); }
+  .pillar-finance .pillar-input input { accent-color: var(--gold); }
+  .pillar-physical .pillar-input input { accent-color: var(--teal); }
+  .pillar-mental .pillar-input input { accent-color: var(--navy); }
+  .pillar-val { font-size: 0.78rem; font-weight: 900; min-width: 28px; text-align: right; }
+  .pillar-career .pillar-val { color: var(--red); }
+  .pillar-finance .pillar-val { color: var(--gold); }
+  .pillar-physical .pillar-val { color: var(--teal); }
+  .pillar-mental .pillar-val { color: var(--navy); }
+
+  /* ======== PL-300 ======== */
+  .pl300-progress { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; height: 10px; overflow: hidden; margin-bottom: 10px; }
+  .pl300-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--gold)); border-radius: 6px; transition: width 0.4s; }
+  .pl300-stats { display: flex; justify-content: space-between; font-size: 0.73rem; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; }
+  .pl300-stats span { color: var(--red); }
+  .pl300-modules { display: flex; flex-direction: column; gap: 7px; max-height: 310px; overflow-y: auto; }
+  .module-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .module-item:hover { border-color: var(--gold); background: var(--gold-light); }
+  .module-item.done { opacity: 0.5; background: #f5faf5; border-color: #c8e6c9; }
+  .module-item.done .module-name { text-decoration: line-through; color: var(--text-muted); }
+  .module-check {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border2);
+    border-radius: 5px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: white;
+  }
+  .module-item.done .module-check { background: var(--teal); border-color: var(--teal); }
+  .module-check::after { content: '✓'; color: white; font-size: 11px; font-weight: 900; display: none; }
+  .module-item.done .module-check::after { display: block; }
+  .module-name { font-size: 0.83rem; font-weight: 700; flex: 1; color: var(--text); }
+  .module-time { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); background: white; border: 1px solid var(--border); padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+
+  /* ======== BRAIN DUMP ======== */
+  .brain-dump-area {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Nunito', inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 12px;
+    resize: none;
+    outline: none;
+    line-height: 1.7;
+    transition: border-color 0.2s;
+  }
+  .brain-dump-area:focus { border-color: var(--gold); background: var(--gold-light); }
+  .brain-dump-area::placeholder { color: var(--text-dim); font-weight: 600; }
+  .sort-btn {
+    margin-top: 10px;
+    background: linear-gradient(135deg, var(--red), #c0392b);
+    color: white;
+    border: none;
+    padding: 11px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 900;
+    font-size: 0.85rem;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    font-family: 'Nunito', inherit;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 12px rgba(230,50,40,0.25);
+  }
+  .sort-btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(230,50,40,0.35); }
+
+  /* ======== BUCKETS ======== */
+  .buckets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 900px) { .buckets { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 500px) { .buckets { grid-template-columns: 1fr; } }
+
+  .bucket { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px; min-height: 110px; }
+  .bucket-label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .bucket-urgent { border-top: 4px solid var(--red); }
+  .bucket-urgent .bucket-label { color: var(--red); }
+  .bucket-week { border-top: 4px solid var(--gold); }
+  .bucket-week .bucket-label { color: var(--gold); }
+  .bucket-later { border-top: 4px solid var(--teal); }
+  .bucket-later .bucket-label { color: var(--teal); }
+  .bucket-drop { border-top: 4px solid var(--text-dim); }
+  .bucket-drop .bucket-label { color: var(--text-muted); }
+
+  .bucket-items { display: flex; flex-direction: column; gap: 5px; }
+  .bucket-item {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    user-select: none;
+  }
+  .bucket-item:hover { opacity: 0.7; }
+  .bucket-item.crossed { text-decoration: line-through; opacity: 0.35; }
+  .bucket-empty { font-size: 0.75rem; font-weight: 600; color: var(--text-dim); font-style: italic; }
+
+  /* ======== FOCUS TIMER ======== */
+  .timer-display {
+    text-align: center;
+    font-size: 3.4rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    color: var(--navy);
+    margin: 8px 0 4px;
+    letter-spacing: 2px;
+  }
+  .timer-label-txt { text-align: center; font-size: 0.72rem; font-weight: 900; color: var(--text-muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .timer-btns { display: flex; gap: 8px; justify-content: center; }
+  .timer-btn { padding: 9px 20px; border-radius: var(--radius-sm); border: none; font-weight: 900; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; font-family: 'Nunito', inherit; }
+  .timer-start { background: linear-gradient(135deg, var(--red), #c0392b); color: white; box-shadow: 0 3px 10px rgba(230,50,40,0.3); }
+  .timer-pause { background: linear-gradient(135deg, var(--gold), #e09b1a); color: white; }
+  .timer-reset { background: var(--surface2); border: 1.5px solid var(--border); color: var(--text-muted); }
+  .timer-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .session-count { text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-top: 12px; }
+  .session-dots { display: flex; gap: 7px; justify-content: center; margin-top: 7px; }
+  .session-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--border); border: 2px solid var(--border2); transition: all 0.3s; }
+  .session-dot.filled { background: var(--red); border-color: var(--red); box-shadow: 0 0 6px rgba(230,50,40,0.4); }
+
+  /* ======== WIN LOG ======== */
+  .win-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .win-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 8px 12px;
+    font-family: 'Nunito', inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .win-input:focus { border-color: var(--gold); background: var(--gold-light); }
+  .win-input::placeholder { color: var(--text-dim); font-weight: 600; }
+  .win-add {
+    background: linear-gradient(135deg, var(--gold), #e09b1a);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 900;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: 'Nunito', inherit;
+    box-shadow: 0 3px 8px rgba(245,166,35,0.3);
+  }
+  .win-add:hover { filter: brightness(1.08); }
+  .win-list { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+  .win-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--gold-light);
+    border: 1.5px solid #f5d88a;
+    border-radius: var(--radius-sm);
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .win-item .win-star { color: var(--gold); flex-shrink: 0; }
+  .win-item .win-del { margin-left: auto; color: var(--text-dim); cursor: pointer; font-size: 0.7rem; flex-shrink: 0; font-weight: 900; }
+  .win-item .win-del:hover { color: var(--red); }
+  .win-empty { font-size: 0.8rem; font-weight: 600; color: var(--text-dim); font-style: italic; }
+
+  /* ======== CRYPTO ======== */
+  .crypto-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .crypto-row:last-child { border-bottom: none; }
+  .crypto-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; flex-shrink: 0; }
+  .crypto-name { flex: 1; }
+  .crypto-name strong { font-size: 0.88rem; font-weight: 900; display: block; color: var(--text); }
+  .crypto-name span { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
+  .crypto-price { text-align: right; font-size: 0.88rem; font-weight: 900; }
+  .crypto-price small { display: block; font-size: 0.7rem; font-weight: 700; }
+  .positive { color: var(--teal); }
+  .negative { color: var(--red); }
+  .crypto-note { margin-top: 10px; font-size: 0.72rem; font-weight: 700; color: var(--text-dim); text-align: center; }
+  .crypto-note a { color: var(--navy); text-decoration: none; }
+  .crypto-note a:hover { text-decoration: underline; }
+
+  /* ======== VISA ======== */
+  .visa-card {
+    background: var(--navy-light);
+    border: 1.5px solid #c5d5f0;
+    border-left: 5px solid var(--navy);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .visa-title { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+  .visa-items { display: flex; flex-direction: column; gap: 9px; }
+  .visa-item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.83rem; font-weight: 700; color: var(--text); }
+  .visa-item .vi-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .visa-item a { color: var(--navy); }
+  .visa-item small { color: var(--text-muted); font-weight: 600; }
+
+  /* ======== SECTION DIVIDER ======== */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 22px 0 14px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+  }
+  .section-label::before, .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ======== FOOTER ======== */
+  .footer { text-align: center; margin-top: 28px; font-size: 0.72rem; font-weight: 700; color: var(--text-dim); }
+  .footer span { color: var(--red); }
+
+  /* ======== SCROLLBAR ======== */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--surface2); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ======== DAILY CHECKER ======== */
+  .daily-checker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .habit-tile {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+    user-select: none;
+  }
+  .habit-tile:hover { border-color: var(--gold); background: var(--gold-light); }
+  .habit-tile.done {
+    background: linear-gradient(135deg, #edfaf3, #d9f5e9);
+    border-color: #7cd8a8;
+  }
+  .habit-tile.done .habit-name { color: #2d7a52; text-decoration: line-through; opacity: 0.75; }
+  .habit-check {
+    width: 22px; height: 22px;
+    border: 2.5px solid var(--border2);
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    transition: all 0.18s;
+    font-size: 13px;
+  }
+  .habit-tile.done .habit-check {
+    background: linear-gradient(135deg, var(--teal), #26d0a0);
+    border-color: var(--teal);
+    color: white;
+  }
+  .habit-info { flex: 1; min-width: 0; }
+  .habit-name {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--text);
+    display: block;
+    line-height: 1.3;
+  }
+  .habit-streak {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .habit-streak.hot { color: var(--red); }
+  .habit-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+  .habit-tile:hover .habit-actions { opacity: 1; }
+  .habit-tile.done:hover .habit-actions { opacity: 0.7; }
+  .habit-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 2px 4px;
+    color: var(--text-dim);
+    border-radius: 4px;
+    font-family: inherit;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .habit-action-btn:hover { color: var(--red); background: var(--red-light); }
+  .daily-progress-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; height: 10px; overflow: hidden; margin-bottom: 8px; }
+  .daily-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), #26d0a0, var(--gold));
+    border-radius: 8px;
+    transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .daily-progress-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .daily-progress-stats .all-done-msg { color: var(--teal); font-weight: 900; display: none; }
+  .add-habit-row { display: flex; gap: 8px; margin-top: 12px; }
+  .add-habit-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 7px 12px;
+    font-family: 'Nunito', inherit;
+    font-size: 0.83rem;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .add-habit-input:focus { border-color: var(--gold); background: var(--gold-light); }
+  .add-habit-input::placeholder { color: var(--text-dim); font-weight: 600; }
+  .add-habit-btn {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    font-weight: 900;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: 'Nunito', inherit;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .add-habit-btn:hover { background: var(--red); transform: scale(1.03); }
+  .emoji-pick { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+  .emoji-opt {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.12s;
+    line-height: 1;
+  }
+  .emoji-opt:hover { border-color: var(--gold); transform: scale(1.15); }
+  .emoji-opt.selected { border-color: var(--red); background: var(--red-light); }
+  .habit-edit-inline {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--gold-light);
+    border: 2px solid var(--gold);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    z-index: 10;
+    align-items: center;
+    gap: 6px;
+  }
+  .habit-edit-inline.show { display: flex; }
+  .habit-edit-field {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-family: 'Nunito', inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    outline: none;
+  }
+  .habit-save-btn, .habit-cancel-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 3px 5px;
+    font-family: inherit;
+    font-weight: 900;
+    border-radius: 4px;
+  }
+  .habit-save-btn { color: var(--teal); }
+  .habit-cancel-btn { color: var(--text-dim); }
+
+  /* ======== MINDFUL SECTION ======== */
+  .mindful-card {
+    background: linear-gradient(135deg, #eef6ff 0%, #f0faf7 50%, #fef9ec 100%);
+    border: 1.5px solid #c5dff8;
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .mindful-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+  @media (max-width: 700px) { .mindful-layout { grid-template-columns: 1fr; } }
+  .breath-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .breath-ring-wrap {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    cursor: pointer;
+  }
+  .breath-ring-outer {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,168,156,0.08), rgba(26,58,107,0.06));
+    border: 2px dashed #c5dff8;
+    animation: none;
+    transition: all 0.3s;
+  }
+  .breath-circle {
+    position: absolute;
+    inset: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 38%, #ffffff, #b8eaf2);
+    border: 3px solid rgba(0,168,156,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    box-shadow: 0 4px 20px rgba(0,168,156,0.15);
+    transition: transform 0.1s;
+  }
+  .breath-phase-text {
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--navy);
+  }
+  .breath-count-text {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--teal);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  @keyframes breath-in {
+    from { transform: scale(0.75); box-shadow: 0 2px 10px rgba(0,168,156,0.1); }
+    to   { transform: scale(1.1);  box-shadow: 0 8px 30px rgba(0,168,156,0.3); }
+  }
+  @keyframes breath-out {
+    from { transform: scale(1.1);  box-shadow: 0 8px 30px rgba(0,168,156,0.3); }
+    to   { transform: scale(0.75); box-shadow: 0 2px 10px rgba(0,168,156,0.1); }
+  }
+  @keyframes breath-hold {
+    from { transform: scale(1.1); }
+    to   { transform: scale(1.1); }
+  }
+  @keyframes breath-hold-low {
+    from { transform: scale(0.75); }
+    to   { transform: scale(0.75); }
+  }
+  .breath-circle.phase-in   { animation: breath-in 4s ease-in-out forwards; }
+  .breath-circle.phase-hold { animation: breath-hold 4s linear forwards; }
+  .breath-circle.phase-out  { animation: breath-out 4s ease-in-out forwards; }
+  .breath-circle.phase-hold2{ animation: breath-hold-low 4s linear forwards; }
+
+  .breath-session-timer {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .breath-session-timer span { color: var(--navy); font-size: 1rem; }
+  .breath-start-btn {
+    background: linear-gradient(135deg, var(--teal), #1a9e93);
+    color: white;
+    border: none;
+    padding: 10px 26px;
+    border-radius: 24px;
+    font-weight: 900;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'Nunito', inherit;
+    box-shadow: 0 4px 14px rgba(0,168,156,0.3);
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .breath-start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,168,156,0.4); }
+  .breath-start-btn.active { background: linear-gradient(135deg, var(--red), #c0392b); box-shadow: 0 4px 14px rgba(230,50,40,0.3); }
+  .breath-complete-msg {
+    display: none;
+    background: linear-gradient(135deg, #edfaf5, #d9f5e9);
+    border: 2px solid #7cd8a8;
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #2d7a52;
+  }
+  .breath-phases-guide {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .phase-pill {
+    text-align: center;
+    padding: 6px 4px;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    transition: all 0.3s;
+  }
+  .phase-pill.active-phase { color: white; border-color: transparent; transform: scale(1.05); }
+  .phase-pill-in.active-phase   { background: var(--teal); }
+  .phase-pill-hold.active-phase { background: var(--navy); }
+  .phase-pill-out.active-phase  { background: var(--ocean); }
+  .phase-pill-hold2.active-phase{ background: var(--gold); color: #3d2800; }
+
+  .mindful-right { display: flex; flex-direction: column; gap: 12px; }
+  .mindful-title { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 2px; display: flex; align-items: center; gap: 7px; }
+  .mindful-quote {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--navy);
+    font-style: italic;
+    line-height: 1.5;
+    border-left: 3px solid var(--teal);
+    padding-left: 12px;
+  }
+  .mindful-why {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    line-height: 1.55;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+  }
+  .mindful-why strong { color: var(--navy); }
+  .lofi-embed-wrap { border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); }
+  .lofi-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--navy);
+    transition: background 0.15s;
+  }
+  .lofi-toggle:hover { background: var(--navy-light); }
+  .lofi-toggle .lofi-badge { background: #1DB954; color: white; font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 900; }
+  .lofi-embed-container { display: none; margin-top: 8px; }
+  .lofi-embed-container.open { display: block; }
+
+  /* ======== ONE THING PICKER ======== */
+  .one-thing-wrap {
+    margin-top: 14px;
+    background: var(--gold-light);
+    border: 2px solid var(--gold);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: none;
+  }
+  .one-thing-wrap.show { display: block; }
+  .one-thing-label { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--navy); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .one-thing-options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .one-thing-option {
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .one-thing-option:hover { border-color: var(--red); background: var(--red-light); }
+  .one-thing-option.chosen { border-color: var(--red); background: var(--red-light); color: var(--red); }
+  .one-thing-option.chosen::before { content: '🎯 '; }
+  .one-thing-locked {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--red);
+    padding: 10px 14px;
+    background: var(--red-light);
+    border: 2px solid var(--red);
+    border-radius: var(--radius-sm);
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .one-thing-locked.show { display: flex; }
+  .one-thing-change { margin-left: auto; font-size: 0.7rem; font-weight: 800; color: var(--text-muted); cursor: pointer; background: none; border: none; font-family: inherit; }
+  .one-thing-change:hover { color: var(--red); }
+
+  /* ======== ARCHIVE / LOG HISTORY ======== */
+  .archive-section { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+  .archive-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; cursor: pointer; background: var(--surface2); border-bottom: 1.5px solid var(--border); user-select: none; transition: background 0.15s; }
+  .archive-header:hover { background: var(--navy-light); }
+  .archive-header-title { font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--navy); }
+  .archive-header-sub { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-top: 2px; }
+  .archive-toggle-icon { font-size: 1rem; color: var(--text-muted); transition: transform 0.25s; }
+  .archive-toggle-icon.open { transform: rotate(180deg); }
+  .archive-body { display: none; padding: 20px; }
+  .archive-body.open { display: block; }
+
+  .week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
+  @media (max-width: 600px) { .week-strip { grid-template-columns: repeat(4, 1fr); } }
+  .week-day-card { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 6px; text-align: center; }
+  .week-day-card.has-data { border-color: var(--border2); cursor: pointer; }
+  .week-day-card.has-data:hover { border-color: var(--gold); background: var(--gold-light); transform: translateY(-2px); transition: all 0.15s; }
+  .week-day-card.today-card { border-color: var(--red); background: var(--red-light); }
+  .week-day-name { font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 3px; }
+  .week-day-date { font-size: 0.65rem; font-weight: 800; color: var(--text); margin-bottom: 5px; }
+  .week-day-mood { font-size: 1rem; margin-bottom: 4px; line-height: 1; }
+  .week-habit-ring { width: 30px; height: 30px; border-radius: 50%; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 900; border: 3px solid var(--border); color: var(--text-muted); background: var(--surface); position: relative; overflow: hidden; }
+  .week-habit-ring .ring-fill { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, var(--teal), #26d0a0); opacity: 0.3; transition: height 0.4s; }
+  .week-habit-ring span { position: relative; z-index: 1; }
+  .week-win-count { font-size: 0.6rem; font-weight: 800; color: var(--gold); }
+  .week-empty-label { font-size: 0.58rem; color: var(--text-dim); font-style: italic; font-weight: 700; }
+
+  .week-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 600px) { .week-stats-row { grid-template-columns: 1fr 1fr; } }
+  .week-stat { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+  .week-stat-val { font-size: 1.5rem; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+  .week-stat-label { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+
+  .log-entries { display: flex; flex-direction: column; gap: 10px; max-height: 420px; overflow-y: auto; }
+  .log-entry { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; }
+  .log-entry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .log-entry-date { font-size: 0.78rem; font-weight: 900; color: var(--navy); }
+  .log-entry-mood { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+  .log-habit-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .log-habit-mini-bar { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .log-habit-mini-fill { height: 100%; background: linear-gradient(90deg, var(--teal), #26d0a0); border-radius: 3px; }
+  .log-habit-pct { font-size: 0.68rem; font-weight: 900; color: var(--teal); min-width: 30px; }
+  .log-intention { font-size: 0.78rem; font-weight: 700; color: var(--text); font-style: italic; margin-bottom: 6px; padding-left: 8px; border-left: 2px solid var(--gold); }
+  .log-one-thing { font-size: 0.73rem; font-weight: 800; color: var(--red); margin-bottom: 6px; }
+  .log-wins { display: flex; flex-wrap: wrap; gap: 5px; }
+  .log-win-chip { background: var(--gold-light); border: 1px solid #f5d88a; border-radius: 12px; padding: 3px 10px; font-size: 0.7rem; font-weight: 800; color: #7a5500; }
+  .log-no-wins { font-size: 0.72rem; font-weight: 700; color: var(--text-dim); font-style: italic; }
+
+  .archive-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; align-items: center; }
+  .export-btn { background: var(--navy); color: white; border: none; padding: 9px 18px; border-radius: var(--radius-sm); font-weight: 900; font-size: 0.82rem; cursor: pointer; font-family: 'Nunito', inherit; transition: all 0.15s; }
+  .export-btn:hover { background: var(--red); transform: translateY(-1px); }
+  .save-today-btn { background: var(--teal); color: white; border: none; padding: 9px 18px; border-radius: var(--radius-sm); font-weight: 900; font-size: 0.82rem; cursor: pointer; font-family: 'Nunito', inherit; transition: all 0.15s; }
+  .save-today-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .save-flash { font-size: 0.75rem; font-weight: 800; color: var(--teal); display: none; align-items: center; gap: 5px; }
+  .archive-empty { text-align: center; padding: 30px 0; color: var(--text-dim); font-size: 0.85rem; font-weight: 700; font-style: italic; }
+  .log-section-title { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin: 18px 0 10px; display: flex; align-items: center; gap: 7px; }
+
+  /* ======== TIMER NOTIFICATION ======== */
+  .timer-done-msg {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--teal);
+    margin-top: 10px;
+    padding: 6px 12px;
+    background: var(--teal-light);
+    border: 1.5px solid var(--teal);
+    border-radius: var(--radius-sm);
+    animation: pulse 1.5s ease 3;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="luffy-hat">🏴‍☠️</div>
+    <div class="header-titles">
+      <h1>Captain <span>Subanshu's</span> Log</h1>
+      <div class="subtitle">The Straw Hat Daily Command Centre</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="date-badge" id="header-date">Loading...</div>
+    <div class="evening-badge" id="evening-badge">🌙 Wind-down — 9PM</div>
+    <div id="sync-status" style="font-size:0.7rem;font-weight:800;color:var(--text-muted);display:flex;align-items:center;gap:4px;">⏳ Connecting...</div>
+  </div>
+</div>
+
+<!-- WANTED POSTER INTENTION -->
+<div class="intention-bar">
+  <label>🎯 Today's Mission</label>
+  <input type="text" id="intention-input" placeholder="What does a King of Pirates level day look like today?" />
+  <button class="intention-save" onclick="saveIntention()">Set Sail</button>
+</div>
+
+<!-- MORNING CHECK-IN -->
+<div class="card" style="margin-bottom:18px;">
+  <div class="card-header">
+    <div class="card-title"><span class="dot" style="background:var(--red)"></span>Morning Check-In — How's the Crew's Captain Today?</div>
+    <span style="font-size:0.7rem;font-weight:700;color:var(--text-muted)" id="mood-time"></span>
+  </div>
+  <div class="mood-row">
+    <button class="mood-btn" onclick="selectMood(this,'🔥 Fired up')" title="Fired up">🔥</button>
+    <button class="mood-btn" onclick="selectMood(this,'😤 Focused')" title="Focused">😤</button>
+    <button class="mood-btn" onclick="selectMood(this,'😐 Neutral')" title="Neutral">😐</button>
+    <button class="mood-btn" onclick="selectMood(this,'😴 Tired')" title="Tired">😴</button>
+    <button class="mood-btn" onclick="selectMood(this,'😰 Anxious')" title="Anxious">😰</button>
+    <button class="mood-btn" onclick="selectMood(this,'🤯 Scattered')" title="Scattered">🤯</button>
+  </div>
+  <div class="mood-label" id="mood-label">Pick your energy — the crew needs to know the captain's condition.</div>
+</div>
+
+<div class="section-label">📋 Daily Crew Duties — Resets Every Morning</div>
+
+<!-- DAILY HABIT CHECKER -->
+<div class="card" style="margin-bottom:18px;">
+  <div class="card-header">
+    <div class="card-title"><span class="dot" style="background:var(--teal)"></span>Daily Habits — Check 'em off, Captain</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span style="font-size:0.72rem;font-weight:900;color:var(--teal)" id="habit-done-count">0/0 done</span>
+      <button onclick="resetHabitsNow()" style="font-size:0.7rem;font-weight:800;color:var(--text-muted);background:none;border:none;cursor:pointer;font-family:inherit;" title="Force reset all">↺ Reset</button>
+    </div>
+  </div>
+  <div class="daily-progress-bar"><div class="daily-progress-fill" id="daily-progress-fill" style="width:0%"></div></div>
+  <div class="daily-progress-stats">
+    <span id="daily-progress-label">0% complete</span>
+    <span class="all-done-msg" id="all-done-msg">🎉 All duties done — you're sailing smooth!</span>
+  </div>
+  <div class="daily-checker-grid" id="habit-grid"></div>
+  <div class="add-habit-row">
+    <div id="selected-emoji" style="font-size:1.2rem;line-height:1;display:flex;align-items:center;padding:0 4px;" title="Pick emoji below">📌</div>
+    <input class="add-habit-input" type="text" id="new-habit-input" placeholder="Add a new daily duty..." onkeydown="if(event.key==='Enter')addHabit()" maxlength="40" />
+    <button class="add-habit-btn" onclick="addHabit()">+ Add</button>
+  </div>
+  <div class="emoji-pick" id="emoji-pick">
+    <span class="emoji-opt" onclick="pickEmoji(this,'📌')">📌</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'🏋️')">🏋️</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'📚')">📚</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'💰')">💰</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'💼')">💼</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'🎯')">🎯</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'🌙')">🌙</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'💊')">💊</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'🚶')">🚶</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'✍️')">✍️</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'🥗')">🥗</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'💧')">💧</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'🧘')">🧘</span>
+    <span class="emoji-opt" onclick="pickEmoji(this,'📵')">📵</span>
+  </div>
+</div>
+
+<div class="section-label">⚓ Your Four Seas — Goal Pillars</div>
+
+<!-- GOAL PILLARS -->
+<div class="grid-4" style="margin-bottom:18px;">
+  <div class="pillar-card pillar-career" data-crew="Luffy's Path">
+    <div class="pillar-icon">💼</div>
+    <div class="pillar-name">Career</div>
+    <div class="pillar-focus">PL-300 + Ops/PM roles with sponsorship</div>
+    <div class="progress-bar"><div class="progress-fill" id="career-fill" style="width:0%"></div></div>
+    <div class="pillar-percent"><span>Progress</span><span id="career-pct">0%</span></div>
+    <div class="pillar-input">
+      <input type="range" min="0" max="100" value="0" id="career-range" oninput="updatePillar('career',this.value)">
+      <span class="pillar-val" id="career-val">0</span>
+    </div>
+  </div>
+  <div class="pillar-card pillar-finance" data-crew="Nami's Treasury">
+    <div class="pillar-icon">₿</div>
+    <div class="pillar-name">Financial</div>
+    <div class="pillar-focus">Crypto/DeFi knowledge + smart tracking</div>
+    <div class="progress-bar"><div class="progress-fill" id="finance-fill" style="width:0%"></div></div>
+    <div class="pillar-percent"><span>Progress</span><span id="finance-pct">0%</span></div>
+    <div class="pillar-input">
+      <input type="range" min="0" max="100" value="0" id="finance-range" oninput="updatePillar('finance',this.value)">
+      <span class="pillar-val" id="finance-val">0</span>
+    </div>
+  </div>
+  <div class="pillar-card pillar-physical" data-crew="Zoro's Discipline">
+    <div class="pillar-icon">🏋️</div>
+    <div class="pillar-name">Physical</div>
+    <div class="pillar-focus">Consistent lifting — build identity around it</div>
+    <div class="progress-bar"><div class="progress-fill" id="physical-fill" style="width:0%"></div></div>
+    <div class="pillar-percent"><span>Progress</span><span id="physical-pct">0%</span></div>
+    <div class="pillar-input">
+      <input type="range" min="0" max="100" value="0" id="physical-range" oninput="updatePillar('physical',this.value)">
+      <span class="pillar-val" id="physical-val">0</span>
+    </div>
+  </div>
+  <div class="pillar-card pillar-mental" data-crew="Robin's Calm">
+    <div class="pillar-icon">🧠</div>
+    <div class="pillar-name">Mental</div>
+    <div class="pillar-focus">Reduce chaos — build calm, structured days</div>
+    <div class="progress-bar"><div class="progress-fill" id="mental-fill" style="width:0%"></div></div>
+    <div class="pillar-percent"><span>Progress</span><span id="mental-pct">0%</span></div>
+    <div class="pillar-input">
+      <input type="range" min="0" max="100" value="0" id="mental-range" oninput="updatePillar('mental',this.value)">
+      <span class="pillar-val" id="mental-val">0</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">🌊 Clear the Fog — 5-Minute Reset Before You Plan</div>
+
+<!-- MINDFUL BREATHING -->
+<div class="mindful-card">
+  <div class="mindful-layout">
+
+    <!-- LEFT: Breathing Circle -->
+    <div class="breath-center">
+      <div class="mindful-title"><span class="dot" style="background:var(--teal)"></span>Box Breathing — 5 min</div>
+      <div class="breath-ring-wrap" onclick="toggleBreathing()">
+        <div class="breath-ring-outer"></div>
+        <div class="breath-circle" id="breath-circle">
+          <div class="breath-phase-text" id="breath-phase">Tap to begin</div>
+          <div class="breath-count-text" id="breath-count">—</div>
+        </div>
+      </div>
+      <div class="breath-phases-guide">
+        <div class="phase-pill phase-pill-in" id="pp-in">Inhale<br>4s</div>
+        <div class="phase-pill phase-pill-hold" id="pp-hold">Hold<br>4s</div>
+        <div class="phase-pill phase-pill-out" id="pp-out">Exhale<br>4s</div>
+        <div class="phase-pill phase-pill-hold2" id="pp-hold2">Hold<br>4s</div>
+      </div>
+      <div class="breath-session-timer">Time remaining: <span id="breath-total-timer">5:00</span></div>
+      <button class="breath-start-btn" id="breath-start-btn" onclick="toggleBreathing()">▶ Begin Reset</button>
+      <div class="breath-complete-msg" id="breath-complete-msg">
+        ✨ Mind cleared. You're ready to plan, Captain.
+      </div>
+    </div>
+
+    <!-- RIGHT: Context & Music -->
+    <div class="mindful-right">
+      <div>
+        <div class="mindful-title">🧠 Why this works for your brain</div>
+        <div class="mindful-why">
+          <strong>ADHD brains have a cold-start problem.</strong> Your prefrontal cortex — the bit that plans, prioritises, and filters — doesn't warm up on its own. Box breathing activates it in under 5 minutes. You'll brain-dump <strong>real priorities</strong> instead of just the loudest thoughts. Don't skip this.
+        </div>
+      </div>
+      <div class="mindful-quote" id="mindful-quote">"I don't want to conquer anything. I just think the guy with the most freedom in this whole ocean... is the Pirate King."</div>
+      <div>
+        <div class="lofi-toggle" onclick="toggleLofi()">
+          <span>🎵 Lo-Fi Focus Music</span>
+          <span class="lofi-badge">Spotify</span>
+        </div>
+        <div class="lofi-embed-container" id="lofi-embed-container">
+          <iframe style="border-radius:10px;margin-top:6px;" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWWQRwui0ExPn?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          <div style="font-size:0.68rem;font-weight:700;color:var(--text-dim);text-align:center;margin-top:4px;">Lo-Fi Beats · Spotify · Let it run during your session</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section-label">🗺️ The Log Pose — Brain Dump & PL-300 Chart</div>
+
+<!-- TRAINING HUB LINK BANNER -->
+<a href="training-hub.html" style="text-decoration:none;display:block;margin-bottom:18px;">
+  <div style="background:linear-gradient(135deg,#1a3a6b,#2d5a9e);border-radius:var(--radius);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 4px 16px rgba(26,58,107,0.25);transition:all 0.2s;flex-wrap:wrap;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(26,58,107,0.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(26,58,107,0.25)'">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span style="font-size:2rem;line-height:1;">📺</span>
+      <div>
+        <div style="font-size:0.88rem;font-weight:900;color:white;letter-spacing:0.3px;">Training Hub — Excel &amp; Power BI</div>
+        <div style="font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.65);margin-top:3px;">Curated video curriculum · Tick off as you go · Progress tracked</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="text-align:right;">
+        <div style="font-size:0.65rem;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.5);margin-bottom:4px;">Your Progress</div>
+        <div style="background:rgba(255,255,255,0.15);border-radius:10px;height:6px;width:100px;overflow:hidden;">
+          <div id="dashboard-training-bar" style="height:100%;background:linear-gradient(90deg,#f5a623,#f2c811);border-radius:10px;width:0%;transition:width 0.5s;"></div>
+        </div>
+        <div style="font-size:0.68rem;font-weight:900;color:rgba(255,255,255,0.7);margin-top:3px;" id="dashboard-training-pct">0% complete</div>
+      </div>
+      <span style="color:white;font-size:1.2rem;font-weight:900;">→</span>
+    </div>
+  </div>
+</a>
+
+<!-- BRAIN DUMP + PL-300 -->
+<div class="grid-2" style="margin-bottom:18px;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="dot" style="background:var(--gold)"></span>Brain Dump — Clear the Fog</div>
+      <span style="font-size:0.7rem;font-weight:700;color:var(--text-muted)">One task per line</span>
+    </div>
+    <textarea class="brain-dump-area" id="brain-dump" rows="7" placeholder="Empty your head, Captain...&#10;One task per line.&#10;&#10;e.g.&#10;Reply to recruiter email&#10;Review PL-300 DAX module&#10;Buy groceries&#10;Maybe learn Spanish someday&#10;Check BTC price"></textarea>
+    <button class="sort-btn" onclick="sortTasks()">⚡ Sort into Islands (Buckets)</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="dot" style="background:var(--red)"></span>PL-300 Study Log</div>
+      <span style="font-size:0.72rem;font-weight:900;color:var(--red)" id="pl300-pct-label">0% done</span>
+    </div>
+    <div class="pl300-progress"><div class="pl300-fill" id="pl300-bar" style="width:0%"></div></div>
+    <div class="pl300-stats"><span>Modules: <span id="pl300-done">0</span>/9</span><span id="pl300-eta">~9 weeks est.</span></div>
+    <div class="pl300-modules" id="pl300-modules">
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">1. Power BI Desktop basics</span><span class="module-time">~4h</span></div>
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">2. Data transformation (Power Query)</span><span class="module-time">~5h</span></div>
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">3. Data modelling & relationships</span><span class="module-time">~5h</span></div>
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">4. DAX fundamentals</span><span class="module-time">~6h</span></div>
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">5. Advanced DAX & measures</span><span class="module-time">~5h</span></div>
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">6. Report design & visuals</span><span class="module-time">~4h</span></div>
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">7. Row-level security & deployment</span><span class="module-time">~3h</span></div>
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">8. Power BI Service & workspaces</span><span class="module-time">~3h</span></div>
+      <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">9. Practice exams × 2</span><span class="module-time">~4h</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">🏝️ Task Islands — Sorted</div>
+
+<!-- TASK BUCKETS -->
+<div class="card" style="margin-bottom:18px;">
+  <div class="card-header">
+    <div class="card-title"><span class="dot" style="background:var(--teal)"></span>Your Tasks — Sorted by Priority</div>
+    <button onclick="clearBuckets()" style="font-size:0.72rem;font-weight:800;color:var(--text-muted);background:none;border:none;cursor:pointer;font-family:inherit;">Clear all</button>
+  </div>
+  <div class="buckets">
+    <div class="bucket bucket-urgent">
+      <div class="bucket-label">🔴 Urgent</div>
+      <div class="bucket-items" id="bucket-urgent"><div class="bucket-empty">Nothing yet</div></div>
+    </div>
+    <div class="bucket bucket-week">
+      <div class="bucket-label">🟡 This Week</div>
+      <div class="bucket-items" id="bucket-week"><div class="bucket-empty">Nothing yet</div></div>
+    </div>
+    <div class="bucket bucket-later">
+      <div class="bucket-label">🟢 Later</div>
+      <div class="bucket-items" id="bucket-later"><div class="bucket-empty">Nothing yet</div></div>
+    </div>
+    <div class="bucket bucket-drop">
+      <div class="bucket-label">⚫ Drop / Delegate</div>
+      <div class="bucket-items" id="bucket-drop"><div class="bucket-empty">Nothing yet</div></div>
+    </div>
+  </div>
+
+  <!-- ONE THING PICKER -->
+  <div class="one-thing-wrap" id="one-thing-wrap">
+    <div class="one-thing-label">🎯 Now — pick your ONE thing to start with</div>
+    <div class="one-thing-options" id="one-thing-options"></div>
+    <div class="one-thing-locked" id="one-thing-locked">
+      <span id="one-thing-display"></span>
+      <button class="one-thing-change" onclick="resetOneThing()">Change</button>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">⚔️ Daily Battle Stations</div>
+
+<!-- TIMER + WINS + CRYPTO -->
+<div class="grid-3" style="margin-bottom:18px;">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="dot" style="background:var(--red)"></span>⏱ Focus — Gear Second</div>
+      <select id="timer-mode" onchange="setTimerMode(this.value)" style="background:var(--surface2);border:1.5px solid var(--border);color:var(--text-muted);font-size:0.72rem;font-weight:800;padding:3px 7px;border-radius:6px;outline:none;font-family:inherit;">
+        <option value="25">25 min</option>
+        <option value="50">50 min</option>
+        <option value="15">15 min</option>
+      </select>
+    </div>
+    <div class="timer-label-txt" id="timer-label">Pomodoro</div>
+    <div class="timer-display" id="timer-display">25:00</div>
+    <div class="timer-btns">
+      <button class="timer-btn timer-start" id="timer-start-btn" onclick="startTimer()">▶ Start</button>
+      <button class="timer-btn timer-reset" onclick="resetTimer()">↺ Reset</button>
+    </div>
+    <div class="session-count">Sessions today: <strong id="session-count">0</strong></div>
+    <div class="session-dots" id="session-dots">
+      <div class="session-dot"></div><div class="session-dot"></div><div class="session-dot"></div><div class="session-dot"></div>
+    </div>
+    <div class="timer-done-msg" id="timer-done-msg">⏰ Session complete! Take a break — even Luffy rests.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="dot" style="background:var(--gold)"></span>⭐ Today's Victories</div>
+      <span style="font-size:0.72rem;font-weight:900;color:var(--gold)" id="win-count">0 wins</span>
+    </div>
+    <div class="win-input-row">
+      <input class="win-input" type="text" id="win-input" placeholder="What did you conquer today?" onkeydown="if(event.key==='Enter')addWin()" />
+      <button class="win-add" onclick="addWin()">+</button>
+    </div>
+    <div class="win-list" id="win-list">
+      <div class="win-empty" id="win-empty">No victories yet. Go find your One Piece.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="dot" style="background:var(--teal)"></span>💰 Treasure Check</div>
+      <button onclick="loadCrypto()" style="font-size:0.72rem;font-weight:900;color:var(--navy);background:none;border:none;cursor:pointer;font-family:inherit;">↻ Refresh</button>
+    </div>
+    <div id="crypto-container">
+      <div style="text-align:center;color:var(--text-muted);font-size:0.82rem;font-weight:700;padding:20px 0;">Hit Refresh to load Beli prices 💰</div>
+    </div>
+    <div class="crypto-note">Live data via <a href="https://www.coingecko.com" target="_blank">CoinGecko</a></div>
+  </div>
+
+</div>
+
+<!-- VISA CHECKLIST -->
+<div class="visa-card">
+  <div class="visa-title">🛂 Sponsored Visa — Navigation Chart</div>
+  <div class="visa-items">
+    <div class="visa-item"><span class="vi-icon">✅</span><span>Only apply to roles that <strong>explicitly offer UK visa sponsorship</strong></span></div>
+    <div class="visa-item"><span class="vi-icon">📋</span><span>Check company is on the <strong>UK Skilled Worker Sponsor Register</strong> before applying</span></div>
+    <div class="visa-item"><span class="vi-icon">💡</span><span>Ops/PM + Power BI = strong fit for <strong>SOC 2421 (BI Analyst)</strong> or <strong>1161 (Ops Manager)</strong></span></div>
+    <div class="visa-item"><span class="vi-icon">📅</span><span>Allow timeline: <small>offer → CoS → visa change = ~3–4 months</small></span></div>
+    <div class="visa-item"><span class="vi-icon">🔗</span><span><a href="https://www.gov.uk/skilled-worker-visa" target="_blank">gov.uk/skilled-worker-visa</a> · <a href="https://www.gov.uk/check-sponsor-licence" target="_blank">Check sponsor licence</a></span></div>
+  </div>
+</div>
+
+<div class="section-label">📖 Captain's Log Archive</div>
+
+<!-- ARCHIVE -->
+<div class="archive-section">
+  <div class="archive-header" onclick="toggleArchive()">
+    <div>
+      <div class="archive-header-title">📖 Captain's Log — Full History</div>
+      <div class="archive-header-sub">Daily snapshots · Weekly summary · Export anytime</div>
+    </div>
+    <div class="archive-toggle-icon" id="archive-toggle-icon">▼</div>
+  </div>
+  <div class="archive-body" id="archive-body">
+
+    <div class="log-section-title">📅 This Week at a Glance</div>
+    <div class="week-strip" id="week-strip"></div>
+
+    <div class="week-stats-row" id="week-stats-row">
+      <div class="week-stat"><div class="week-stat-val" id="ws-habit-avg" style="color:var(--teal)">—</div><div class="week-stat-label">Avg Habits Done</div></div>
+      <div class="week-stat"><div class="week-stat-val" id="ws-wins-total" style="color:var(--gold)">—</div><div class="week-stat-label">Total Wins</div></div>
+      <div class="week-stat"><div class="week-stat-val" id="ws-days-logged" style="color:var(--navy)">—</div><div class="week-stat-label">Days Logged</div></div>
+      <div class="week-stat"><div class="week-stat-val" id="ws-top-mood" style="color:var(--red)">—</div><div class="week-stat-label">Most Common Mood</div></div>
+    </div>
+
+    <div class="log-section-title">🗓 Full Log — All Days</div>
+    <div class="log-entries" id="log-entries">
+      <div class="archive-empty">No past logs yet. Hit "Save Today" at the end of your day to start your archive.</div>
+    </div>
+
+    <div class="archive-actions">
+      <button class="save-today-btn" onclick="saveTodaySnapshot()">💾 Save Today's Log</button>
+      <button class="export-btn" onclick="exportAllData()">⬇ Export All as JSON</button>
+      <div class="save-flash" id="save-flash">✓ Saved!</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">⚓ Built for Captain Subanshu · <span>「夢を持つことを諦めるな」</span> · Data stays local in your browser</div>
+
+<script>
+// ===================== DATE & TIME =====================
+function updateDateTime() {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = document.getElementById('header-date');
+  if (d) d.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;
+  const badge = document.getElementById('evening-badge');
+  if (now.getHours() >= 21 && now.getHours() < 23) badge.style.display = 'flex';
+  const mt = document.getElementById('mood-time');
+  if (mt) mt.textContent = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+updateDateTime();
+setInterval(updateDateTime, 30000);
+
+// ===================== FIREBASE + LOCAL STORAGE SYNC =====================
+const FB_CONFIG = {
+  apiKey: "AIzaSyANpS7-0FwYHSZPapRy961cBgHLBd9hPu4",
+  authDomain: "daily-planner-e61fc.firebaseapp.com",
+  projectId: "daily-planner-e61fc",
+  storageBucket: "daily-planner-e61fc.firebasestorage.app",
+  messagingSenderId: "912213843115",
+  appId: "1:912213843115:web:4aba43a5f506297c356bee"
+};
+firebase.initializeApp(FB_CONFIG);
+const db = firebase.firestore();
+db.enablePersistence().catch(() => {});
+const FS_DOC = db.collection('dashboard').doc('main');
+
+let _syncTimer = null;
+let _ignoreNextSnapshot = false;
+
+function setSyncStatus(s) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const states = { synced:'☁️ Synced', syncing:'↻ Syncing...', offline:'📴 Offline', error:'⚠️ Sync error', connecting:'⏳ Connecting...' };
+  const colors = { synced:'var(--teal)', syncing:'var(--text-muted)', offline:'var(--text-muted)', error:'var(--red)', connecting:'var(--text-muted)' };
+  el.textContent = states[s] || s;
+  el.style.color = colors[s] || 'var(--text-muted)';
+}
+
+function save(key, val) {
+  try { localStorage.setItem('sub_' + key, JSON.stringify(val)); } catch(e) {}
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(pushAllToFirestore, 1200);
+  setSyncStatus('syncing');
+}
+
+function load(key, def) {
+  try { const v = localStorage.getItem('sub_' + key); return v !== null ? JSON.parse(v) : def; } catch(e) { return def; }
+}
+
+function pushAllToFirestore() {
+  const data = { _ts: Date.now() };
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k.startsWith('sub_')) continue;
+    try { data[k.slice(4)] = JSON.parse(localStorage.getItem(k)); } catch(e) {}
+  }
+  _ignoreNextSnapshot = true;
+  FS_DOC.set(data, { merge: true })
+    .then(() => { setSyncStatus('synced'); setTimeout(() => _ignoreNextSnapshot = false, 1500); })
+    .catch(() => { setSyncStatus('error'); _ignoreNextSnapshot = false; });
+}
+
+function applyFirestoreData(data) {
+  let changed = false;
+  Object.keys(data).forEach(k => {
+    if (k === '_ts') return;
+    const local = localStorage.getItem('sub_' + k);
+    const incoming = JSON.stringify(data[k]);
+    if (local !== incoming) {
+      try { localStorage.setItem('sub_' + k, incoming); changed = true; } catch(e) {}
+    }
+  });
+  if (changed) {
+    // Re-render all live sections
+    try { renderHabits(); } catch(e) {}
+    try { renderWins(); } catch(e) {}
+    try { updatePL300(); } catch(e) {}
+    try { ['career','finance','physical','mental'].forEach(n => { const v = load('pillar_'+n,0); document.getElementById(n+'-range').value=v; updatePillar(n,v); }); } catch(e) {}
+    try { const bd = load('brainDump',''); if (bd) document.getElementById('brain-dump').value = bd; } catch(e) {}
+    try {
+      const b = load('buckets', null);
+      if (b) ['urgent','week','later','drop'].forEach(bk => {
+        const el = document.getElementById('bucket-'+bk);
+        if (el && b[bk] && b[bk].length) el.innerHTML = b[bk].map(t=>`<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('');
+      });
+    } catch(e) {}
+  }
+}
+
+// Real-time listener — sync from Firestore to this device
+FS_DOC.onSnapshot(doc => {
+  if (_ignoreNextSnapshot) { _ignoreNextSnapshot = false; return; }
+  if (!doc.exists) { setSyncStatus('synced'); return; }
+  const data = doc.data();
+  const fsTs = data._ts || 0;
+  const localTs = parseInt(localStorage.getItem('sub__ts') || '0');
+  setSyncStatus('synced');
+  if (fsTs > localTs) applyFirestoreData(data);
+}, err => {
+  if (err.code === 'unavailable') setSyncStatus('offline');
+  else setSyncStatus('error');
+});
+
+// PWA service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ===================== INTENTION =====================
+function saveIntention() {
+  const v = document.getElementById('intention-input').value.trim();
+  if (v) { save('intention', {text:v,date:new Date().toDateString()}); document.getElementById('intention-input').style.borderBottom = '2px solid var(--red)'; }
+}
+(function(){
+  const s = load('intention', null);
+  if (s && s.date === new Date().toDateString()) document.getElementById('intention-input').value = s.text;
+})();
+
+// ===================== MOOD =====================
+function selectMood(btn, label) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const r = {
+    '🔥 Fired up': "Let's go. Channel that energy — pick ONE priority and charge.",
+    '😤 Focused': "Perfect headspace. Lock in and protect your attention.",
+    '😐 Neutral': "That's fine. Start with one easy task to build momentum.",
+    '😴 Tired': "Be honest. Do what you can. Rest is not failure.",
+    '😰 Anxious': "Breathe. Pick the smallest next action. Just one thing.",
+    '🤯 Scattered': "Let's focus on one thing — which matters most right now?"
+  };
+  document.getElementById('mood-label').textContent = r[label] || label;
+  save('mood', {label, date: new Date().toDateString()});
+}
+(function(){
+  const s = load('mood', null);
+  if (!s || s.date !== new Date().toDateString()) return;
+  document.querySelectorAll('.mood-btn').forEach(b => {
+    if (b.getAttribute('title') && s.label.includes(b.getAttribute('title'))) b.classList.add('selected');
+  });
+})();
+
+// ===================== GOAL PILLARS =====================
+function updatePillar(name, val) {
+  val = parseInt(val);
+  document.getElementById(name+'-fill').style.width = val+'%';
+  document.getElementById(name+'-pct').textContent = val+'%';
+  document.getElementById(name+'-val').textContent = val;
+  save('pillar_'+name, val);
+}
+['career','finance','physical','mental'].forEach(n => {
+  const v = load('pillar_'+n, 0);
+  document.getElementById(n+'-range').value = v;
+  updatePillar(n, v);
+});
+
+// ===================== PL-300 =====================
+function toggleModule(el) { el.classList.toggle('done'); updatePL300(); savePL300(); }
+function updatePL300() {
+  const all = document.querySelectorAll('.module-item');
+  const done = document.querySelectorAll('.module-item.done').length;
+  const pct = Math.round((done/all.length)*100);
+  document.getElementById('pl300-bar').style.width = pct+'%';
+  document.getElementById('pl300-done').textContent = done;
+  document.getElementById('pl300-pct-label').textContent = pct+'% done';
+  const left = all.length - done;
+  document.getElementById('pl300-eta').textContent = left > 0 ? `~${left} week${left!==1?'s':''} left` : '🎉 Book your exam!';
+}
+function savePL300() {
+  const states = Array.from(document.querySelectorAll('.module-item')).map(el => el.classList.contains('done'));
+  save('pl300', states);
+}
+(function(){
+  const states = load('pl300', []);
+  const items = document.querySelectorAll('.module-item');
+  states.forEach((done, i) => { if (done && items[i]) items[i].classList.add('done'); });
+  updatePL300();
+})();
+
+// ===================== BRAIN DUMP =====================
+const URGENT_WORDS = ['today','urgent','deadline','asap','due','now','must','call','email','reply','respond','submit','apply','interview','doctor','pay','bill','expire','meeting','tomorrow'];
+const WEEK_WORDS = ['week','this week','review','prepare','schedule','plan','update','follow','send','check','complete','finish','research','draft','meet','write'];
+const LATER_WORDS = ['next month','next week','eventually','future','one day','when','once','consider','explore','look into'];
+const DROP_WORDS = ['maybe','someday','probably','just','might','could if','spare','binge','scroll','random'];
+
+function classify(task) {
+  const t = task.toLowerCase();
+  if (URGENT_WORDS.some(w => t.includes(w))) return 'urgent';
+  if (DROP_WORDS.some(w => t.includes(w)) && !URGENT_WORDS.some(w => t.includes(w)) && !WEEK_WORDS.some(w => t.includes(w))) return 'drop';
+  if (LATER_WORDS.some(w => t.includes(w))) return 'later';
+  if (WEEK_WORDS.some(w => t.includes(w))) return 'week';
+  return 'week';
+}
+
+function sortTasks() {
+  const tasks = document.getElementById('brain-dump').value.split('\n').map(t => t.trim()).filter(t => t.length > 1);
+  if (!tasks.length) {
+    const bd = document.getElementById('brain-dump');
+    bd.style.borderColor = 'var(--red)';
+    bd.placeholder = 'Empty your head first, Captain — one task per line!';
+    setTimeout(() => { bd.style.borderColor = ''; bd.placeholder = 'Empty your head, Captain...\nOne task per line.'; }, 2500);
+    return;
+  }
+  const buckets = {urgent:[], week:[], later:[], drop:[]};
+  tasks.forEach(t => buckets[classify(t)].push(t));
+  ['urgent','week','later','drop'].forEach(b => {
+    const el = document.getElementById('bucket-'+b);
+    el.innerHTML = buckets[b].length
+      ? buckets[b].map(t => `<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('')
+      : '<div class="bucket-empty">Nothing here</div>';
+  });
+  save('buckets', buckets);
+
+  // Feed urgent (then week) tasks into One Thing picker
+  const oneThingPool = [...buckets.urgent, ...buckets.week];
+  showOneThing(oneThingPool);
+}
+
+function clearBuckets() {
+  ['urgent','week','later','drop'].forEach(b => { document.getElementById('bucket-'+b).innerHTML = '<div class="bucket-empty">Nothing yet</div>'; });
+  document.getElementById('brain-dump').value = '';
+  save('buckets', null);
+  save('brainDump', '');
+}
+
+// Auto-save raw brain dump text as you type → syncs to Firestore → weekly task reads it
+(function(){
+  const bd = document.getElementById('brain-dump');
+  const saved = load('brainDump', '');
+  if (saved) bd.value = saved;
+  let _bdTimer = null;
+  bd.addEventListener('input', () => {
+    clearTimeout(_bdTimer);
+    _bdTimer = setTimeout(() => save('brainDump', bd.value), 800);
+  });
+})();
+
+(function(){
+  const b = load('buckets', null);
+  if (!b) return;
+  ['urgent','week','later','drop'].forEach(bk => {
+    const el = document.getElementById('bucket-'+bk);
+    if (b[bk] && b[bk].length) el.innerHTML = b[bk].map(t => `<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('');
+  });
+  // Restore one thing picker if tasks exist
+  const oneThingPool = [...(b.urgent||[]), ...(b.week||[])];
+  if (oneThingPool.length) showOneThing(oneThingPool);
+})();
+
+// ===================== FOCUS TIMER =====================
+let timerSeconds = 25*60, timerMax = 25*60, timerRunning = false, timerInterval = null, sessionCount = 0;
+function setTimerMode(mins) {
+  resetTimer();
+  timerMax = mins*60; timerSeconds = timerMax;
+  updateTimerDisplay();
+  const labels = {'25':'Pomodoro','50':'Deep Work — Gear Fourth','15':'Quick Sprint'};
+  document.getElementById('timer-label').textContent = labels[mins] || 'Focus';
+}
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds/60), s = timerSeconds%60;
+  document.getElementById('timer-display').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function startTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('timer-start-btn').textContent = '▶ Resume';
+    document.getElementById('timer-start-btn').className = 'timer-btn timer-start';
+  } else {
+    timerRunning = true;
+    document.getElementById('timer-start-btn').textContent = '⏸ Pause';
+    document.getElementById('timer-start-btn').className = 'timer-btn timer-pause';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateTimerDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        sessionCount++;
+        document.getElementById('session-count').textContent = sessionCount;
+        const dots = document.querySelectorAll('.session-dot');
+        if (sessionCount <= 4) dots[sessionCount-1].classList.add('filled');
+        document.getElementById('timer-start-btn').textContent = '▶ Start';
+        document.getElementById('timer-start-btn').className = 'timer-btn timer-start';
+        timerSeconds = timerMax; updateTimerDisplay();
+        const doneMsg = document.getElementById('timer-done-msg');
+        doneMsg.style.display = 'block';
+        setTimeout(() => { doneMsg.style.display = 'none'; }, 5000);
+      }
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerSeconds = timerMax;
+  updateTimerDisplay();
+  document.getElementById('timer-start-btn').textContent = '▶ Start';
+  document.getElementById('timer-start-btn').className = 'timer-btn timer-start';
+}
+
+// ===================== WIN LOG =====================
+let wins = load('wins_'+new Date().toDateString(), []);
+function renderWins() {
+  const list = document.getElementById('win-list');
+  document.getElementById('win-count').textContent = wins.length + (wins.length===1?' win':' wins');
+  if (!wins.length) { list.innerHTML = '<div class="win-empty" id="win-empty">No victories yet. Go find your One Piece.</div>'; return; }
+  list.innerHTML = wins.map((w,i) => `<div class="win-item"><span class="win-star">⭐</span><span>${w}</span><span class="win-del" onclick="removeWin(${i})">✕</span></div>`).join('');
+}
+function addWin() {
+  const inp = document.getElementById('win-input');
+  const v = inp.value.trim();
+  if (!v) return;
+  wins.push(v); save('wins_'+new Date().toDateString(), wins);
+  renderWins(); inp.value = '';
+}
+function removeWin(i) { wins.splice(i,1); save('wins_'+new Date().toDateString(), wins); renderWins(); }
+renderWins();
+
+// ===================== MINDFUL BREATHING =====================
+const BREATH_PHASES = [
+  { name: 'Inhale',  dur: 4, cls: 'phase-in',    pill: 'pp-in'    },
+  { name: 'Hold',    dur: 4, cls: 'phase-hold',   pill: 'pp-hold'  },
+  { name: 'Exhale',  dur: 4, cls: 'phase-out',    pill: 'pp-out'   },
+  { name: 'Hold',    dur: 4, cls: 'phase-hold2',  pill: 'pp-hold2' },
+];
+const MINDFUL_QUOTES = [
+  '"I don\'t want to conquer anything. I just think the guy with the most freedom in this whole ocean... is the Pirate King."',
+  '"Bring on the hardship. It\'s preferred in a path of carnage." — Roronoa Zoro',
+  '"Power isn\'t determined by your size, but by the size of your heart and dreams." — Monkey D. Luffy',
+  '"When do you think people die? When they are shot through the heart? No. When they have a disease? No... When they\'re forgotten." — Dr. Hiluluk',
+  '"No matter how hard or impossible it is, never lose sight of your goal." — Monkey D. Luffy',
+  '"One may stray from the path of a man. One may stray from the path of a woman. But there is no straying from the path of a human." — Bentham',
+];
+
+let breathRunning = false;
+let breathPhaseIdx = 0;
+let breathPhaseCount = 0;
+let breathTotalSeconds = 5 * 60;
+let breathTotalInterval = null;
+let breathPhaseInterval = null;
+let breathCycleTimeout = null;
+
+function toggleBreathing() {
+  if (breathRunning) {
+    stopBreathing();
+  } else {
+    startBreathing();
+  }
+}
+
+function startBreathing() {
+  breathRunning = true;
+  const btn = document.getElementById('breath-start-btn');
+  btn.textContent = '⏹ Stop';
+  btn.classList.add('active');
+  document.getElementById('breath-complete-msg').style.display = 'none';
+
+  // Randomise quote
+  const q = MINDFUL_QUOTES[Math.floor(Math.random() * MINDFUL_QUOTES.length)];
+  document.getElementById('mindful-quote').textContent = q;
+
+  // Total countdown
+  breathTotalInterval = setInterval(() => {
+    breathTotalSeconds--;
+    const m = Math.floor(breathTotalSeconds / 60);
+    const s = breathTotalSeconds % 60;
+    const el = document.getElementById('breath-total-timer');
+    if (el) el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    if (breathTotalSeconds <= 0) { finishBreathing(); }
+  }, 1000);
+
+  runPhase(0);
+}
+
+function runPhase(idx) {
+  if (!breathRunning) return;
+  const phase = BREATH_PHASES[idx % BREATH_PHASES.length];
+  const circle = document.getElementById('breath-circle');
+  const phaseEl = document.getElementById('breath-phase');
+  const countEl = document.getElementById('breath-count');
+
+  // Update pill highlights
+  ['pp-in','pp-hold','pp-out','pp-hold2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = el.className.replace(' active-phase','');
+  });
+  const activePill = document.getElementById(phase.pill);
+  if (activePill) activePill.classList.add('active-phase');
+
+  // Update animation class
+  circle.className = 'breath-circle ' + phase.cls;
+  phaseEl.textContent = phase.name;
+
+  let count = phase.dur;
+  countEl.textContent = count;
+  clearInterval(breathPhaseInterval);
+  breathPhaseInterval = setInterval(() => {
+    count--;
+    countEl.textContent = count > 0 ? count : '';
+    if (count <= 0) {
+      clearInterval(breathPhaseInterval);
+    }
+  }, 1000);
+
+  breathCycleTimeout = setTimeout(() => {
+    if (breathRunning) runPhase(idx + 1);
+  }, phase.dur * 1000);
+}
+
+function stopBreathing() {
+  breathRunning = false;
+  clearInterval(breathTotalInterval);
+  clearInterval(breathPhaseInterval);
+  clearTimeout(breathCycleTimeout);
+  const btn = document.getElementById('breath-start-btn');
+  btn.textContent = '▶ Begin Reset';
+  btn.classList.remove('active');
+  const circle = document.getElementById('breath-circle');
+  circle.className = 'breath-circle';
+  document.getElementById('breath-phase').textContent = 'Tap to begin';
+  document.getElementById('breath-count').textContent = '—';
+  ['pp-in','pp-hold','pp-out','pp-hold2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active-phase');
+  });
+  breathTotalSeconds = 5 * 60;
+  const tEl = document.getElementById('breath-total-timer');
+  if (tEl) tEl.textContent = '5:00';
+}
+
+function finishBreathing() {
+  stopBreathing();
+  document.getElementById('breath-complete-msg').style.display = 'block';
+  document.getElementById('breath-start-btn').style.display = 'none';
+}
+
+function toggleLofi() {
+  const c = document.getElementById('lofi-embed-container');
+  c.classList.toggle('open');
+}
+
+// ===================== ONE THING PICKER =====================
+function showOneThing(tasks) {
+  const wrap = document.getElementById('one-thing-wrap');
+  const opts = document.getElementById('one-thing-options');
+  const locked = document.getElementById('one-thing-locked');
+  const saved = load('one_thing_' + new Date().toDateString(), null);
+
+  if (!tasks || tasks.length === 0) { wrap.classList.remove('show'); return; }
+  wrap.classList.add('show');
+
+  if (saved) {
+    opts.style.display = 'none';
+    locked.classList.add('show');
+    document.getElementById('one-thing-display').textContent = '🎯 ' + saved;
+    return;
+  }
+
+  locked.classList.remove('show');
+  opts.style.display = 'flex';
+  opts.style.flexDirection = 'column';
+
+  // Show top urgent tasks, fallback to week tasks
+  const shown = tasks.slice(0, 5);
+  opts.innerHTML = shown.map(t => `<div class="one-thing-option" onclick="lockOneThing('${t.replace(/'/g,"&#39;")}')">${t}</div>`).join('');
+}
+
+function lockOneThing(task) {
+  save('one_thing_' + new Date().toDateString(), task);
+  const opts = document.getElementById('one-thing-options');
+  const locked = document.getElementById('one-thing-locked');
+  opts.style.display = 'none';
+  locked.classList.add('show');
+  document.getElementById('one-thing-display').textContent = '🎯 ' + task;
+}
+
+function resetOneThing() {
+  save('one_thing_' + new Date().toDateString(), null);
+  document.getElementById('one-thing-locked').classList.remove('show');
+  document.getElementById('one-thing-options').style.display = 'flex';
+}
+
+// ===================== DAILY HABITS =====================
+const DEFAULT_HABITS = [
+  { id: 'h1', emoji: '🎯', name: 'Set morning intention' },
+  { id: 'h2', emoji: '📚', name: 'PL-300 study (30 min)' },
+  { id: 'h3', emoji: '🏋️', name: 'Gym / workout' },
+  { id: 'h4', emoji: '💰', name: 'Crypto morning check' },
+  { id: 'h5', emoji: '📋', name: 'Brain dump + sort tasks' },
+  { id: 'h6', emoji: '💼', name: '1 job action (apply/LinkedIn)' },
+  { id: 'h7', emoji: '📵', name: 'No doomscroll before noon' },
+  { id: 'h8', emoji: '🌙', name: '9PM wind-down' },
+];
+
+let selectedEmoji = '📌';
+const todayKey = new Date().toDateString();
+
+function getHabits() { return load('habits_list', DEFAULT_HABITS); }
+function getChecked() { return load('habits_checked_' + todayKey, {}); }
+function getStreaks() { return load('habits_streaks', {}); }
+
+function saveHabits(h) { save('habits_list', h); }
+function saveChecked(c) { save('habits_checked_' + todayKey, c); }
+function saveStreaks(s) { save('habits_streaks', s); }
+
+function renderHabits() {
+  const habits = getHabits();
+  const checked = getChecked();
+  const streaks = getStreaks();
+  const grid = document.getElementById('habit-grid');
+  const done = habits.filter(h => checked[h.id]).length;
+  const total = habits.length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById('daily-progress-fill').style.width = pct + '%';
+  document.getElementById('daily-progress-label').textContent = pct + '% complete';
+  document.getElementById('habit-done-count').textContent = `${done}/${total} done`;
+  const allDoneMsg = document.getElementById('all-done-msg');
+  allDoneMsg.style.display = (done === total && total > 0) ? 'block' : 'none';
+
+  grid.innerHTML = habits.map((h, idx) => {
+    const isDone = !!checked[h.id];
+    const streak = streaks[h.id] || 0;
+    const streakClass = streak >= 3 ? 'hot' : '';
+    const streakText = streak > 0
+      ? `${streak >= 3 ? '🔥' : '⚡'} ${streak} day streak`
+      : 'Start your streak!';
+    return `
+      <div class="habit-tile${isDone ? ' done' : ''}" id="tile-${h.id}" onclick="toggleHabit('${h.id}', event)">
+        <div class="habit-check">${isDone ? '✓' : ''}</div>
+        <div class="habit-info">
+          <span class="habit-name">${h.emoji} ${h.name}</span>
+          <span class="habit-streak ${streakClass}">${streakText}</span>
+        </div>
+        <div class="habit-actions" onclick="event.stopPropagation()">
+          <button class="habit-action-btn" onclick="startEditHabit('${h.id}')" title="Rename">✏️</button>
+          <button class="habit-action-btn" onclick="deleteHabit('${h.id}')" title="Delete">✕</button>
+        </div>
+        <div class="habit-edit-inline" id="edit-${h.id}">
+          <input class="habit-edit-field" id="editfield-${h.id}" value="${h.name}" maxlength="40" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')saveEditHabit('${h.id}');if(event.key==='Escape')cancelEditHabit('${h.id}')" />
+          <button class="habit-save-btn" onclick="saveEditHabit('${h.id}')" title="Save">✓</button>
+          <button class="habit-cancel-btn" onclick="cancelEditHabit('${h.id}')" title="Cancel">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleHabit(id, event) {
+  if (event && event.target.closest('.habit-edit-inline')) return;
+  const checked = getChecked();
+  const streaks = getStreaks();
+  const wasChecked = !!checked[id];
+  if (wasChecked) {
+    delete checked[id];
+    // Don't break streak on uncheck — that's harsh
+  } else {
+    checked[id] = true;
+    // Update streak: check if was checked yesterday
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    const yesterdayKey = yest.toDateString();
+    const yesterdayChecked = load('habits_checked_' + yesterdayKey, {});
+    if (yesterdayChecked[id]) {
+      streaks[id] = (streaks[id] || 0) + 1;
+    } else {
+      streaks[id] = 1; // start fresh streak
+    }
+    saveStreaks(streaks);
+  }
+  saveChecked(checked);
+  renderHabits();
+}
+
+function deleteHabit(id) {
+  const habits = getHabits().filter(h => h.id !== id);
+  saveHabits(habits);
+  renderHabits();
+}
+
+function startEditHabit(id) {
+  document.querySelectorAll('.habit-edit-inline').forEach(el => el.classList.remove('show'));
+  const el = document.getElementById('edit-' + id);
+  if (el) { el.classList.add('show'); el.querySelector('input').focus(); }
+}
+
+function saveEditHabit(id) {
+  const field = document.getElementById('editfield-' + id);
+  const val = field ? field.value.trim() : '';
+  if (!val) return;
+  const habits = getHabits();
+  const h = habits.find(h => h.id === id);
+  if (h) { h.name = val; saveHabits(habits); }
+  renderHabits();
+}
+
+function cancelEditHabit(id) {
+  const el = document.getElementById('edit-' + id);
+  if (el) el.classList.remove('show');
+}
+
+function pickEmoji(el, emoji) {
+  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedEmoji = emoji;
+  document.getElementById('selected-emoji').textContent = emoji;
+}
+
+function addHabit() {
+  const inp = document.getElementById('new-habit-input');
+  const name = inp.value.trim();
+  if (!name) return;
+  const habits = getHabits();
+  habits.push({ id: 'h' + Date.now(), emoji: selectedEmoji, name });
+  saveHabits(habits);
+  renderHabits();
+  inp.value = '';
+}
+
+function resetHabitsNow() {
+  saveChecked({});
+  renderHabits();
+}
+
+renderHabits();
+
+// ===================== CAPTAIN'S LOG ARCHIVE =====================
+const MOOD_EMOJI = { '🔥 Fired up':'🔥', '😤 Focused':'😤', '😐 Neutral':'😐', '😴 Tired':'😴', '😰 Anxious':'😰', '🤯 Scattered':'🤯' };
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function getSnapshots() { return load('log_snapshots', {}); }
+function saveSnapshots(s) { save('log_snapshots', s); }
+
+function buildTodaySnapshot() {
+  const today = new Date().toDateString();
+  const habits = getHabits();
+  const checked = getChecked();
+  const habitsDone = habits.filter(h => checked[h.id]).length;
+  const moodData = load('mood', null);
+  const intentionData = load('intention', null);
+  const winsData = load('wins_' + today, []);
+  const oneThing = load('one_thing_' + today, null);
+  const pillars = {
+    career:   load('pillar_career', 0),
+    finance:  load('pillar_finance', 0),
+    physical: load('pillar_physical', 0),
+    mental:   load('pillar_mental', 0),
+  };
+  return {
+    date: today,
+    mood: moodData ? moodData.label : null,
+    intention: intentionData ? intentionData.text : null,
+    habitsTotal: habits.length,
+    habitsDone,
+    wins: winsData,
+    oneThing,
+    pillars,
+  };
+}
+
+function saveTodaySnapshot() {
+  const snap = buildTodaySnapshot();
+  const all = getSnapshots();
+  all[snap.date] = snap;
+  saveSnapshots(all);
+  renderArchive();
+  const flash = document.getElementById('save-flash');
+  flash.style.display = 'flex';
+  setTimeout(() => { flash.style.display = 'none'; }, 2500);
+}
+
+// Auto-save snapshot on page load if we have meaningful data
+(function autoSnapshot() {
+  const today = new Date().toDateString();
+  const winsData = load('wins_' + today, []);
+  const moodData = load('mood', null);
+  if ((winsData.length > 0 || moodData) && moodData && moodData.date === today) {
+    const all = getSnapshots();
+    // Always update today's auto-snapshot silently
+    all[today] = buildTodaySnapshot();
+    all[today]._auto = true;
+    saveSnapshots(all);
+  }
+})();
+
+function toggleArchive() {
+  const body = document.getElementById('archive-body');
+  const icon = document.getElementById('archive-toggle-icon');
+  const isOpen = body.classList.toggle('open');
+  icon.classList.toggle('open', isOpen);
+  if (isOpen) renderArchive();
+}
+
+function renderArchive() {
+  const all = getSnapshots();
+  const dates = Object.keys(all).sort((a, b) => new Date(b) - new Date(a));
+
+  renderWeekStrip(all);
+  renderWeekStats(all);
+
+  const container = document.getElementById('log-entries');
+  if (dates.length === 0) {
+    container.innerHTML = '<div class="archive-empty">No past logs yet. Hit "Save Today" at the end of your day to start your archive.</div>';
+    return;
+  }
+
+  container.innerHTML = dates.map(d => {
+    const s = all[d];
+    const dateObj = new Date(d);
+    const pct = s.habitsTotal ? Math.round((s.habitsDone / s.habitsTotal) * 100) : 0;
+    const moodEmoji = s.mood ? (MOOD_EMOJI[s.mood] || '❓') : '—';
+    const winsHtml = s.wins && s.wins.length
+      ? s.wins.map(w => `<span class="log-win-chip">⭐ ${w}</span>`).join('')
+      : '<span class="log-no-wins">No wins logged</span>';
+    const isToday = d === new Date().toDateString();
+    return `
+      <div class="log-entry">
+        <div class="log-entry-header">
+          <div class="log-entry-date">${DAY_NAMES[dateObj.getDay()]}, ${dateObj.getDate()} ${MONTH_NAMES[dateObj.getMonth()]} ${dateObj.getFullYear()} ${isToday ? '· <span style="color:var(--red)">Today</span>' : ''}</div>
+          <div class="log-entry-mood">${moodEmoji} ${s.mood || 'No mood logged'}</div>
+        </div>
+        ${s.intention ? `<div class="log-intention">"${s.intention}"</div>` : ''}
+        ${s.oneThing ? `<div class="log-one-thing">🎯 One Thing: ${s.oneThing}</div>` : ''}
+        <div class="log-habit-bar-row">
+          <div style="font-size:0.68rem;font-weight:800;color:var(--text-muted);white-space:nowrap;">Habits ${s.habitsDone}/${s.habitsTotal}</div>
+          <div class="log-habit-mini-bar"><div class="log-habit-mini-fill" style="width:${pct}%"></div></div>
+          <div class="log-habit-pct">${pct}%</div>
+        </div>
+        ${s.pillars ? `<div style="font-size:0.68rem;font-weight:700;color:var(--text-muted);margin-bottom:6px;">
+          💼${s.pillars.career}% · ₿${s.pillars.finance}% · 🏋️${s.pillars.physical}% · 🧠${s.pillars.mental}%
+        </div>` : ''}
+        <div class="log-wins">${winsHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderWeekStrip(all) {
+  const strip = document.getElementById('week-strip');
+  const today = new Date();
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    days.push(d);
+  }
+  strip.innerHTML = days.map(d => {
+    const key = d.toDateString();
+    const snap = all[key];
+    const isToday = key === today.toDateString();
+    const pct = snap && snap.habitsTotal ? Math.round((snap.habitsDone / snap.habitsTotal) * 100) : 0;
+    const moodEmoji = snap && snap.mood ? (MOOD_EMOJI[snap.mood] || '?') : '';
+    return `<div class="week-day-card ${snap ? 'has-data' : ''} ${isToday ? 'today-card' : ''}" ${snap ? `onclick="document.getElementById('archive-body').classList.add('open')"` : ''}>
+      <div class="week-day-name">${DAY_NAMES[d.getDay()]}</div>
+      <div class="week-day-date">${d.getDate()} ${MONTH_NAMES[d.getMonth()]}</div>
+      ${snap ? `
+        <div class="week-day-mood">${moodEmoji}</div>
+        <div class="week-habit-ring">
+          <div class="ring-fill" style="height:${pct}%"></div>
+          <span>${pct}%</span>
+        </div>
+        <div class="week-win-count">${snap.wins ? snap.wins.length : 0} ⭐</div>
+      ` : `<div class="week-empty-label">${isToday ? 'Today' : 'No log'}</div>`}
+    </div>`;
+  }).join('');
+}
+
+function renderWeekStats(all) {
+  const today = new Date();
+  const weekSnaps = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const snap = all[d.toDateString()];
+    if (snap) weekSnaps.push(snap);
+  }
+  if (!weekSnaps.length) return;
+
+  const avgHabits = weekSnaps.length
+    ? Math.round(weekSnaps.reduce((a, s) => a + (s.habitsTotal ? s.habitsDone / s.habitsTotal * 100 : 0), 0) / weekSnaps.length)
+    : 0;
+  const totalWins = weekSnaps.reduce((a, s) => a + (s.wins ? s.wins.length : 0), 0);
+  const moodCount = {};
+  weekSnaps.forEach(s => { if (s.mood) moodCount[s.mood] = (moodCount[s.mood] || 0) + 1; });
+  const topMood = Object.keys(moodCount).sort((a,b) => moodCount[b]-moodCount[a])[0];
+  const topMoodEmoji = topMood ? (MOOD_EMOJI[topMood] || '?') : '—';
+
+  document.getElementById('ws-habit-avg').textContent = weekSnaps.length ? avgHabits + '%' : '—';
+  document.getElementById('ws-wins-total').textContent = weekSnaps.length ? totalWins : '—';
+  document.getElementById('ws-days-logged').textContent = weekSnaps.length + '/7';
+  document.getElementById('ws-top-mood').textContent = topMoodEmoji;
+}
+
+function exportAllData() {
+  const all = getSnapshots();
+  const dataStr = JSON.stringify({ exported: new Date().toISOString(), logs: all }, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `captains-log-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===================== TRAINING HUB PROGRESS SYNC =====================
+(function syncTrainingProgress() {
+  try {
+    const checked = JSON.parse(localStorage.getItem('th_checked') || '{}');
+    const doneCount = Object.values(checked).filter(Boolean).length;
+    // Total curated videos: 29 PBI + 25 Excel = 54
+    const TOTAL_CURATED = 54;
+    const pct = Math.min(100, Math.round(doneCount / TOTAL_CURATED * 100));
+    const bar = document.getElementById('dashboard-training-bar');
+    const label = document.getElementById('dashboard-training-pct');
+    if (bar) bar.style.width = pct + '%';
+    if (label) label.textContent = doneCount + ' videos · ' + pct + '% done';
+  } catch(e) {}
+})();
+
+// ===================== CRYPTO =====================
+async function loadCrypto() {
+  const c = document.getElementById('crypto-container');
+  c.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.82rem;font-weight:700;padding:10px 0;">Charting the seas... 🌊</div>';
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,chainlink&vs_currencies=gbp&include_24hr_change=true');
+    const data = await res.json();
+    const coins = [
+      {id:'bitcoin', name:'Bitcoin', ticker:'BTC', icon:'₿', color:'#f7931a', bg:'#fff7eb'},
+      {id:'ethereum', name:'Ethereum', ticker:'ETH', icon:'Ξ', color:'#627eea', bg:'#eef0ff'},
+      {id:'solana', name:'Solana', ticker:'SOL', icon:'◎', color:'#9945ff', bg:'#f5eeff'},
+      {id:'chainlink', name:'Chainlink', ticker:'LINK', icon:'⬡', color:'#1a6ada', bg:'#eef4ff'},
+    ];
+    c.innerHTML = coins.map(coin => {
+      const p = data[coin.id];
+      if (!p) return '';
+      const price = p.gbp ? '£' + p.gbp.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}) : 'N/A';
+      const chg = p.gbp_24h_change ? p.gbp_24h_change.toFixed(2) : '0.00';
+      const pos = parseFloat(chg) >= 0;
+      return `<div class="crypto-row">
+        <div class="crypto-icon" style="background:${coin.bg};color:${coin.color}">${coin.icon}</div>
+        <div class="crypto-name"><strong>${coin.name}</strong><span>${coin.ticker}</span></div>
+        <div class="crypto-price ${pos?'positive':'negative'}">${price}<small>${pos?'+':''}${chg}%</small></div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    c.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.8rem;font-weight:700;padding:10px 0;">Sea fog — check your connection</div>';
+  }
+}
+</script>
+</body>
+</html>

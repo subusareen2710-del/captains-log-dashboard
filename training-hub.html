@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Hub — Subanshu</title>
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a3a6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training Hub">
+<link rel="apple-touch-icon" href="icon-512.svg">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #fdf6ec;
+  --surface: #ffffff;
+  --surface2: #fef9f3;
+  --border: #f0dfc5;
+  --border2: #e8cfa8;
+  --red: #e63228; --red-light: #fff0ef;
+  --gold: #f5a623; --gold-light: #fffbef;
+  --navy: #1a3a6b; --navy-light: #eef2fb;
+  --teal: #00a89c; --teal-light: #edfaf9;
+  --excel: #217346; --excel-light: #eaf5ee;
+  --pbi: #f2c811; --pbi-dark: #e8a500; --pbi-light: #fffbeb;
+  --text: #2c1810; --text-muted: #8b6e5a; --text-dim: #c9b09a;
+  --radius: 14px; --radius-sm: 9px;
+  --shadow: 0 2px 12px rgba(44,24,16,0.07);
+  --shadow-hover: 0 6px 20px rgba(44,24,16,0.13);
+}
+
+body {
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(245,166,35,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(230,50,40,0.05) 0%, transparent 40%);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px;
+}
+
+/* ===== HEADER ===== */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--navy);
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 24px;
+  font-weight: 900;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.back-btn:hover { background: var(--red); transform: translateY(-1px); }
+.header-title { text-align: center; flex: 1; }
+.header-title h1 { font-size: 1.5rem; font-weight: 900; color: var(--navy); }
+.header-title h1 span { color: var(--red); }
+.header-title p { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 3px; }
+.date-badge { background: var(--navy); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
+
+/* ===== OVERALL STATS ===== */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 700px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+.stat-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-val { font-size: 2rem; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+
+/* ===== TAB SWITCHER ===== */
+.tab-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px;
+  box-shadow: var(--shadow);
+}
+.tab-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  background: transparent;
+}
+.tab-btn:hover { background: var(--surface2); }
+.tab-btn.active-pbi {
+  background: var(--pbi);
+  color: #3d2800;
+  box-shadow: 0 3px 10px rgba(242,200,17,0.35);
+}
+.tab-btn.active-excel {
+  background: var(--excel);
+  color: white;
+  box-shadow: 0 3px 10px rgba(33,115,70,0.3);
+}
+/* Generic active state for dynamically added tabs */
+.tab-btn.active-new {
+  background: var(--navy);
+  color: white;
+  box-shadow: 0 3px 10px rgba(26,58,107,0.3);
+}
+.tab-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.12);
+}
+
+/* ===== TRACK PANEL ===== */
+.track-panel { display: none; }
+.track-panel.active { display: block; }
+.track-progress-bar {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  height: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.track-progress-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; }
+.pbi-fill { background: linear-gradient(90deg, var(--pbi-dark), var(--pbi)); }
+.excel-fill { background: linear-gradient(90deg, #1a5c38, var(--excel)); }
+.track-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.track-stats span { font-weight: 900; }
+
+/* ===== MODULE ACCORDION ===== */
+.module-block {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s;
+}
+.module-block:hover { box-shadow: var(--shadow-hover); }
+.module-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  background: var(--surface2);
+  border-bottom: 1.5px solid transparent;
+  transition: background 0.15s;
+  user-select: none;
+}
+.module-head:hover { background: var(--gold-light); }
+.module-head.open { border-bottom-color: var(--border); }
+.module-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.module-head-info { flex: 1; }
+.module-head-title { font-size: 0.88rem; font-weight: 900; color: var(--navy); }
+.module-head-sub { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); margin-top: 2px; }
+.module-mini-bar { width: 80px; }
+.module-mini-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.module-mini-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.module-mini-pct { font-size: 0.65rem; font-weight: 900; margin-top: 3px; }
+.module-chevron { color: var(--text-dim); font-size: 0.9rem; transition: transform 0.2s; flex-shrink: 0; }
+.module-chevron.open { transform: rotate(180deg); }
+.module-body { display: none; padding: 10px 12px; }
+.module-body.open { display: block; }
+
+/* ===== VIDEO ROW ===== */
+.video-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.12s;
+  border-bottom: 1px solid var(--border);
+}
+.video-row:last-child { border-bottom: none; }
+.video-row:hover { background: var(--surface2); }
+.video-row.done { opacity: 0.5; }
+.video-row.done .video-title { text-decoration: line-through; }
+.video-check {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--border2);
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: white;
+  transition: all 0.18s;
+  margin-top: 1px;
+  font-size: 12px;
+  font-weight: 900;
+}
+.video-row.done .video-check { background: var(--teal); border-color: var(--teal); color: white; }
+.video-info { flex: 1; min-width: 0; }
+.video-title { font-size: 0.84rem; font-weight: 800; color: var(--text); line-height: 1.35; display: block; }
+.video-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.channel-badge {
+  font-size: 0.62rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.duration-tag { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+.type-tag {
+  font-size: 0.6rem;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.yt-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #ff0000;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 900;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.yt-btn:hover { background: #cc0000; transform: scale(1.05); }
+.resource-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--navy);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 900;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.resource-btn:hover { background: var(--red); transform: scale(1.05); }
+
+/* ===== ADD CUSTOM VIDEO ===== */
+.add-video-section {
+  background: var(--surface2);
+  border: 1.5px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 14px;
+}
+.add-video-title { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 12px; }
+.add-video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+@media (max-width: 600px) { .add-video-grid { grid-template-columns: 1fr; } }
+.add-input {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.add-input:focus { border-color: var(--gold); background: var(--gold-light); }
+.add-input::placeholder { color: var(--text-dim); font-weight: 600; }
+.add-video-btn {
+  background: var(--navy);
+  color: white;
+  border: none;
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 900;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.add-video-btn:hover { background: var(--red); }
+
+/* ===== SECTION LABEL ===== */
+.section-label {
+  display: flex; align-items: center; gap: 10px;
+  margin: 20px 0 14px;
+  font-size: 0.68rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted);
+}
+.section-label::before, .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ===== MODULE NUMBER COLOURS ===== */
+.pbi-num { background: var(--pbi-light); color: var(--pbi-dark); border: 2px solid var(--pbi); }
+.excel-num { background: var(--excel-light); color: var(--excel); border: 2px solid #a8d5b5; }
+
+/* Channel badge colours */
+.badge-giac { background: #fef3c7; color: #92400e; }
+.badge-sqlbi { background: #ede9fe; color: #5b21b6; }
+.badge-leila { background: #fce7f3; color: #9d174d; }
+.badge-kevin { background: #dbeafe; color: #1e40af; }
+.badge-ms { background: #e0f2fe; color: #0369a1; }
+.badge-custom { background: var(--gold-light); color: #92400e; }
+.badge-mslearn { background: #f0fdf4; color: #166534; }
+
+/* Type tags */
+.tag-video { background: #fee2e2; color: #991b1b; }
+.tag-course { background: #dbeafe; color: #1e40af; }
+.tag-practice { background: #d1fae5; color: #065f46; }
+.tag-article { background: #fef3c7; color: #92400e; }
+
+/* ===== FOOTER ===== */
+.footer { text-align: center; margin-top: 28px; font-size: 0.72rem; font-weight: 700; color: var(--text-dim); }
+.footer span { color: var(--red); }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--surface2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a href="subanshu-dashboard.html" class="back-btn">← Captain's Log</a>
+  <div class="header-title">
+    <h1>📺 Training <span>Hub</span></h1>
+    <p>Excel · Power BI · PL-300 — tick off as you go</p>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+    <div class="date-badge" id="date-badge">Loading...</div>
+    <div id="th-sync" style="font-size:0.7rem;font-weight:800;color:var(--text-muted);">⏳ Connecting...</div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-val" id="stat-total-done" style="color:var(--teal)">0</div>
+    <div class="stat-label">Videos Done</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="stat-total-pct" style="color:var(--navy)">0%</div>
+    <div class="stat-label">Overall Progress</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="stat-pbi-pct" style="color:var(--pbi-dark)">0%</div>
+    <div class="stat-label">Power BI Done</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="stat-excel-pct" style="color:var(--excel)">0%</div>
+    <div class="stat-label">Excel Done</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab-btn active-pbi" id="tab-pbi" onclick="switchTab('pbi')">
+    ⚡ Power BI / PL-300
+    <span class="tab-badge" id="pbi-badge">0%</span>
+  </button>
+  <button class="tab-btn" id="tab-excel" onclick="switchTab('excel')">
+    📊 Excel
+    <span class="tab-badge" id="excel-badge">0%</span>
+  </button>
+</div>
+
+<!-- ========== POWER BI PANEL ========== -->
+<div class="track-panel active" id="panel-pbi">
+  <div class="track-progress-bar"><div class="track-progress-fill pbi-fill" id="pbi-fill" style="width:0%"></div></div>
+  <div class="track-stats">
+    <span>Power BI / PL-300: <span id="pbi-done-count">0</span> / <span id="pbi-total-count">0</span> videos complete</span>
+    <span id="pbi-next-label" style="color:var(--navy)">→ Start with Module 1</span>
+  </div>
+  <div id="pbi-modules"></div>
+  <div class="add-video-section" id="add-video-pbi">
+    <div class="add-video-title">➕ Add Your Own Resource</div>
+    <div class="add-video-grid">
+      <input class="add-input" id="add-pbi-title" placeholder="Video / resource title" />
+      <input class="add-input" id="add-pbi-url" placeholder="https://youtube.com/watch?v=..." />
+    </div>
+    <div class="add-video-grid">
+      <input class="add-input" id="add-pbi-channel" placeholder="Channel / source name" />
+      <input class="add-input" id="add-pbi-duration" placeholder="Duration (e.g. 45m)" />
+    </div>
+    <button class="add-video-btn" onclick="addCustomVideo('pbi')">+ Add to Power BI Track</button>
+  </div>
+</div>
+
+<!-- ========== EXCEL PANEL ========== -->
+<div class="track-panel" id="panel-excel">
+  <div class="track-progress-bar"><div class="track-progress-fill excel-fill" id="excel-fill" style="width:0%"></div></div>
+  <div class="track-stats">
+    <span>Excel: <span id="excel-done-count">0</span> / <span id="excel-total-count">0</span> videos complete</span>
+    <span id="excel-next-label" style="color:var(--excel)">→ Start with Module 1</span>
+  </div>
+  <div id="excel-modules"></div>
+  <div class="add-video-section">
+    <div class="add-video-title">➕ Add Your Own Resource</div>
+    <div class="add-video-grid">
+      <input class="add-input" id="add-excel-title" placeholder="Video / resource title" />
+      <input class="add-input" id="add-excel-url" placeholder="https://youtube.com/watch?v=..." />
+    </div>
+    <div class="add-video-grid">
+      <input class="add-input" id="add-excel-channel" placeholder="Channel / source name" />
+      <input class="add-input" id="add-excel-duration" placeholder="Duration (e.g. 45m)" />
+    </div>
+    <button class="add-video-btn" onclick="addCustomVideo('excel')">+ Add to Excel Track</button>
+  </div>
+</div>
+
+<div class="footer">⚓ Training Hub · Part of <span>Captain Subanshu's</span> Command Centre · Data saved locally</div>
+
+<script>
+// ===== DATA =====
+const CURRICULUM = {
+  pbi: [
+    {
+      id: 'pbi-m1', title: 'Power BI Desktop Basics', sub: 'Interface, navigation & your first report',
+      videos: [
+        { id:'pbi-v1', title:'Power BI Tutorial for Beginners — Full Course', channel:'Guy in a Cube', badge:'badge-giac', dur:'1h 20m', type:'course', url:'https://www.youtube.com/watch?v=AGrl-H87pRU' },
+        { id:'pbi-v2', title:'Microsoft Power BI for Beginners (2024)', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'2h 11m', type:'course', url:'https://www.youtube.com/watch?v=TmhQCQr_0ls' },
+        { id:'pbi-v3', title:'Introduction to Power BI — Microsoft Official', channel:'Microsoft Power BI', badge:'badge-ms', dur:'45m', type:'video', url:'https://www.youtube.com/@MSPowerBI' },
+      ]
+    },
+    {
+      id: 'pbi-m2', title: 'Data Transformation — Power Query', sub: 'Cleaning, shaping & loading data into Power BI',
+      videos: [
+        { id:'pbi-v4', title:'Power Query Beginner to Pro', channel:'Guy in a Cube', badge:'badge-giac', dur:'55m', type:'course', url:'https://www.youtube.com/watch?v=0aeZX1l4JT4' },
+        { id:'pbi-v5', title:'Power Query Tutorial — All Key Features', channel:'Leila Gharani', badge:'badge-leila', dur:'1h', type:'course', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'pbi-v6', title:'M Language Basics in Power Query', channel:'Guy in a Cube', badge:'badge-giac', dur:'25m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+      ]
+    },
+    {
+      id: 'pbi-m3', title: 'Data Modelling & Relationships', sub: 'Star schema, fact/dim tables, relationships',
+      videos: [
+        { id:'pbi-v7', title:'Star Schema — The Complete Guide', channel:'SQLBI', badge:'badge-sqlbi', dur:'30m', type:'video', url:'https://www.youtube.com/watch?v=QjBuSqsN0YM' },
+        { id:'pbi-v8', title:'Data Modelling in Power BI — Best Practices', channel:'Guy in a Cube', badge:'badge-giac', dur:'40m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+        { id:'pbi-v9', title:'Relationships Deep Dive', channel:'SQLBI', badge:'badge-sqlbi', dur:'35m', type:'video', url:'https://www.youtube.com/@SQLBI' },
+      ]
+    },
+    {
+      id: 'pbi-m4', title: 'DAX Fundamentals', sub: 'Measures, calculated columns, filter context',
+      videos: [
+        { id:'pbi-v10', title:'DAX Tutorial for Beginners — Full Course', channel:'SQLBI', badge:'badge-sqlbi', dur:'2h', type:'course', url:'https://www.youtube.com/watch?v=klQAZLr5vxA' },
+        { id:'pbi-v11', title:'Measures vs Calculated Columns — When to Use', channel:'Guy in a Cube', badge:'badge-giac', dur:'20m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+        { id:'pbi-v12', title:'Row Context vs Filter Context Explained', channel:'SQLBI', badge:'badge-sqlbi', dur:'25m', type:'video', url:'https://www.youtube.com/@SQLBI' },
+        { id:'pbi-v13', title:'SUM vs SUMX — Iterator Functions', channel:'SQLBI', badge:'badge-sqlbi', dur:'18m', type:'video', url:'https://www.youtube.com/@SQLBI' },
+      ]
+    },
+    {
+      id: 'pbi-m5', title: 'Advanced DAX', sub: 'CALCULATE, time intelligence, complex measures',
+      videos: [
+        { id:'pbi-v14', title:'CALCULATE — The Most Important DAX Function', channel:'SQLBI', badge:'badge-sqlbi', dur:'30m', type:'video', url:'https://www.youtube.com/watch?v=I5MzP4wGiQg' },
+        { id:'pbi-v15', title:'Time Intelligence in DAX (YTD, MTD, QTD)', channel:'SQLBI', badge:'badge-sqlbi', dur:'45m', type:'course', url:'https://www.youtube.com/@SQLBI' },
+        { id:'pbi-v16', title:'Advanced DAX Patterns', channel:'SQLBI', badge:'badge-sqlbi', dur:'1h', type:'course', url:'https://www.daxpatterns.com' },
+        { id:'pbi-v17', title:'Variables in DAX — VAR / RETURN', channel:'Guy in a Cube', badge:'badge-giac', dur:'15m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+      ]
+    },
+    {
+      id: 'pbi-m6', title: 'Report Design & Visualisations', sub: 'Visuals, formatting, storytelling with data',
+      videos: [
+        { id:'pbi-v18', title:'Power BI Report Design Best Practices', channel:'Guy in a Cube', badge:'badge-giac', dur:'35m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+        { id:'pbi-v19', title:'Data Storytelling in Power BI', channel:'Microsoft Power BI', badge:'badge-ms', dur:'30m', type:'video', url:'https://www.youtube.com/@MSPowerBI' },
+        { id:'pbi-v20', title:'Custom Visuals — Power BI Marketplace', channel:'Guy in a Cube', badge:'badge-giac', dur:'25m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+      ]
+    },
+    {
+      id: 'pbi-m7', title: 'Row-Level Security & Deployment', sub: 'RLS setup, roles, workspace publishing',
+      videos: [
+        { id:'pbi-v21', title:'Row-Level Security Step by Step', channel:'Guy in a Cube', badge:'badge-giac', dur:'30m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+        { id:'pbi-v22', title:'Publishing & Deployment to Power BI Service', channel:'Guy in a Cube', badge:'badge-giac', dur:'20m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+      ]
+    },
+    {
+      id: 'pbi-m8', title: 'Power BI Service & Workspaces', sub: 'Dashboards, sharing, dataflows, gateways',
+      videos: [
+        { id:'pbi-v23', title:'Power BI Service Complete Tutorial', channel:'Guy in a Cube', badge:'badge-giac', dur:'1h', type:'course', url:'https://www.youtube.com/@GuyInACube' },
+        { id:'pbi-v24', title:'Power BI Dataflows Explained', channel:'Microsoft Power BI', badge:'badge-ms', dur:'35m', type:'video', url:'https://www.youtube.com/@MSPowerBI' },
+        { id:'pbi-v25', title:'Scheduled Refresh & On-Premise Gateway', channel:'Guy in a Cube', badge:'badge-giac', dur:'25m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+      ]
+    },
+    {
+      id: 'pbi-m9', title: 'PL-300 Exam Prep', sub: 'Practice exams, Microsoft Learn path, exam strategy',
+      videos: [
+        { id:'pbi-v26', title:'PL-300 Microsoft Learn Official Path', channel:'Microsoft Learn', badge:'badge-mslearn', dur:'Self-paced', type:'course', url:'https://learn.microsoft.com/en-us/certifications/exams/pl-300/' },
+        { id:'pbi-v27', title:'PL-300 Study Guide — All Topics Covered', channel:'Guy in a Cube', badge:'badge-giac', dur:'2h', type:'course', url:'https://www.youtube.com/@GuyInACube' },
+        { id:'pbi-v28', title:'PL-300 Practice Questions (Free)', channel:'Microsoft Learn', badge:'badge-mslearn', dur:'Practice', type:'practice', url:'https://learn.microsoft.com/en-us/certifications/practice-assessments-for-microsoft-certifications' },
+        { id:'pbi-v29', title:'Exam Tips & Gotchas for PL-300', channel:'Guy in a Cube', badge:'badge-giac', dur:'30m', type:'video', url:'https://www.youtube.com/@GuyInACube' },
+      ]
+    },
+  ],
+  excel: [
+    {
+      id: 'excel-m1', title: 'Excel Fundamentals', sub: 'Interface, navigation, formatting, basic formulas',
+      videos: [
+        { id:'ex-v1', title:'Excel Tutorial for Beginners — Complete 2024', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'1h 45m', type:'course', url:'https://www.youtube.com/watch?v=PSNXoAs2FtQ' },
+        { id:'ex-v2', title:'Excel Basics in 1 Hour', channel:'Leila Gharani', badge:'badge-leila', dur:'1h', type:'course', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v3', title:'Excel Keyboard Shortcuts — Boost Your Speed', channel:'Leila Gharani', badge:'badge-leila', dur:'20m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+      ]
+    },
+    {
+      id: 'excel-m2', title: 'Essential Lookup Formulas', sub: 'VLOOKUP, XLOOKUP, INDEX/MATCH — most-used in Ops/PM',
+      videos: [
+        { id:'ex-v4', title:'XLOOKUP — Replace VLOOKUP Forever', channel:'Leila Gharani', badge:'badge-leila', dur:'25m', type:'video', url:'https://www.youtube.com/watch?v=qkNDoBEBLe4' },
+        { id:'ex-v5', title:'INDEX MATCH — The Power Combo', channel:'Leila Gharani', badge:'badge-leila', dur:'30m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v6', title:'VLOOKUP — When You Still Need It', channel:'Leila Gharani', badge:'badge-leila', dur:'20m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v7', title:'MATCH & INDEX for Dynamic Lookups', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'22m', type:'video', url:'https://www.youtube.com/@KevinStratvert' },
+      ]
+    },
+    {
+      id: 'excel-m3', title: 'Data Analysis Formulas', sub: 'SUMIFS, COUNTIFS, IF nesting, array formulas',
+      videos: [
+        { id:'ex-v8', title:'SUMIFS & COUNTIFS — Full Tutorial', channel:'Leila Gharani', badge:'badge-leila', dur:'25m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v9', title:'IF, IFS, IFERROR & Nested Logic', channel:'Leila Gharani', badge:'badge-leila', dur:'30m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v10', title:'Dynamic Array Formulas (UNIQUE, SORT, FILTER)', channel:'Leila Gharani', badge:'badge-leila', dur:'35m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v11', title:'Text Functions — TEXTJOIN, LEFT, MID, FIND', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'20m', type:'video', url:'https://www.youtube.com/@KevinStratvert' },
+      ]
+    },
+    {
+      id: 'excel-m4', title: 'PivotTables & Charts', sub: 'Most critical skill for Ops/PM reporting',
+      videos: [
+        { id:'ex-v12', title:'PivotTable Tutorial — Beginner to Pro', channel:'Leila Gharani', badge:'badge-leila', dur:'1h', type:'course', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v13', title:'Advanced PivotTable Tricks', channel:'Leila Gharani', badge:'badge-leila', dur:'35m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v14', title:'Excel Charts — All Types Explained', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'45m', type:'course', url:'https://www.youtube.com/@KevinStratvert' },
+        { id:'ex-v15', title:'Slicers & Timelines with PivotTables', channel:'Leila Gharani', badge:'badge-leila', dur:'20m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+      ]
+    },
+    {
+      id: 'excel-m5', title: 'Power Query in Excel', sub: 'Automate data cleaning — huge Ops/PM skill',
+      videos: [
+        { id:'ex-v16', title:'Power Query for Beginners — Excel Edition', channel:'Leila Gharani', badge:'badge-leila', dur:'1h', type:'course', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v17', title:'Combine Multiple Files with Power Query', channel:'Leila Gharani', badge:'badge-leila', dur:'30m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v18', title:'Data Cleaning Tricks in Power Query', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'25m', type:'video', url:'https://www.youtube.com/@KevinStratvert' },
+      ]
+    },
+    {
+      id: 'excel-m6', title: 'Excel Dashboards', sub: 'Build reporting dashboards for stakeholders',
+      videos: [
+        { id:'ex-v19', title:'Excel Dashboard Tutorial — Beginner to Pro', channel:'Leila Gharani', badge:'badge-leila', dur:'1h 15m', type:'course', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v20', title:'Dynamic Dashboard with Dropdown Filters', channel:'Leila Gharani', badge:'badge-leila', dur:'45m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v21', title:'KPI Dashboard for Operations Teams', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'40m', type:'video', url:'https://www.youtube.com/@KevinStratvert' },
+      ]
+    },
+    {
+      id: 'excel-m7', title: 'Excel for Ops / PM Roles', sub: 'Project trackers, Gantt charts, resource planning',
+      videos: [
+        { id:'ex-v22', title:'Project Tracker in Excel — Full Build', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'50m', type:'course', url:'https://www.youtube.com/@KevinStratvert' },
+        { id:'ex-v23', title:'Gantt Chart in Excel from Scratch', channel:'Leila Gharani', badge:'badge-leila', dur:'30m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+        { id:'ex-v24', title:'Resource Planning Spreadsheet Template', channel:'Kevin Stratvert', badge:'badge-kevin', dur:'35m', type:'video', url:'https://www.youtube.com/@KevinStratvert' },
+        { id:'ex-v25', title:'What-If Analysis, Goal Seek & Solver', channel:'Leila Gharani', badge:'badge-leila', dur:'28m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
+      ]
+    },
+  ]
+};
+
+// ===== FIREBASE + STORAGE =====
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey: "AIzaSyANpS7-0FwYHSZPapRy961cBgHLBd9hPu4",
+    authDomain: "daily-planner-e61fc.firebaseapp.com",
+    projectId: "daily-planner-e61fc",
+    storageBucket: "daily-planner-e61fc.firebasestorage.app",
+    messagingSenderId: "912213843115",
+    appId: "1:912213843115:web:4aba43a5f506297c356bee"
+  });
+}
+const thDb = firebase.firestore();
+thDb.enablePersistence().catch(() => {});
+const TH_DOC = thDb.collection('training').doc('main');
+
+let _thSyncTimer = null;
+let _thIgnore = false;
+
+function setSyncBadge(s) {
+  const el = document.getElementById('th-sync');
+  if (!el) return;
+  const map = { synced:'☁️ Synced', syncing:'↻ Syncing...', offline:'📴 Offline', error:'⚠️ Error' };
+  el.textContent = map[s] || s;
+  el.style.color = s === 'synced' ? '#00a89c' : s === 'error' ? '#e63228' : '#8b6e5a';
+}
+
+function save(k, v) {
+  try { localStorage.setItem('th_' + k, JSON.stringify(v)); } catch(e) {}
+  clearTimeout(_thSyncTimer);
+  _thSyncTimer = setTimeout(thPushAll, 1200);
+  setSyncBadge('syncing');
+}
+
+function load(k, d) {
+  try { const v = localStorage.getItem('th_' + k); return v !== null ? JSON.parse(v) : d; } catch(e) { return d; }
+}
+
+function thPushAll() {
+  const data = { _ts: Date.now() };
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k.startsWith('th_')) continue;
+    try { data[k.slice(3)] = JSON.parse(localStorage.getItem(k)); } catch(e) {}
+  }
+  _thIgnore = true;
+  TH_DOC.set(data, { merge: true })
+    .then(() => { setSyncBadge('synced'); setTimeout(() => _thIgnore = false, 1500); })
+    .catch(() => { setSyncBadge('error'); _thIgnore = false; });
+}
+
+TH_DOC.onSnapshot(doc => {
+  if (_thIgnore) { _thIgnore = false; return; }
+  if (!doc.exists) { setSyncBadge('synced'); return; }
+  const data = doc.data();
+  const fsTs = data._ts || 0;
+  const localTs = parseInt(localStorage.getItem('th__ts') || '0');
+  setSyncBadge('synced');
+  if (fsTs > localTs) {
+    Object.keys(data).forEach(k => {
+      if (k === '_ts') return;
+      try { localStorage.setItem('th_' + k, JSON.stringify(data[k])); } catch(e) {}
+    });
+    checked = load('checked', {});
+    customVideos = load('custom_videos', { pbi: [], excel: [] });
+    renderAll();
+  }
+}, () => setSyncBadge('offline'));
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+let checked = load('checked', {});
+let customVideos = load('custom_videos', { pbi: [], excel: [] });
+
+// ===== DATE =====
+(function() {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const el = document.getElementById('date-badge');
+  if (el) el.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+})();
+
+// ===== TABS =====
+let currentTab = 'pbi';
+const KNOWN_TAB_STYLES = { pbi: 'active-pbi', excel: 'active-excel' };
+function switchTab(tab) {
+  currentTab = tab;
+  // Hide all panels, deactivate all buttons (works for any future tabs too)
+  document.querySelectorAll('.track-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn');
+  const panel = document.getElementById('panel-' + tab);
+  if (panel) panel.classList.add('active');
+  const btn = document.getElementById('tab-' + tab);
+  if (btn) btn.classList.add(KNOWN_TAB_STYLES[tab] || 'active-new');
+}
+
+// ===== TOGGLE VIDEO DONE =====
+function toggleVideo(id) {
+  checked[id] = !checked[id];
+  save('checked', checked);
+  renderAll();
+}
+
+// ===== MODULE TOGGLE =====
+function toggleModule(id) {
+  const body = document.getElementById('mb-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const head = document.getElementById('mh-' + id);
+  const isOpen = body.classList.toggle('open');
+  if (chev) chev.classList.toggle('open', isOpen);
+  if (head) head.classList.toggle('open', isOpen);
+}
+
+// ===== RENDER =====
+function renderAll() {
+  renderTrack('pbi');
+  renderTrack('excel');
+  updateStats();
+}
+
+function getAllVideos(track) {
+  const modules = CURRICULUM[track];
+  const custom = customVideos[track] || [];
+  let all = [];
+  modules.forEach(m => { all = all.concat(m.videos); });
+  all = all.concat(custom);
+  return all;
+}
+
+function renderTrack(track) {
+  const allVids = getAllVideos(track);
+  const done = allVids.filter(v => checked[v.id]).length;
+  const total = allVids.length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+
+  document.getElementById(track + '-fill').style.width = pct + '%';
+  document.getElementById(track + '-done-count').textContent = done;
+  document.getElementById(track + '-total-count').textContent = total;
+
+  const badge = document.getElementById(track + '-badge');
+  if (badge) badge.textContent = pct + '%';
+
+  // Next label
+  const nextLabel = document.getElementById(track + '-next-label');
+  if (nextLabel) {
+    const nextVid = allVids.find(v => !checked[v.id]);
+    nextLabel.textContent = nextVid ? `→ Up next: ${nextVid.title.slice(0, 40)}${nextVid.title.length > 40 ? '...' : ''}` : '🎉 Track complete!';
+  }
+
+  const container = document.getElementById(track + '-modules');
+  const numClass = track === 'pbi' ? 'pbi-num' : 'excel-num';
+  const modules = CURRICULUM[track];
+
+  container.innerHTML = modules.map((mod, idx) => {
+    const modVids = [...mod.videos, ...(customVideos[track] || []).filter(v => v.moduleId === mod.id)];
+    const modDone = modVids.filter(v => checked[v.id]).length;
+    const modPct = modVids.length ? Math.round(modDone / modVids.length * 100) : 0;
+    const modFillColor = track === 'pbi' ? 'var(--pbi-dark)' : 'var(--excel)';
+    const allModDone = modDone === modVids.length && modVids.length > 0;
+
+    return `
+      <div class="module-block">
+        <div class="module-head" id="mh-${mod.id}" onclick="toggleModule('${mod.id}')">
+          <div class="module-num ${numClass}">${idx + 1}</div>
+          <div class="module-head-info">
+            <div class="module-head-title">${allModDone ? '✅ ' : ''}${mod.title}</div>
+            <div class="module-head-sub">${mod.sub}</div>
+          </div>
+          <div class="module-mini-bar">
+            <div class="module-mini-track">
+              <div class="module-mini-fill" style="width:${modPct}%;background:${modFillColor}"></div>
+            </div>
+            <div class="module-mini-pct" style="color:${modFillColor}">${modDone}/${modVids.length}</div>
+          </div>
+          <div class="module-chevron" id="chev-${mod.id}">▼</div>
+        </div>
+        <div class="module-body" id="mb-${mod.id}">
+          ${modVids.map(v => renderVideoRow(v)).join('')}
+        </div>
+      </div>`;
+  }).join('');
+
+  // Render custom videos not attached to a module separately
+  const orphanCustom = (customVideos[track] || []).filter(v => !v.moduleId);
+  if (orphanCustom.length) {
+    container.innerHTML += `
+      <div class="module-block">
+        <div class="module-head" id="mh-custom-${track}" onclick="toggleModule('custom-${track}')">
+          <div class="module-num ${numClass}">+</div>
+          <div class="module-head-info">
+            <div class="module-head-title">My Custom Resources</div>
+            <div class="module-head-sub">Videos & links you've added</div>
+          </div>
+          <div class="module-chevron" id="chev-custom-${track}">▼</div>
+        </div>
+        <div class="module-body open" id="mb-custom-${track}">
+          ${orphanCustom.map(v => renderVideoRow(v, true)).join('')}
+        </div>
+      </div>`;
+  }
+}
+
+function renderVideoRow(v, canDelete = false) {
+  const isDone = !!checked[v.id];
+  const linkBtn = v.url && v.url.startsWith('http')
+    ? `<a class="${v.url.includes('youtube') || v.url.includes('youtu.be') ? 'yt-btn' : 'resource-btn'}" href="${v.url}" target="_blank" rel="noopener">${v.url.includes('youtube') || v.url.includes('youtu.be') ? '▶ Watch' : '🔗 Open'}</a>`
+    : '';
+  const delBtn = canDelete
+    ? `<button style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-weight:900;font-size:0.72rem;padding:6px;font-family:inherit;" onclick="deleteCustomVideo('${v.id}','${currentTab}')" title="Remove">✕</button>`
+    : '';
+  const typeTag = v.type ? `<span class="type-tag tag-${v.type}">${v.type}</span>` : '';
+  return `
+    <div class="video-row${isDone ? ' done' : ''}" id="vrow-${v.id}">
+      <div class="video-check" onclick="toggleVideo('${v.id}')">${isDone ? '✓' : ''}</div>
+      <div class="video-info">
+        <span class="video-title">${v.title}</span>
+        <div class="video-meta">
+          <span class="channel-badge ${v.badge || 'badge-custom'}">${v.channel}</span>
+          ${v.dur ? `<span class="duration-tag">⏱ ${v.dur}</span>` : ''}
+          ${typeTag}
+        </div>
+      </div>
+      ${linkBtn}
+      ${delBtn}
+    </div>`;
+}
+
+function updateStats() {
+  const pbiVids = getAllVideos('pbi');
+  const excelVids = getAllVideos('excel');
+  const allVids = [...pbiVids, ...excelVids];
+  const pbiDone = pbiVids.filter(v => checked[v.id]).length;
+  const excelDone = excelVids.filter(v => checked[v.id]).length;
+  const totalDone = pbiDone + excelDone;
+  const totalVids = allVids.length;
+  const pbiPct = pbiVids.length ? Math.round(pbiDone / pbiVids.length * 100) : 0;
+  const excelPct = excelVids.length ? Math.round(excelDone / excelVids.length * 100) : 0;
+
+  document.getElementById('stat-total-done').textContent = totalDone;
+  document.getElementById('stat-total-pct').textContent = totalVids ? Math.round(totalDone / totalVids * 100) + '%' : '0%';
+  document.getElementById('stat-pbi-pct').textContent = pbiPct + '%';
+  document.getElementById('stat-excel-pct').textContent = excelPct + '%';
+}
+
+// ===== ADD CUSTOM VIDEO =====
+function addCustomVideo(track) {
+  const title = document.getElementById(`add-${track}-title`).value.trim();
+  const url = document.getElementById(`add-${track}-url`).value.trim();
+  const channel = document.getElementById(`add-${track}-channel`).value.trim() || 'My Resource';
+  const dur = document.getElementById(`add-${track}-duration`).value.trim();
+  if (!title) {
+    const inp = document.getElementById(`add-${track}-title`);
+    inp.style.borderColor = 'var(--red)';
+    inp.placeholder = 'Title required!';
+    setTimeout(() => { inp.style.borderColor = ''; inp.placeholder = 'Video / resource title'; }, 2000);
+    return;
+  }
+  const newVid = { id: 'custom-' + Date.now(), title, channel, badge: 'badge-custom', dur, url, type: 'video' };
+  customVideos[track].push(newVid);
+  save('custom_videos', customVideos);
+  ['title','url','channel','duration'].forEach(f => { document.getElementById(`add-${track}-${f}`).value = ''; });
+  renderAll();
+}
+
+function deleteCustomVideo(id, track) {
+  customVideos[track] = customVideos[track].filter(v => v.id !== id);
+  save('custom_videos', customVideos);
+  renderAll();
+}
+
+// ===== INIT =====
+renderAll();
+</script>
+</body>
+</html>
