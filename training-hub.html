@@ -6,7 +6,7 @@
 <title>Training Hub — Subanshu</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1a3a6b">
+<meta name="theme-color" content="#0e0805">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Training Hub">
@@ -20,29 +20,40 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: #fdf6ec;
-  --surface: #ffffff;
-  --surface2: #fef9f3;
-  --border: #f0dfc5;
-  --border2: #e8cfa8;
-  --red: #e63228; --red-light: #fff0ef;
-  --gold: #f5a623; --gold-light: #fffbef;
-  --navy: #1a3a6b; --navy-light: #eef2fb;
-  --teal: #00a89c; --teal-light: #edfaf9;
-  --excel: #217346; --excel-light: #eaf5ee;
-  --pbi: #f2c811; --pbi-dark: #e8a500; --pbi-light: #fffbeb;
-  --text: #2c1810; --text-muted: #8b6e5a; --text-dim: #c9b09a;
+  /* ── Dark fire palette matching Training tab ── */
+  --bg:       #0a0603;
+  --surface:  #130a05;
+  --surface2: #1c0f08;
+  --border:   #2e1a0d;
+  --border2:  #3f2510;
+
+  /* Accent colours */
+  --orange:   #ff6b35;
+  --orange2:  #ff4500;
+  --red:      #ff4444;   --red-light:  rgba(255,68,68,0.08);
+  --gold:     #ffb627;   --gold-light: rgba(255,182,39,0.08);
+  --navy:     #ff6b35;   --navy-light: rgba(255,107,53,0.08);  /* remapped to orange */
+  --teal:     #00d4c8;   --teal-light: rgba(0,212,200,0.08);
+  --excel:    #22c55e;   --excel-light: rgba(34,197,94,0.08);
+  --pbi:      #ffb627;   --pbi-dark: #ff8c00; --pbi-light: rgba(255,182,39,0.08);
+
+  --text:       #f0e0d0;
+  --text-muted: #a07060;
+  --text-dim:   #50302a;
+
   --radius: 14px; --radius-sm: 9px;
-  --shadow: 0 2px 12px rgba(44,24,16,0.07);
-  --shadow-hover: 0 6px 20px rgba(44,24,16,0.13);
+  --shadow:       0 2px 12px rgba(0,0,0,0.4);
+  --shadow-hover: 0 6px 24px rgba(255,107,53,0.18);
 }
 
 body {
   font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
   background-image:
-    radial-gradient(circle at 10% 20%, rgba(245,166,35,0.06) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(230,50,40,0.05) 0%, transparent 40%);
+    radial-gradient(ellipse at 15% 0%,   rgba(255,107,53,0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 100%, rgba(255,68,68,0.12)  0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%,  rgba(255,80,20,0.05)  0%, transparent 70%);
+  background-attachment: fixed;
   color: var(--text);
   min-height: 100vh;
   padding: 24px;
@@ -61,9 +72,9 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--navy);
-  color: white;
-  border: none;
+  background: rgba(255,107,53,0.12);
+  color: var(--orange);
+  border: 1px solid rgba(255,107,53,0.35);
   padding: 9px 18px;
   border-radius: 24px;
   font-weight: 900;
@@ -73,12 +84,12 @@ body {
   text-decoration: none;
   transition: all 0.2s;
 }
-.back-btn:hover { background: var(--red); transform: translateY(-1px); }
+.back-btn:hover { background: var(--orange); color: #0a0603; transform: translateY(-1px); }
 .header-title { text-align: center; flex: 1; }
-.header-title h1 { font-size: 1.5rem; font-weight: 900; color: var(--navy); }
-.header-title h1 span { color: var(--red); }
+.header-title h1 { font-size: 1.5rem; font-weight: 900; color: var(--text); }
+.header-title h1 span { color: var(--orange); }
 .header-title p { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 3px; }
-.date-badge { background: var(--navy); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
+.date-badge { background: rgba(255,107,53,0.15); color: var(--orange); border: 1px solid rgba(255,107,53,0.3); padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
 
 /* ===== OVERALL STATS ===== */
 .stats-row {
@@ -90,11 +101,20 @@ body {
 @media (max-width: 700px) { .stats-row { grid-template-columns: 1fr 1fr; } }
 .stat-card {
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
   text-align: center;
   box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,107,53,0.8), transparent);
 }
 .stat-val { font-size: 2rem; font-weight: 900; line-height: 1; margin-bottom: 4px; }
 .stat-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
@@ -105,7 +125,7 @@ body {
   gap: 10px;
   margin-bottom: 22px;
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 6px;
   box-shadow: var(--shadow);
@@ -127,22 +147,22 @@ body {
   color: var(--text-muted);
   background: transparent;
 }
-.tab-btn:hover { background: var(--surface2); }
+.tab-btn:hover { background: rgba(255,107,53,0.08); color: var(--orange); }
 .tab-btn.active-pbi {
-  background: var(--pbi);
-  color: #3d2800;
-  box-shadow: 0 3px 10px rgba(242,200,17,0.35);
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  color: white;
+  box-shadow: 0 3px 14px rgba(255,107,53,0.4);
 }
 .tab-btn.active-excel {
-  background: var(--excel);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
   color: white;
-  box-shadow: 0 3px 10px rgba(33,115,70,0.3);
+  box-shadow: 0 3px 10px rgba(34,197,94,0.3);
 }
 /* Generic active state for dynamically added tabs */
 .tab-btn.active-new {
-  background: var(--navy);
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
   color: white;
-  box-shadow: 0 3px 10px rgba(26,58,107,0.3);
+  box-shadow: 0 3px 10px rgba(255,107,53,0.3);
 }
 .tab-badge {
   font-size: 0.65rem;
@@ -164,7 +184,7 @@ body {
   margin-bottom: 8px;
 }
 .track-progress-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; }
-.pbi-fill { background: linear-gradient(90deg, var(--pbi-dark), var(--pbi)); }
+.pbi-fill { background: linear-gradient(90deg, #ff4500, #ff6b35, #ffb627); }
 .excel-fill { background: linear-gradient(90deg, #1a5c38, var(--excel)); }
 .track-stats {
   display: flex;
@@ -179,7 +199,7 @@ body {
 /* ===== MODULE ACCORDION ===== */
 .module-block {
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 12px;
   overflow: hidden;
@@ -198,7 +218,7 @@ body {
   transition: background 0.15s;
   user-select: none;
 }
-.module-head:hover { background: var(--gold-light); }
+.module-head:hover { background: rgba(255,107,53,0.06); }
 .module-head.open { border-bottom-color: var(--border); }
 .module-num {
   width: 28px;
@@ -212,7 +232,7 @@ body {
   flex-shrink: 0;
 }
 .module-head-info { flex: 1; }
-.module-head-title { font-size: 0.88rem; font-weight: 900; color: var(--navy); }
+.module-head-title { font-size: 0.88rem; font-weight: 900; color: var(--text); }
 .module-head-sub { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); margin-top: 2px; }
 .module-mini-bar { width: 80px; }
 .module-mini-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
@@ -234,7 +254,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .video-row:last-child { border-bottom: none; }
-.video-row:hover { background: var(--surface2); }
+.video-row:hover { background: rgba(255,107,53,0.05); }
 .video-row.done { opacity: 0.5; }
 .video-row.done .video-title { text-decoration: line-through; }
 .video-check {
@@ -253,7 +273,7 @@ body {
   font-size: 12px;
   font-weight: 900;
 }
-.video-row.done .video-check { background: var(--teal); border-color: var(--teal); color: white; }
+.video-row.done .video-check { background: var(--orange); border-color: var(--orange); color: white; }
 .video-info { flex: 1; min-width: 0; }
 .video-title { font-size: 0.84rem; font-weight: 800; color: var(--text); line-height: 1.35; display: block; }
 .video-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
@@ -298,9 +318,9 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  background: var(--navy);
-  color: white;
-  border: none;
+  background: rgba(255,107,53,0.15);
+  color: var(--orange);
+  border: 1px solid rgba(255,107,53,0.3);
   padding: 6px 12px;
   border-radius: var(--radius-sm);
   font-size: 0.72rem;
@@ -312,7 +332,7 @@ body {
   flex-shrink: 0;
   transition: all 0.15s;
 }
-.resource-btn:hover { background: var(--red); transform: scale(1.05); }
+.resource-btn:hover { background: var(--orange); color: #0a0603; transform: scale(1.05); }
 
 /* ===== ADD CUSTOM VIDEO ===== */
 .add-video-section {
@@ -338,10 +358,10 @@ body {
   transition: border-color 0.2s;
   width: 100%;
 }
-.add-input:focus { border-color: var(--gold); background: var(--gold-light); }
+.add-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,107,53,0.12); }
 .add-input::placeholder { color: var(--text-dim); font-weight: 600; }
 .add-video-btn {
-  background: var(--navy);
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
   color: white;
   border: none;
   padding: 9px 20px;
@@ -351,8 +371,9 @@ body {
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
+  box-shadow: 0 3px 12px rgba(255,107,53,0.3);
 }
-.add-video-btn:hover { background: var(--red); }
+.add-video-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
 /* ===== SECTION LABEL ===== */
 .section-label {
@@ -360,35 +381,36 @@ body {
   margin: 20px 0 14px;
   font-size: 0.68rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted);
 }
-.section-label::before, .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.section-label::before, .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255,107,53,0.35), transparent); }
 
 /* ===== MODULE NUMBER COLOURS ===== */
-.pbi-num { background: var(--pbi-light); color: var(--pbi-dark); border: 2px solid var(--pbi); }
-.excel-num { background: var(--excel-light); color: var(--excel); border: 2px solid #a8d5b5; }
+.pbi-num { background: rgba(255,107,53,0.12); color: var(--orange); border: 2px solid rgba(255,107,53,0.4); }
+.excel-num { background: rgba(34,197,94,0.1); color: var(--excel); border: 2px solid rgba(34,197,94,0.35); }
 
 /* Channel badge colours */
-.badge-giac { background: #fef3c7; color: #92400e; }
-.badge-sqlbi { background: #ede9fe; color: #5b21b6; }
-.badge-leila { background: #fce7f3; color: #9d174d; }
-.badge-kevin { background: #dbeafe; color: #1e40af; }
-.badge-ms { background: #e0f2fe; color: #0369a1; }
-.badge-custom { background: var(--gold-light); color: #92400e; }
-.badge-mslearn { background: #f0fdf4; color: #166534; }
+.badge-giac   { background: rgba(255,182,39,0.15);  color: #ffb627; }
+.badge-sqlbi  { background: rgba(168,85,247,0.15);  color: #c084fc; }
+.badge-leila  { background: rgba(244,114,182,0.15); color: #f472b6; }
+.badge-kevin  { background: rgba(96,165,250,0.15);  color: #60a5fa; }
+.badge-ms     { background: rgba(56,189,248,0.15);  color: #38bdf8; }
+.badge-custom { background: rgba(255,107,53,0.15);  color: #ff6b35; }
+.badge-mslearn{ background: rgba(34,197,94,0.15);   color: #4ade80; }
 
 /* Type tags */
-.tag-video { background: #fee2e2; color: #991b1b; }
-.tag-course { background: #dbeafe; color: #1e40af; }
-.tag-practice { background: #d1fae5; color: #065f46; }
-.tag-article { background: #fef3c7; color: #92400e; }
+.tag-video    { background: rgba(255,107,53,0.15); color: #ff6b35; }
+.tag-course   { background: rgba(96,165,250,0.15);  color: #60a5fa; }
+.tag-practice { background: rgba(34,197,94,0.15);   color: #4ade80; }
+.tag-article  { background: rgba(255,182,39,0.15);  color: #ffb627; }
 
 /* ===== FOOTER ===== */
-.footer { text-align: center; margin-top: 28px; font-size: 0.72rem; font-weight: 700; color: var(--text-dim); }
+.footer { text-align: center; margin-top: 28px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
 .footer span { color: var(--red); }
 
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface2); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(255,107,53,0.35); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,107,53,0.6); }
 </style>
 </head>
 <body>
@@ -409,15 +431,15 @@ body {
 <!-- STATS -->
 <div class="stats-row">
   <div class="stat-card">
-    <div class="stat-val" id="stat-total-done" style="color:var(--teal)">0</div>
+    <div class="stat-val" id="stat-total-done" style="color:var(--orange)">0</div>
     <div class="stat-label">Videos Done</div>
   </div>
   <div class="stat-card">
-    <div class="stat-val" id="stat-total-pct" style="color:var(--navy)">0%</div>
+    <div class="stat-val" id="stat-total-pct" style="color:var(--text)">0%</div>
     <div class="stat-label">Overall Progress</div>
   </div>
   <div class="stat-card">
-    <div class="stat-val" id="stat-pbi-pct" style="color:var(--pbi-dark)">0%</div>
+    <div class="stat-val" id="stat-pbi-pct" style="color:var(--gold)">0%</div>
     <div class="stat-label">Power BI Done</div>
   </div>
   <div class="stat-card">
@@ -443,7 +465,7 @@ body {
   <div class="track-progress-bar"><div class="track-progress-fill pbi-fill" id="pbi-fill" style="width:0%"></div></div>
   <div class="track-stats">
     <span>Power BI / PL-300: <span id="pbi-done-count">0</span> / <span id="pbi-total-count">0</span> videos complete</span>
-    <span id="pbi-next-label" style="color:var(--navy)">→ Start with Module 1</span>
+    <span id="pbi-next-label" style="color:var(--orange)">→ Start with Module 1</span>
   </div>
   <div id="pbi-modules"></div>
   <div class="add-video-section" id="add-video-pbi">
