@@ -31,6 +31,7 @@
   --teal: #00a89c; --teal-light: #edfaf9;
   --excel: #217346; --excel-light: #eaf5ee;
   --pbi: #f2c811; --pbi-dark: #e8a500; --pbi-light: #fffbeb;
+  --r-blue: #276DC3; --r-blue-dark: #1a5299; --r-light: #eef4fc;
   --text: #2c1810; --text-muted: #8b6e5a; --text-dim: #c9b09a;
   --radius: 14px; --radius-sm: 9px;
   --shadow: 0 2px 12px rgba(44,24,16,0.07);
@@ -138,6 +139,11 @@ body {
   color: white;
   box-shadow: 0 3px 10px rgba(33,115,70,0.3);
 }
+.tab-btn.active-r {
+  background: var(--r-blue);
+  color: white;
+  box-shadow: 0 3px 10px rgba(39,109,195,0.35);
+}
 /* Generic active state for dynamically added tabs */
 .tab-btn.active-new {
   background: var(--navy);
@@ -166,6 +172,7 @@ body {
 .track-progress-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; }
 .pbi-fill { background: linear-gradient(90deg, var(--pbi-dark), var(--pbi)); }
 .excel-fill { background: linear-gradient(90deg, #1a5c38, var(--excel)); }
+.r-fill     { background: linear-gradient(90deg, var(--r-blue-dark), var(--r-blue)); }
 .track-stats {
   display: flex;
   justify-content: space-between;
@@ -365,6 +372,7 @@ body {
 /* ===== MODULE NUMBER COLOURS ===== */
 .pbi-num { background: var(--pbi-light); color: var(--pbi-dark); border: 2px solid var(--pbi); }
 .excel-num { background: var(--excel-light); color: var(--excel); border: 2px solid #a8d5b5; }
+.r-num     { background: var(--r-light); color: var(--r-blue-dark); border: 2px solid var(--r-blue); }
 
 /* Channel badge colours */
 .badge-giac { background: #fef3c7; color: #92400e; }
@@ -692,6 +700,40 @@ const CURRICULUM = {
         { id:'ex-v25', title:'What-If Analysis, Goal Seek & Solver', channel:'Leila Gharani', badge:'badge-leila', dur:'28m', type:'video', url:'https://www.youtube.com/@LeilaGharani' },
       ]
     },
+  ],
+  r: [
+    {
+      id: 'r-m1', title: 'Getting Started with R', sub: 'Installation · RStudio · variables · vectors · data types',
+      videos: [
+        { id:'r-v1', title:'R programming for ABSOLUTE beginners', channel:'R Programming 101', badge:'badge-rp101', dur:'14 min', type:'video', url:'https://www.youtube.com/watch?v=FY8BISK5DpM' },
+        { id:'r-v2', title:'Learn R in 39 minutes', channel:'Equitable Equations', badge:'badge-eq', dur:'39 min', type:'video', url:'https://www.youtube.com/watch?v=yZ0bV2Afkjc' },
+      ]
+    },
+    {
+      id: 'r-m2', title: 'R Fundamentals Deep Dive', sub: 'Data structures · functions · loops · packages · tidyverse basics',
+      videos: [
+        { id:'r-v3', title:'R Programming Tutorial – Learn the Basics of Statistical Computing', channel:'freeCodeCamp.org', badge:'badge-fcc', dur:'2h 10m', type:'course', url:'https://www.youtube.com/watch?v=_V8eKsto3Ug' },
+      ]
+    },
+    {
+      id: 'r-m3', title: 'Data Wrangling & Visualisation', sub: 'dplyr · ggplot2 · tidyr · data frames · charts',
+      videos: [
+        { id:'r-v4', title:'Data Visualization with R in 36 minutes', channel:'Equitable Equations', badge:'badge-eq', dur:'36 min', type:'video', url:'https://www.youtube.com/watch?v=McL9MMwmIZY' },
+      ]
+    },
+    {
+      id: 'r-m4', title: 'Statistics in R', sub: 'Linear regression · hypothesis testing · StatQuest methodology',
+      videos: [
+        { id:'r-v5', title:'Linear Regression in R, Step by Step', channel:'StatQuest with Josh Starmer', badge:'badge-statquest', dur:'5 min', type:'video', url:'https://www.youtube.com/watch?v=wsi0jg_gH28' },
+        { id:'r-v6', title:'R programming in one hour – a crash course for beginners', channel:'R Programming 101', badge:'badge-rp101', dur:'1h', type:'course', url:'https://www.youtube.com/watch?v=eR-XRSKsuR4' },
+      ]
+    },
+    {
+      id: 'r-m5', title: 'University-Level R (Harvard CS50)', sub: 'Full CS50 lecture series · data science workflows · final projects',
+      videos: [
+        { id:'r-v7', title:"Harvard CS50's Intro to R Programming – Full University Course", channel:'freeCodeCamp.org / CS50', badge:'badge-fcc', dur:'8h 48m', type:'course', url:'https://www.youtube.com/watch?v=g_3IKHG-rfA' },
+      ]
+    },
   ]
 };
 
@@ -710,6 +752,13 @@ const TRACK_META = {
     activeClass: 'active-excel', fillClass: 'excel-fill',
     numClass: 'excel-num', accentColor: 'var(--excel)',
     fillColor: 'var(--excel)', statPctId: 'stat-excel-pct',
+    startLabel: '→ Start with Module 1'
+  },
+  r: {
+    label: 'R Programming', icon: '📈',
+    activeClass: 'active-r', fillClass: 'r-fill',
+    numClass: 'r-num', accentColor: 'var(--r-blue)',
+    fillColor: 'var(--r-blue)', statPctId: 'stat-r-pct',
     startLabel: '→ Start with Module 1'
   }
   // ── Add new courses here, e.g.: ──
