@@ -6,7 +6,7 @@
 <title>Training Hub — Subanshu</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0e0805">
+<meta name="theme-color" content="#1a3a6b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Training Hub">
@@ -20,126 +20,65 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  /* ── Identical tokens to main dashboard ── */
-  --bg:      #080d1a;
-  --surface: #0f1729;
-  --surface2:#0b1220;
-  --border:  #1a2740;
-  --border2: #243554;
-
-  --red:     #ff4444;   --red-light:   rgba(255,68,68,0.12);
-  --gold:    #ffb627;   --gold-light:  rgba(255,182,39,0.12);
-  --navy:    #4d8eff;   --navy-light:  rgba(77,142,255,0.12);
-  --teal:    #00d4c8;   --teal-light:  rgba(0,212,200,0.12);
-  --ocean:   #38bdf8;
-  --orange:  #ff6b35;   /* Training-tab accent */
-  --excel:   #22c55e;   --excel-light: rgba(34,197,94,0.12);
-  --pbi:     #ffb627;   --pbi-dark: #ff8c00; --pbi-light: rgba(255,182,39,0.12);
-
-  --text:       #e8edf8;
-  --text-muted: #7a90b8;
-  --text-dim:   #3a4f72;
-
+  --bg: #fdf6ec;
+  --surface: #ffffff;
+  --surface2: #fef9f3;
+  --border: #f0dfc5;
+  --border2: #e8cfa8;
+  --red: #e63228; --red-light: #fff0ef;
+  --gold: #f5a623; --gold-light: #fffbef;
+  --navy: #1a3a6b; --navy-light: #eef2fb;
+  --teal: #00a89c; --teal-light: #edfaf9;
+  --excel: #217346; --excel-light: #eaf5ee;
+  --pbi: #f2c811; --pbi-dark: #e8a500; --pbi-light: #fffbeb;
+  --text: #2c1810; --text-muted: #8b6e5a; --text-dim: #c9b09a;
   --radius: 14px; --radius-sm: 9px;
-  --shadow:       0 2px 16px rgba(0,0,0,0.4);
-  --shadow-hover: 0 8px 32px rgba(0,0,0,0.6);
+  --shadow: 0 2px 12px rgba(44,24,16,0.07);
+  --shadow-hover: 0 6px 20px rgba(44,24,16,0.13);
 }
 
 body {
   font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
-  background: #080d1a;
+  background: var(--bg);
   background-image:
-    radial-gradient(ellipse at 20% -5%,   rgba(255,107,53,0.22) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 110%,  rgba(255,68,68,0.13)  0%, transparent 50%);
-  background-attachment: fixed;
+    radial-gradient(circle at 10% 20%, rgba(245,166,35,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(230,50,40,0.05) 0%, transparent 40%);
   color: var(--text);
   min-height: 100vh;
-  padding: 0;
-}
-.page-wrap {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px 20px 48px;
+  padding: 24px;
 }
 
 /* ===== HEADER ===== */
-/* ── Header — matches main dashboard ── */
-.hub-header {
+.top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 20px;
-  background: rgba(8,13,26,0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  margin-bottom: 0;
-}
-.hub-header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.hub-header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.hub-icon {
-  font-size: 2rem;
-  line-height: 1;
-  filter: drop-shadow(0 0 10px rgba(255,107,53,0.5));
-}
-.hub-titles h1 {
-  font-size: 1.15rem;
-  font-weight: 900;
-  letter-spacing: -0.3px;
-  background: linear-gradient(135deg, #e8edf8 40%, #ff6b35);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1.2;
-}
-.hub-titles p {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-top: 2px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 .back-btn {
   display: flex;
   align-items: center;
-  gap: 7px;
-  background: rgba(255,255,255,0.04);
-  color: var(--text-muted);
-  border: 1px solid var(--border2);
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-weight: 800;
-  font-size: 0.78rem;
+  gap: 8px;
+  background: var(--navy);
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 24px;
+  font-weight: 900;
+  font-size: 0.82rem;
   cursor: pointer;
   font-family: inherit;
   text-decoration: none;
   transition: all 0.2s;
 }
-.back-btn:hover {
-  background: rgba(255,107,53,0.1);
-  border-color: rgba(255,107,53,0.4);
-  color: var(--orange);
-  transform: translateX(-2px);
-}
-.date-badge {
-  background: rgba(255,255,255,0.05);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
+.back-btn:hover { background: var(--red); transform: translateY(-1px); }
+.header-title { text-align: center; flex: 1; }
+.header-title h1 { font-size: 1.5rem; font-weight: 900; color: var(--navy); }
+.header-title h1 span { color: var(--red); }
+.header-title p { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 3px; }
+.date-badge { background: var(--navy); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
 
 /* ===== OVERALL STATS ===== */
 .stats-row {
@@ -153,27 +92,9 @@ body {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  padding: 18px 16px;
+  padding: 16px;
   text-align: center;
   box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-  transition:
-    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    border-color 0.2s;
-}
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-hover);
-  border-color: rgba(255,107,53,0.4);
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255,107,53,0.8), transparent);
 }
 .stat-val { font-size: 2rem; font-weight: 900; line-height: 1; margin-bottom: 4px; }
 .stat-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
@@ -181,25 +102,24 @@ body {
 /* ===== TAB SWITCHER ===== */
 .tab-bar {
   display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  background: rgba(15,23,41,0.7);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  gap: 10px;
+  margin-bottom: 22px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
   padding: 6px;
   box-shadow: var(--shadow);
-  backdrop-filter: blur(8px);
 }
 .tab-btn {
   flex: 1;
-  padding: 11px 20px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 11px;
+  border-radius: var(--radius-sm);
   font-family: inherit;
   font-weight: 900;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -207,22 +127,22 @@ body {
   color: var(--text-muted);
   background: transparent;
 }
-.tab-btn:hover { background: rgba(255,107,53,0.1); color: var(--orange); }
+.tab-btn:hover { background: var(--surface2); }
 .tab-btn.active-pbi {
-  background: linear-gradient(135deg, #ff6b35, #ff4500);
-  color: white;
-  box-shadow: 0 3px 14px rgba(255,107,53,0.4);
+  background: var(--pbi);
+  color: #3d2800;
+  box-shadow: 0 3px 10px rgba(242,200,17,0.35);
 }
 .tab-btn.active-excel {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: var(--excel);
   color: white;
-  box-shadow: 0 3px 10px rgba(34,197,94,0.3);
+  box-shadow: 0 3px 10px rgba(33,115,70,0.3);
 }
 /* Generic active state for dynamically added tabs */
 .tab-btn.active-new {
-  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  background: var(--navy);
   color: white;
-  box-shadow: 0 3px 10px rgba(255,107,53,0.3);
+  box-shadow: 0 3px 10px rgba(26,58,107,0.3);
 }
 .tab-badge {
   font-size: 0.65rem;
@@ -238,13 +158,13 @@ body {
 .track-progress-bar {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   height: 10px;
   overflow: hidden;
   margin-bottom: 8px;
 }
 .track-progress-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; }
-.pbi-fill { background: linear-gradient(90deg, #ff4500, #ff6b35, #ffb627); }
+.pbi-fill { background: linear-gradient(90deg, var(--pbi-dark), var(--pbi)); }
 .excel-fill { background: linear-gradient(90deg, #1a5c38, var(--excel)); }
 .track-stats {
   display: flex;
@@ -261,45 +181,25 @@ body {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   overflow: hidden;
   box-shadow: var(--shadow);
-  transition:
-    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    border-color 0.2s;
+  transition: box-shadow 0.2s;
 }
-.module-block:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-hover);
-  border-color: rgba(255,107,53,0.35);
-}
+.module-block:hover { box-shadow: var(--shadow-hover); }
 .module-head {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 17px 20px;
+  padding: 14px 18px;
   cursor: pointer;
   background: var(--surface2);
-  border-bottom: 1px solid transparent;
-  transition: background 0.2s;
+  border-bottom: 1.5px solid transparent;
+  transition: background 0.15s;
   user-select: none;
-  position: relative;
 }
-.module-head::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: linear-gradient(180deg, #ff6b35, #ff4500);
-  border-radius: 0 2px 2px 0;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.module-head:hover { background: rgba(255,107,53,0.06); }
-.module-head:hover::before { opacity: 1; }
+.module-head:hover { background: var(--gold-light); }
 .module-head.open { border-bottom-color: var(--border); }
-.module-head.open::before { opacity: 1; }
 .module-num {
   width: 32px;
   height: 32px;
@@ -310,29 +210,15 @@ body {
   font-size: 0.78rem;
   font-weight: 900;
   flex-shrink: 0;
-  letter-spacing: -0.5px;
 }
-.module-head-info { flex: 1; min-width: 0; }
-.module-head-title {
-  font-size: 1.02rem;
-  font-weight: 800;
-  color: var(--text);
-  letter-spacing: -0.25px;
-  line-height: 1.3;
-}
-.module-head-sub {
-  font-size: 0.77rem;
-  font-weight: 400;
-  font-style: italic;
-  color: var(--text-dim);
-  margin-top: 3px;
-  letter-spacing: 0.1px;
-}
-.module-mini-bar { width: 80px; flex-shrink: 0; }
+.module-head-info { flex: 1; }
+.module-head-title { font-size: 1.02rem; font-weight: 800; letter-spacing: -0.25px; line-height: 1.3; color: var(--navy); }
+.module-head-sub { font-size: 0.77rem; font-weight: 400; font-style: italic; color: var(--text-muted); margin-top: 3px; }
+.module-mini-bar { width: 80px; }
 .module-mini-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
 .module-mini-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-.module-mini-pct { font-size: 0.7rem; font-weight: 700; margin-top: 4px; }
-.module-chevron { color: var(--text-dim); font-size: 0.85rem; transition: transform 0.2s; flex-shrink: 0; }
+.module-mini-pct { font-size: 0.65rem; font-weight: 900; margin-top: 3px; }
+.module-chevron { color: var(--text-dim); font-size: 0.9rem; transition: transform 0.2s; flex-shrink: 0; }
 .module-chevron.open { transform: rotate(180deg); }
 .module-body { display: none; padding: 10px 12px; }
 .module-body.open { display: block; }
@@ -341,14 +227,14 @@ body {
 .video-row {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 11px 10px;
-  border-radius: 10px;
-  transition: background 0.18s, transform 0.15s;
+  gap: 11px;
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.12s;
   border-bottom: 1px solid var(--border);
 }
 .video-row:last-child { border-bottom: none; }
-.video-row:hover { background: rgba(255,107,53,0.06); transform: translateX(2px); }
+.video-row:hover { background: var(--surface2); }
 .video-row.done { opacity: 0.5; }
 .video-row.done .video-title { text-decoration: line-through; }
 .video-check {
@@ -367,16 +253,9 @@ body {
   font-size: 12px;
   font-weight: 900;
 }
-.video-row.done .video-check { background: var(--orange); border-color: var(--orange); color: white; }
+.video-row.done .video-check { background: var(--teal); border-color: var(--teal); color: white; }
 .video-info { flex: 1; min-width: 0; }
-.video-title {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.4;
-  display: block;
-  letter-spacing: -0.1px;
-}
+.video-title { font-size: 0.88rem; font-weight: 600; letter-spacing: -0.1px; color: var(--text); line-height: 1.35; display: block; }
 .video-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
 .channel-badge {
   font-size: 0.62rem;
@@ -419,9 +298,9 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  background: rgba(255,107,53,0.15);
-  color: var(--orange);
-  border: 1px solid rgba(255,107,53,0.3);
+  background: var(--navy);
+  color: white;
+  border: none;
   padding: 6px 12px;
   border-radius: var(--radius-sm);
   font-size: 0.72rem;
@@ -433,39 +312,36 @@ body {
   flex-shrink: 0;
   transition: all 0.15s;
 }
-.resource-btn:hover { background: var(--orange); color: #0a0603; transform: scale(1.05); }
+.resource-btn:hover { background: var(--red); transform: scale(1.05); }
 
 /* ===== ADD CUSTOM VIDEO ===== */
 .add-video-section {
   background: var(--surface2);
-  border: 1px dashed rgba(255,107,53,0.25);
+  border: 1.5px dashed var(--border2);
   border-radius: var(--radius);
-  padding: 18px;
-  margin-top: 16px;
+  padding: 16px;
+  margin-top: 14px;
 }
 .add-video-title { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 12px; }
 .add-video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 @media (max-width: 600px) { .add-video-grid { grid-template-columns: 1fr; } }
 .add-input {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 9px 13px;
+  padding: 8px 12px;
   font-family: inherit;
   font-size: 0.83rem;
   font-weight: 700;
   color: var(--text);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s;
   width: 100%;
 }
-.add-input:focus {
-  border-color: rgba(255,107,53,0.6);
-  box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
-}
+.add-input:focus { border-color: var(--gold); background: var(--gold-light); }
 .add-input::placeholder { color: var(--text-dim); font-weight: 600; }
 .add-video-btn {
-  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  background: var(--navy);
   color: white;
   border: none;
   padding: 9px 20px;
@@ -475,440 +351,198 @@ body {
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
-  box-shadow: 0 3px 12px rgba(255,107,53,0.3);
 }
-.add-video-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.add-video-btn:hover { background: var(--red); }
 
 /* ===== SECTION LABEL ===== */
 .section-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 24px 0 16px;
-  font-size: 0.70rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--text-muted);
+  display: flex; align-items: center; gap: 10px;
+  margin: 20px 0 14px;
+  font-size: 0.68rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted);
 }
-.section-label::before { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,107,53,0.4), transparent); }
-.section-label::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,107,53,0.4), transparent); }
+.section-label::before, .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
 /* ===== MODULE NUMBER COLOURS ===== */
-.pbi-num { background: rgba(255,107,53,0.12); color: var(--orange); border: 2px solid rgba(255,107,53,0.4); }
-.excel-num { background: rgba(34,197,94,0.1); color: var(--excel); border: 2px solid rgba(34,197,94,0.35); }
+.pbi-num { background: var(--pbi-light); color: var(--pbi-dark); border: 2px solid var(--pbi); }
+.excel-num { background: var(--excel-light); color: var(--excel); border: 2px solid #a8d5b5; }
 
 /* Channel badge colours */
-.badge-giac   { background: rgba(255,182,39,0.15);  color: #ffb627; }
-.badge-sqlbi  { background: rgba(168,85,247,0.15);  color: #c084fc; }
-.badge-leila  { background: rgba(244,114,182,0.15); color: #f472b6; }
-.badge-kevin  { background: rgba(96,165,250,0.15);  color: #60a5fa; }
-.badge-ms     { background: rgba(56,189,248,0.15);  color: #38bdf8; }
-.badge-custom { background: rgba(255,107,53,0.15);  color: #ff6b35; }
-.badge-mslearn{ background: rgba(34,197,94,0.15);   color: #4ade80; }
+.badge-giac { background: #fef3c7; color: #92400e; }
+.badge-sqlbi { background: #ede9fe; color: #5b21b6; }
+.badge-leila { background: #fce7f3; color: #9d174d; }
+.badge-kevin { background: #dbeafe; color: #1e40af; }
+.badge-ms { background: #e0f2fe; color: #0369a1; }
+.badge-custom { background: var(--gold-light); color: #92400e; }
+.badge-mslearn { background: #f0fdf4; color: #166534; }
 
 /* Type tags */
-.tag-video    { background: rgba(255,107,53,0.15); color: #ff6b35; }
-.tag-course   { background: rgba(96,165,250,0.15);  color: #60a5fa; }
-.tag-practice { background: rgba(34,197,94,0.15);   color: #4ade80; }
-.tag-article  { background: rgba(255,182,39,0.15);  color: #ffb627; }
+.tag-video { background: #fee2e2; color: #991b1b; }
+.tag-course { background: #dbeafe; color: #1e40af; }
+.tag-practice { background: #d1fae5; color: #065f46; }
+.tag-article { background: #fef3c7; color: #92400e; }
 
 /* ===== FOOTER ===== */
-.footer { text-align: center; margin-top: 28px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
-.footer span { color: var(--orange); }
+.footer { text-align: center; margin-top: 28px; font-size: 0.72rem; font-weight: 700; color: var(--text-dim); }
+.footer span { color: var(--red); }
 
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--surface2); }
-::-webkit-scrollbar-thumb { background: rgba(255,107,53,0.35); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,107,53,0.6); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
-  /* ── Theme toggle — identical to main dashboard ── */
-  .theme-toggle {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-  .theme-toggle-track {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 26px;
-    background: var(--surface);
-    border: 1.5px solid var(--border2);
-    border-radius: 20px;
-    padding: 3px;
-    transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.3);
-  }
-  .theme-toggle:hover .theme-toggle-track {
-    border-color: rgba(255,107,53,0.6);
-    box-shadow: 0 0 12px rgba(255,107,53,0.25), inset 0 1px 4px rgba(0,0,0,0.2);
-  }
-  .theme-toggle-thumb {
-    font-size: 1rem;
-    line-height: 1;
-    display: block;
-    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    transform: translateX(-8px);
-  }
-  body.light-mode .theme-toggle-thumb { transform: translateX(8px); }
-  body.light-mode .theme-toggle-track {
-    background: rgba(255,255,255,0.7);
-    border-color: rgba(0,0,0,0.15);
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
-  }
+/* ===== ARCHIVE ===== */
+.archive-toggle {
+  display: flex; align-items: center; gap: 8px;
+  margin: 18px 0 6px; cursor: pointer; user-select: none;
+  color: var(--text-muted); font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.4px; text-transform: uppercase;
+}
+.archive-toggle:hover { color: var(--navy); }
+.archive-toggle-chevron { transition: transform 0.2s; font-size: 0.7rem; }
+.archive-toggle-chevron.open { transform: rotate(90deg); }
+.archive-list { display: none; }
+.archive-list.open { display: block; }
+.module-block.archived { opacity: 0.55; border-style: dashed; border-color: var(--border); }
+.module-block.archived:hover { opacity: 0.8; transform: none; }
+.archive-btn {
+  background: none; border: 1.5px solid var(--border); border-radius: 6px;
+  padding: 3px 9px; font-size: 0.68rem; font-weight: 700; font-family: inherit;
+  color: var(--text-muted); cursor: pointer; white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s; flex-shrink: 0;
+}
+.archive-btn:hover { border-color: var(--gold); color: var(--gold); }
+.restore-btn {
+  background: none; border: 1.5px solid var(--border); border-radius: 6px;
+  padding: 3px 9px; font-size: 0.68rem; font-weight: 700; font-family: inherit;
+  color: var(--text-muted); cursor: pointer; white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s; flex-shrink: 0;
+}
+.restore-btn:hover { border-color: var(--excel); color: var(--excel); }
 
-  /* ── Light mode variable overrides ── */
-  body.light-mode {
-    --bg: #fefefe;
-    --surface: rgba(255,255,255,0.82);
-    --surface2: rgba(255,255,255,0.55);
-    --border: rgba(0,0,0,0.07);
-    --border2: rgba(0,0,0,0.12);
-    --text: #1a1f2e;
-    --text-muted: #52637a;
-    --text-dim: #9aaabf;
-    --shadow: 0 2px 20px rgba(0,0,0,0.07);
-    --shadow-hover: 0 10px 40px rgba(0,0,0,0.12);
-  }
-  body.light-mode {
-    background: #fff7ed;
-    background-image:
-      radial-gradient(ellipse at 20% -5%,   rgba(255,107,53,0.30) 0%, transparent 55%),
-      radial-gradient(ellipse at 85% 110%,  rgba(255,182,39,0.22) 0%, transparent 50%);
-  }
-  body.light-mode .hub-header {
-    background: rgba(255,247,237,0.88);
-    border-bottom-color: rgba(255,107,53,0.15);
-  }
-  body.light-mode .hub-titles h1 {
-    background: linear-gradient(135deg, #1a1f2e 40%, #ff6b35);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  body.light-mode .back-btn {
-    background: rgba(255,255,255,0.7);
-    border-color: rgba(0,0,0,0.1);
-    color: #52637a;
-  }
-  body.light-mode .back-btn:hover {
-    background: rgba(255,107,53,0.1);
-    border-color: rgba(255,107,53,0.4);
-    color: #ff6b35;
-  }
-  body.light-mode .stat-card,
-  body.light-mode .module-block,
-  body.light-mode .tab-bar,
-  body.light-mode .add-video-section,
-  body.light-mode .notes-card {
-    background: rgba(255,255,255,0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-color: rgba(255,255,255,0.9);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95);
-  }
-  body.light-mode .module-head { background: rgba(255,255,255,0.5); }
-  body.light-mode .module-head:hover { background: rgba(255,107,53,0.06); }
-  body.light-mode .tab-btn { color: #52637a; }
-  body.light-mode .add-input {
-    background: rgba(255,255,255,0.9);
-    border-color: rgba(0,0,0,0.1);
-    color: #1a1f2e;
-  }
-  body.light-mode .add-input:focus {
-    border-color: rgba(255,107,53,0.5);
-    box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
-  }
-  body.light-mode .video-row:hover { background: rgba(255,107,53,0.05); }
-  body.light-mode .notes-textarea {
-    background: rgba(255,255,255,0.6);
-    color: #1a1f2e;
-    border-color: rgba(0,0,0,0.08);
-  }
-  body.light-mode .notes-textarea:focus {
-    border-color: rgba(255,107,53,0.45);
-  }
-  body.light-mode .notes-toolbar { border-top-color: rgba(0,0,0,0.08); }
-  body.light-mode .date-badge {
-    background: rgba(255,255,255,0.7);
-    color: #52637a;
-    border-color: rgba(0,0,0,0.1);
-  }
+/* ===== POPULATE NOW BUTTON + MODAL ===== */
+.populate-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: linear-gradient(135deg, var(--navy) 0%, #2563eb 100%);
+  color: white; border: none; border-radius: 10px;
+  padding: 8px 16px; font-size: 0.78rem; font-weight: 800;
+  font-family: inherit; cursor: pointer; letter-spacing: 0.2px;
+  box-shadow: 0 2px 10px rgba(26,58,107,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+.populate-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,58,107,0.4); }
+.populate-btn:active { transform: translateY(0); }
+.populate-btn .btn-icon { font-size: 1rem; }
 
-  /* ── Per-video notes ── */
-  .vn-toggle-btn {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    transition: border-color 0.2s, background 0.2s, transform 0.15s;
-    color: var(--text-dim);
-  }
-  .vn-toggle-btn:hover { border-color: rgba(255,107,53,0.5); background: rgba(255,107,53,0.08); transform: scale(1.1); }
-  .vn-toggle-btn.has-notes { border-color: rgba(255,107,53,0.45); color: #ff6b35; background: rgba(255,107,53,0.08); }
-  .vn-area {
-    display: none;
-    padding: 0 10px 10px 44px;
-    border-bottom: 1px solid var(--border);
-    animation: vnSlideIn 0.2s ease;
-  }
-  .vn-area.open { display: block; }
-  @keyframes vnSlideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
-  .vn-textarea {
-    width: 100%;
-    min-height: 80px;
-    max-height: 280px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 10px 12px;
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.6;
-    resize: vertical;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    margin-top: 8px;
-  }
-  .vn-textarea:focus {
-    border-color: rgba(255,107,53,0.5);
-    box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
-  }
-  .vn-textarea::placeholder { color: var(--text-dim); font-weight: 600; font-style: italic; }
-  .vn-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 5px;
-  }
-  .vn-status { font-size: 0.62rem; font-weight: 700; color: var(--text-dim); transition: color 0.25s; }
-  .vn-status.saving { color: #ffb627; }
-  .vn-status.saved  { color: #22c55e; }
-
-  /* ── Compiled notes card ── */
-  .notes-card {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    margin-bottom: 24px;
-    transition:
-      transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      border-color 0.2s;
-  }
-  .notes-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: rgba(255,107,53,0.35); }
-  .notes-card::before { content:''; display:block; height:2px; background:linear-gradient(90deg, rgba(255,107,53,0.8), transparent); }
-  .notes-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    cursor: pointer;
-    user-select: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .notes-title {
-    font-size: 0.72rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-  .notes-title .dot { width:8px; height:8px; border-radius:50%; background:#ff6b35; box-shadow:0 0 8px rgba(255,107,53,0.6); display:inline-block; }
-  .notes-count-badge {
-    font-size: 0.62rem;
-    font-weight: 900;
-    padding: 2px 8px;
-    border-radius: 8px;
-    background: rgba(255,107,53,0.12);
-    border: 1px solid rgba(255,107,53,0.25);
-    color: #ff6b35;
-  }
-  .notes-actions { display: flex; align-items: center; gap: 8px; }
-  .notes-copy-btn {
-    font-size: 0.68rem; font-weight: 800; color: var(--text-muted);
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 7px; padding: 4px 10px; cursor: pointer; font-family: inherit;
-    transition: border-color 0.2s, color 0.2s;
-  }
-  .notes-copy-btn:hover { border-color: rgba(255,107,53,0.4); color: #ff6b35; }
-  .notes-body { padding: 16px 18px; }
-  .notes-empty {
-    text-align: center;
-    padding: 24px;
-    color: var(--text-dim);
-    font-size: 0.82rem;
-    font-weight: 700;
-  }
-  .notes-module-group { margin-bottom: 18px; }
-  .notes-module-group:last-child { margin-bottom: 0; }
-  .notes-module-label {
-    font-size: 0.65rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: #ff6b35;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .notes-module-label::after { content:''; flex:1; height:1px; background: rgba(255,107,53,0.2); }
-  .notes-entry {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    border-left: 3px solid rgba(255,107,53,0.5);
-  }
-  .notes-entry:last-child { margin-bottom: 0; }
-  .notes-entry-title { font-size: 0.78rem; font-weight: 900; color: var(--text); margin-bottom: 6px; }
-  .notes-entry-text { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; }
-
-  /* light mode extras */
-  body.light-mode .vn-textarea { background: rgba(255,255,255,0.6); color: #1a1f2e; }
-  body.light-mode .notes-entry { background: rgba(255,255,255,0.6); }
-
-
-  /* ── Archive drawer ── */
-  .archive-toggle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 18px 0 6px;
-    cursor: pointer;
-    user-select: none;
-    color: var(--text-dim);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-  }
-  .archive-toggle:hover { color: var(--text-muted); }
-  .archive-toggle-chevron { transition: transform 0.2s; font-size: 0.7rem; }
-  .archive-toggle-chevron.open { transform: rotate(90deg); }
-  .archive-list { display: none; }
-  .archive-list.open { display: block; }
-  .module-block.archived {
-    opacity: 0.6;
-    border-style: dashed;
-    border-color: var(--border);
-  }
-  .module-block.archived:hover { opacity: 0.85; transform: none; }
-  .archive-btn {
-    background: none;
-    border: 1.5px solid var(--border);
-    border-radius: 6px;
-    padding: 3px 9px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    font-family: inherit;
-    color: var(--text-dim);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: border-color 0.15s, color 0.15s;
-    flex-shrink: 0;
-  }
-  .archive-btn:hover { border-color: var(--orange); color: var(--orange); }
-  .restore-btn {
-    background: none;
-    border: 1.5px solid var(--border);
-    border-radius: 6px;
-    padding: 3px 9px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    font-family: inherit;
-    color: var(--text-dim);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: border-color 0.15s, color 0.15s;
-    flex-shrink: 0;
-  }
-  .restore-btn:hover { border-color: var(--excel); color: var(--excel); }
+.pop-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(44,24,16,0.55); backdrop-filter: blur(4px);
+  z-index: 1000; align-items: center; justify-content: center;
+}
+.pop-overlay.open { display: flex; }
+.pop-modal {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 18px; padding: 30px 28px; max-width: 420px; width: 90%;
+  box-shadow: 0 20px 60px rgba(44,24,16,0.25);
+  animation: popIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from { transform: scale(0.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.pop-title { font-size: 1.15rem; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
+.pop-sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
+.pop-steps { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-direction: column; gap: 12px; }
+.pop-step { display: flex; align-items: flex-start; gap: 12px; }
+.pop-step-num {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--navy);
+  color: white; font-size: 0.72rem; font-weight: 900;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.pop-step-text { font-size: 0.84rem; color: var(--text); line-height: 1.45; }
+.pop-step-text strong { color: var(--navy); font-weight: 800; }
+.pop-copy-row { display: flex; gap: 8px; margin-top: 6px; }
+.pop-copy-input {
+  flex: 1; background: var(--surface2); border: 1.5px solid var(--border2);
+  border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; font-weight: 700;
+  font-family: 'Courier New', monospace; color: var(--navy); outline: none;
+}
+.pop-copy-btn {
+  background: var(--navy); color: white; border: none; border-radius: 8px;
+  padding: 7px 14px; font-size: 0.78rem; font-weight: 800; font-family: inherit;
+  cursor: pointer; transition: background 0.15s; white-space: nowrap;
+}
+.pop-copy-btn:hover { background: #2563eb; }
+.pop-copy-btn.copied { background: var(--excel); }
+.pop-close-btn {
+  width: 100%; background: none; border: 1.5px solid var(--border2);
+  border-radius: 10px; padding: 9px; font-size: 0.82rem; font-weight: 700;
+  font-family: inherit; color: var(--text-muted); cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.pop-close-btn:hover { border-color: var(--navy); color: var(--navy); }
 </style>
 </head>
 <body>
 
-<!-- HEADER — mirrors main dashboard -->
-<div class="hub-header">
-  <div class="hub-header-left">
-    <span class="hub-icon">📺</span>
-    <div class="hub-titles">
-      <h1>Training Hub</h1>
-      <p>Excel · Power BI · PL-300 — tick off as you go</p>
-    </div>
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a href="subanshu-dashboard.html" class="back-btn">← Captain's Log</a>
+  <div class="header-title">
+    <h1>📺 Training <span>Hub</span></h1>
+    <p>Excel · Power BI · PL-300 — tick off as you go</p>
   </div>
-  <div class="hub-header-right">
-    <div class="date-badge" id="date-badge">Loading...</div>
-    <div id="th-sync" style="font-size:0.68rem;font-weight:800;color:var(--text-muted);">⏳ Syncing...</div>
-    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">
-      <span class="theme-toggle-track">
-        <span class="theme-toggle-thumb" id="theme-thumb">🌙</span>
-      </span>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+    <button class="populate-btn" onclick="showPopulateModal()">
+      <span class="btn-icon">🚀</span> Populate Now
     </button>
-    <a href="subanshu-dashboard.html" class="back-btn">← Log</a>
+    <div id="th-sync" style="font-size:0.7rem;font-weight:800;color:var(--text-muted);">⏳ Connecting...</div>
   </div>
 </div>
 
-<div class="page-wrap">
+<!-- POPULATE NOW MODAL -->
+<div class="pop-overlay" id="pop-overlay" onclick="if(event.target===this)closePopulateModal()">
+  <div class="pop-modal">
+    <div class="pop-title">🚀 Populate Now</div>
+    <div class="pop-sub">Run the training pipeline immediately — detects new goals from your brain dump and adds them to this hub.</div>
+    <ol class="pop-steps">
+      <li class="pop-step">
+        <div class="pop-step-num">1</div>
+        <div class="pop-step-text">Copy the message below</div>
+      </li>
+      <li class="pop-step">
+        <div class="pop-step-num">2</div>
+        <div class="pop-step-text"><strong>Open Cowork</strong> (the desktop app where you chatted with me)</div>
+      </li>
+      <li class="pop-step">
+        <div class="pop-step-num">3</div>
+        <div class="pop-step-text">Paste and send — I'll run the full pipeline right away 🎓</div>
+      </li>
+    </ol>
+    <div class="pop-copy-row">
+      <input class="pop-copy-input" id="pop-copy-text" value="populate now" readonly />
+      <button class="pop-copy-btn" id="pop-copy-btn" onclick="copyPopulateText()">Copy</button>
+    </div>
+    <div style="margin-top:16px;">
+      <button class="pop-close-btn" onclick="closePopulateModal()">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- STATS -->
 <div class="stats-row">
   <div class="stat-card">
-    <div class="stat-val" id="stat-total-done" style="color:var(--orange)">0</div>
+    <div class="stat-val" id="stat-total-done" style="color:var(--teal)">0</div>
     <div class="stat-label">Videos Done</div>
   </div>
   <div class="stat-card">
-    <div class="stat-val" id="stat-total-pct" style="color:var(--text)">0%</div>
+    <div class="stat-val" id="stat-total-pct" style="color:var(--navy)">0%</div>
     <div class="stat-label">Overall Progress</div>
   </div>
   <div class="stat-card">
-    <div class="stat-val" id="stat-pbi-pct" style="color:var(--gold)">0%</div>
+    <div class="stat-val" id="stat-pbi-pct" style="color:var(--pbi-dark)">0%</div>
     <div class="stat-label">Power BI Done</div>
   </div>
   <div class="stat-card">
     <div class="stat-val" id="stat-excel-pct" style="color:var(--excel)">0%</div>
     <div class="stat-label">Excel Done</div>
-  </div>
-</div>
-
-<!-- TABS -->
-
-<!-- ── MY NOTES — compiled view ── -->
-<div class="notes-card">
-  <div class="notes-header">
-    <div class="notes-title">
-      <span class="dot"></span>My Notes
-      <span class="notes-count-badge" id="notes-count-badge">0 notes</span>
-    </div>
-    <div class="notes-actions">
-      <button class="notes-copy-btn" onclick="copyAllNotes()" title="Copy all notes to clipboard">📋 Copy All</button>
-    </div>
-  </div>
-  <div class="notes-body" id="all-notes-body">
-    <div class="notes-empty" id="notes-empty-msg">
-      📝 No notes yet — click the 📝 button on any video to start taking notes.
-    </div>
   </div>
 </div>
 
@@ -1061,6 +695,29 @@ const CURRICULUM = {
   ]
 };
 
+// To add a new course: add an entry to CURRICULUM AND to TRACK_META below.
+// Everything else (tabs, panels, stats, progress) is auto-generated.
+const TRACK_META = {
+  pbi: {
+    label: 'Power BI / PL-300', icon: '⚡',
+    activeClass: 'active-pbi', fillClass: 'pbi-fill',
+    numClass: 'pbi-num', accentColor: 'var(--navy)',
+    fillColor: 'var(--pbi-dark)', statPctId: 'stat-pbi-pct',
+    startLabel: '→ Start with Module 1'
+  },
+  excel: {
+    label: 'Excel', icon: '📊',
+    activeClass: 'active-excel', fillClass: 'excel-fill',
+    numClass: 'excel-num', accentColor: 'var(--excel)',
+    fillColor: 'var(--excel)', statPctId: 'stat-excel-pct',
+    startLabel: '→ Start with Module 1'
+  }
+  // ── Add new courses here, e.g.: ──
+  // ,sql: { label: 'SQL Fundamentals', icon: '🗄️', activeClass: 'active-new',
+  //   fillClass: 'pbi-fill', numClass: 'pbi-num', accentColor: 'var(--navy)',
+  //   fillColor: 'var(--navy)', statPctId: 'stat-sql-pct', startLabel: '→ Start with Module 1' }
+};
+
 // ===== FIREBASE + STORAGE =====
 if (!firebase.apps.length) {
   firebase.initializeApp({
@@ -1144,41 +801,17 @@ let customVideos = load('custom_videos', { pbi: [], excel: [] });
 })();
 
 // ===== TABS =====
-// ── TRACK META ──────────────────────────────────────────────────────
-// To add a new course: add an entry to CURRICULUM AND to TRACK_META below.
-// Everything else (tabs, panels, stats, progress) is auto-generated.
-const TRACK_META = {
-  pbi: {
-    label: 'Power BI / PL-300', icon: '⚡',
-    activeClass: 'active-pbi', fillClass: 'pbi-fill',
-    numClass: 'pbi-num', accentColor: 'var(--orange)',
-    fillColor: 'var(--pbi-dark)', statPctId: 'stat-pbi-pct',
-    startLabel: '→ Start with Module 1'
-  },
-  excel: {
-    label: 'Excel', icon: '📊',
-    activeClass: 'active-excel', fillClass: 'excel-fill',
-    numClass: 'excel-num', accentColor: 'var(--excel)',
-    fillColor: 'var(--excel)', statPctId: 'stat-excel-pct',
-    startLabel: '→ Start with Module 1'
-  }
-  // ── Add new courses here, e.g.: ──
-  // sql: { label: 'SQL Fundamentals', icon: '🗄️', activeClass: 'active-new',
-  //   fillClass: 'pbi-fill', numClass: 'pbi-num', accentColor: 'var(--blue)',
-  //   fillColor: 'var(--blue)', startLabel: '→ Start with Module 1' }
-};
-
-// Build tabs and panels dynamically — runs once at startup
+// ===== BUILD TABS + PANELS DYNAMICALLY =====
 function buildTabsAndPanels() {
-  const tabBar   = document.getElementById('tab-bar');
+  const tabBar    = document.getElementById('tab-bar');
   const container = document.getElementById('panel-container');
-  const tracks   = Object.keys(CURRICULUM);
+  const tracks    = Object.keys(CURRICULUM);
 
   tracks.forEach((track, i) => {
     const meta = TRACK_META[track] || {
       label: track.toUpperCase(), icon: '📚', activeClass: 'active-new',
       fillClass: 'pbi-fill', numClass: 'pbi-num',
-      accentColor: 'var(--orange)', fillColor: 'var(--orange)', startLabel: '→ Start'
+      accentColor: 'var(--navy)', fillColor: 'var(--navy)', startLabel: '→ Start'
     };
 
     // Tab button
@@ -1218,7 +851,7 @@ function buildTabsAndPanels() {
   });
 }
 
-// ── ARCHIVE ─────────────────────────────────────────────────────────
+// ===== ARCHIVE =====
 let archivedModules = new Set(load('archivedModules', []));
 
 function archiveModule(modId) {
@@ -1240,16 +873,15 @@ function toggleArchiveDrawer(track) {
 }
 
 let currentTab = 'pbi';
-const KNOWN_TAB_STYLES = { pbi: 'active-pbi', excel: 'active-excel' };
 function switchTab(tab) {
   currentTab = tab;
-  // Hide all panels, deactivate all buttons (works for any future tabs too)
   document.querySelectorAll('.track-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn');
   const panel = document.getElementById('panel-' + tab);
   if (panel) panel.classList.add('active');
   const btn = document.getElementById('tab-' + tab);
-  if (btn) btn.classList.add(KNOWN_TAB_STYLES[tab] || 'active-new');
+  const meta = TRACK_META[tab];
+  if (btn) btn.classList.add(meta ? meta.activeClass : 'active-new');
 }
 
 // ===== TOGGLE VIDEO DONE =====
@@ -1285,10 +917,13 @@ function getAllVideos(track) {
 }
 
 function renderTrack(track) {
-  const allVids = getAllVideos(track);
-  const done = allVids.filter(v => checked[v.id]).length;
-  const total = allVids.length;
-  const pct = total ? Math.round(done / total * 100) : 0;
+  const allVids   = getAllVideos(track);
+  const done      = allVids.filter(v => checked[v.id]).length;
+  const total     = allVids.length;
+  const pct       = total ? Math.round(done / total * 100) : 0;
+  const meta      = TRACK_META[track] || { numClass: 'pbi-num', fillColor: 'var(--pbi-dark)', accentColor: 'var(--navy)' };
+  const numClass  = meta.numClass;
+  const fillColor = meta.fillColor;
 
   document.getElementById(track + '-fill').style.width = pct + '%';
   document.getElementById(track + '-done-count').textContent = done;
@@ -1297,22 +932,16 @@ function renderTrack(track) {
   const badge = document.getElementById(track + '-badge');
   if (badge) badge.textContent = pct + '%';
 
-  // Next label
   const nextLabel = document.getElementById(track + '-next-label');
   if (nextLabel) {
     const nextVid = allVids.find(v => !checked[v.id]);
     nextLabel.textContent = nextVid ? `→ Up next: ${nextVid.title.slice(0, 40)}${nextVid.title.length > 40 ? '...' : ''}` : '🎉 Track complete!';
   }
 
-  const container = document.getElementById(track + '-modules');
-  const meta      = TRACK_META[track] || { numClass: 'pbi-num', fillColor: 'var(--pbi-dark)', accentColor: 'var(--orange)' };
-  const numClass  = meta.numClass;
-  const fillColor = meta.fillColor;
-  const modules   = CURRICULUM[track];
-
-  // Split into active and archived
-  const activeMods   = modules.filter(m => !archivedModules.has(m.id));
-  const archivedMods = modules.filter(m =>  archivedModules.has(m.id));
+  const container  = document.getElementById(track + '-modules');
+  const modules    = CURRICULUM[track];
+  const activeMods = modules.filter(m => !archivedModules.has(m.id));
+  const archivedMods = modules.filter(m => archivedModules.has(m.id));
 
   function renderModBlock(mod, idx, isArchived) {
     const modVids = [...mod.videos, ...(customVideos[track] || []).filter(v => v.moduleId === mod.id)];
@@ -1320,14 +949,14 @@ function renderTrack(track) {
     const modPct  = modVids.length ? Math.round(modDone / modVids.length * 100) : 0;
     const allDone = modDone === modVids.length && modVids.length > 0;
     const archiveBtn = (allDone && !isArchived)
-      ? `<button class="archive-btn" onclick="event.stopPropagation();archiveModule('${mod.id}')" title="Archive this completed chapter">📦 Archive</button>`
+      ? `<button class="archive-btn" onclick="event.stopPropagation();archiveModule('${mod.id}')" title="Archive completed chapter">📦 Archive</button>`
       : '';
     const restoreBtn = isArchived
       ? `<button class="restore-btn" onclick="event.stopPropagation();restoreModule('${mod.id}')" title="Restore chapter">↩ Restore</button>`
       : '';
     return `
       <div class="module-block${isArchived ? ' archived' : ''}">
-        <div class="module-head${isArchived ? '' : ''}" id="mh-${mod.id}" onclick="toggleModule('${mod.id}')">
+        <div class="module-head" id="mh-${mod.id}" onclick="toggleModule('${mod.id}')">
           <div class="module-num ${numClass}">${idx + 1}</div>
           <div class="module-head-info">
             <div class="module-head-title">${allDone ? '✅ ' : ''}${mod.title}</div>
@@ -1343,28 +972,24 @@ function renderTrack(track) {
           <div class="module-chevron" id="chev-${mod.id}">▼</div>
         </div>
         <div class="module-body" id="mb-${mod.id}">
-          ${modVids.map(v => renderVideoRow(v, false, mod.title)).join('')}
+          ${modVids.map(v => renderVideoRow(v)).join('')}
         </div>
       </div>`;
   }
 
   container.innerHTML = activeMods.map((mod, idx) => renderModBlock(mod, idx, false)).join('');
 
-  // Append archived drawer if any
   if (archivedMods.length) {
-    const archiveDrawerId = 'arch-list-' + track;
-    const archiveChevId   = 'arch-chev-' + track;
     container.innerHTML += `
       <div class="archive-toggle" onclick="toggleArchiveDrawer('${track}')">
-        <span class="archive-toggle-chevron" id="${archiveChevId}">▶</span>
+        <span class="archive-toggle-chevron" id="arch-chev-${track}">▶</span>
         📦 Archived chapters (${archivedMods.length})
       </div>
-      <div class="archive-list" id="${archiveDrawerId}">
+      <div class="archive-list" id="arch-list-${track}">
         ${archivedMods.map((mod, idx) => renderModBlock(mod, activeMods.length + idx, true)).join('')}
       </div>`;
   }
 
-  // Render custom videos not attached to a module separately
   const orphanCustom = (customVideos[track] || []).filter(v => !v.moduleId);
   if (orphanCustom.length) {
     container.innerHTML += `
@@ -1378,19 +1003,14 @@ function renderTrack(track) {
           <div class="module-chevron" id="chev-custom-${track}">▼</div>
         </div>
         <div class="module-body open" id="mb-custom-${track}">
-          ${orphanCustom.map(v => renderVideoRow(v, true, 'My Custom Resources')).join('')}
+          ${orphanCustom.map(v => renderVideoRow(v, true)).join('')}
         </div>
       </div>`;
   }
 }
 
-function renderVideoRow(v, canDelete = false, moduleName = '') {
-  const isDone  = !!checked[v.id];
-  const hasNote = !!(videoNotes[v.id] && videoNotes[v.id].text && videoNotes[v.id].text.trim());
-  const noteText = hasNote ? videoNotes[v.id].text : '';
-  const safeTitle  = v.title.replace(/'/g, "\'").replace(/`/g, '\`');
-  const safeMod    = moduleName.replace(/'/g, "\'").replace(/`/g, '\`');
-
+function renderVideoRow(v, canDelete = false) {
+  const isDone = !!checked[v.id];
   const linkBtn = v.url && v.url.startsWith('http')
     ? `<a class="${v.url.includes('youtube') || v.url.includes('youtu.be') ? 'yt-btn' : 'resource-btn'}" href="${v.url}" target="_blank" rel="noopener">${v.url.includes('youtube') || v.url.includes('youtu.be') ? '▶ Watch' : '🔗 Open'}</a>`
     : '';
@@ -1398,35 +1018,19 @@ function renderVideoRow(v, canDelete = false, moduleName = '') {
     ? `<button style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-weight:900;font-size:0.72rem;padding:6px;font-family:inherit;" onclick="deleteCustomVideo('${v.id}','${currentTab}')" title="Remove">✕</button>`
     : '';
   const typeTag = v.type ? `<span class="type-tag tag-${v.type}">${v.type}</span>` : '';
-
   return `
-    <div id="vrow-wrap-${v.id}">
-      <div class="video-row${isDone ? ' done' : ''}" id="vrow-${v.id}">
-        <div class="video-check" onclick="toggleVideo('${v.id}')">${isDone ? '✓' : ''}</div>
-        <div class="video-info">
-          <span class="video-title">${v.title}</span>
-          <div class="video-meta">
-            <span class="channel-badge ${v.badge || 'badge-custom'}">${v.channel}</span>
-            ${v.dur ? `<span class="duration-tag">⏱ ${v.dur}</span>` : ''}
-            ${typeTag}
-          </div>
-        </div>
-        ${linkBtn}
-        <button class="vn-toggle-btn${hasNote ? ' has-notes' : ''}"
-          id="vnbtn-${v.id}"
-          onclick="toggleVideoNote('${v.id}', '${safeTitle}', '${safeMod}')"
-          title="${hasNote ? 'View / edit notes' : 'Add notes'}">📝</button>
-        ${delBtn}
-      </div>
-      <div class="vn-area" id="vna-${v.id}">
-        <textarea class="vn-textarea" id="vnt-${v.id}"
-          placeholder="Your notes for this video — formulas, key takeaways, questions..."
-          oninput="scheduleVideoNoteSave('${v.id}', '${safeTitle}', '${safeMod}')"
-        >${noteText}</textarea>
-        <div class="vn-footer">
-          <span class="vn-status" id="vns-${v.id}"></span>
+    <div class="video-row${isDone ? ' done' : ''}" id="vrow-${v.id}">
+      <div class="video-check" onclick="toggleVideo('${v.id}')">${isDone ? '✓' : ''}</div>
+      <div class="video-info">
+        <span class="video-title">${v.title}</span>
+        <div class="video-meta">
+          <span class="channel-badge ${v.badge || 'badge-custom'}">${v.channel}</span>
+          ${v.dur ? `<span class="duration-tag">⏱ ${v.dur}</span>` : ''}
+          ${typeTag}
         </div>
       </div>
+      ${linkBtn}
+      ${delBtn}
     </div>`;
 }
 
@@ -1444,10 +1048,10 @@ function updateStats() {
       if (el) el.textContent = pct + '%';
     }
   });
-  const statDone = document.getElementById('stat-total-done');
-  const statPct  = document.getElementById('stat-total-pct');
-  if (statDone) statDone.textContent = totalDone;
-  if (statPct)  statPct.textContent  = totalVids ? Math.round(totalDone / totalVids * 100) + '%' : '0%';
+  const totalDoneEl = document.getElementById('stat-total-done');
+  if (totalDoneEl) totalDoneEl.textContent = totalDone;
+  const totalPctEl = document.getElementById('stat-total-pct');
+  if (totalPctEl) totalPctEl.textContent = totalVids ? Math.round(totalDone / totalVids * 100) + '%' : '0%';
 }
 
 // ===== ADD CUSTOM VIDEO =====
@@ -1464,6 +1068,7 @@ function addCustomVideo(track) {
     return;
   }
   const newVid = { id: 'custom-' + Date.now(), title, channel, badge: 'badge-custom', dur, url, type: 'video' };
+  if (!customVideos[track]) customVideos[track] = [];
   customVideos[track].push(newVid);
   save('custom_videos', customVideos);
   ['title','url','channel','duration'].forEach(f => { document.getElementById(`add-${track}-${f}`).value = ''; });
@@ -1476,164 +1081,30 @@ function deleteCustomVideo(id, track) {
   renderAll();
 }
 
+// ===== POPULATE NOW MODAL =====
+function showPopulateModal() {
+  document.getElementById('pop-overlay').classList.add('open');
+}
+function closePopulateModal() {
+  document.getElementById('pop-overlay').classList.remove('open');
+  const btn = document.getElementById('pop-copy-btn');
+  if (btn) { btn.textContent = 'Copy'; btn.classList.remove('copied'); }
+}
+function copyPopulateText() {
+  const text = document.getElementById('pop-copy-text').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('pop-copy-btn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+  });
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePopulateModal();
+});
+
 // ===== INIT =====
-// videoNotes must be declared BEFORE renderAll() so renderVideoRow can access it
-let videoNotes = {};       // { [videoId]: { text, title, module } }
-let vnSaveTimers = {};
 buildTabsAndPanels(); // generate tabs + panels from CURRICULUM before first render
 renderAll();
-
-  // ── PER-VIDEO NOTES ──────────────────────────────────────
-
-  function loadVideoNotes() {
-    db.collection('captain').doc('video-notes').get()
-      .then(snap => {
-        if (snap.exists) videoNotes = snap.data() || {};
-        // Fallback: try localStorage
-      })
-      .catch(() => {
-        try { videoNotes = JSON.parse(localStorage.getItem('video_notes') || '{}'); } catch(e) {}
-      });
-  }
-
-  function toggleVideoNote(id, title, moduleName) {
-    const area = document.getElementById('vna-' + id);
-    const btn  = document.getElementById('vnbtn-' + id);
-    if (!area) return;
-    const isOpen = area.classList.contains('open');
-    area.classList.toggle('open', !isOpen);
-    if (!isOpen) {
-      // Opening — populate textarea if notes exist
-      const ta = document.getElementById('vnt-' + id);
-      if (ta && videoNotes[id]) ta.value = videoNotes[id].text || '';
-      if (ta) setTimeout(() => ta.focus(), 50);
-    }
-    if (btn) btn.title = isOpen ? 'Add notes' : 'Close notes';
-  }
-
-  function scheduleVideoNoteSave(id, title, moduleName) {
-    const status = document.getElementById('vns-' + id);
-    if (status) { status.textContent = 'Unsaved…'; status.className = 'vn-status saving'; }
-    clearTimeout(vnSaveTimers[id]);
-    vnSaveTimers[id] = setTimeout(() => saveVideoNote(id, title, moduleName), 1200);
-  }
-
-  function saveVideoNote(id, title, moduleName) {
-    const ta     = document.getElementById('vnt-' + id);
-    const status = document.getElementById('vns-' + id);
-    const btn    = document.getElementById('vnbtn-' + id);
-    if (!ta) return;
-    const text = ta.value;
-    if (text.trim()) {
-      videoNotes[id] = { text, title, module: moduleName };
-      if (btn) btn.classList.add('has-notes');
-    } else {
-      delete videoNotes[id];
-      if (btn) btn.classList.remove('has-notes');
-    }
-    // Persist
-    localStorage.setItem('video_notes', JSON.stringify(videoNotes));
-    db.collection('captain').doc('video-notes').set(videoNotes)
-      .then(() => {
-        if (status) { status.textContent = 'Saved ✓'; status.className = 'vn-status saved'; }
-        setTimeout(() => { if (status) { status.textContent = ''; status.className = 'vn-status'; } }, 2500);
-        renderAllNotes();
-      })
-      .catch(() => {
-        if (status) { status.textContent = 'Saved locally'; status.className = 'vn-status saved'; }
-        renderAllNotes();
-      });
-  }
-
-  function renderAllNotes() {
-    const body  = document.getElementById('all-notes-body');
-    const badge = document.getElementById('notes-count-badge');
-    const empty = document.getElementById('notes-empty-msg');
-    if (!body) return;
-
-    const entries = Object.entries(videoNotes).filter(([,n]) => n && n.text && n.text.trim());
-    if (badge) badge.textContent = entries.length + (entries.length === 1 ? ' note' : ' notes');
-
-    if (!entries.length) {
-      body.innerHTML = '<div class="notes-empty" id="notes-empty-msg">📝 No notes yet — click the 📝 button on any video to start taking notes.</div>';
-      return;
-    }
-
-    // Group by module
-    const grouped = {};
-    entries.forEach(([id, n]) => {
-      const mod = n.module || 'General';
-      if (!grouped[mod]) grouped[mod] = [];
-      grouped[mod].push({ id, ...n });
-    });
-
-    body.innerHTML = Object.entries(grouped).map(([mod, notes]) => `
-      <div class="notes-module-group">
-        <div class="notes-module-label">${mod}</div>
-        ${notes.map(n => `
-          <div class="notes-entry">
-            <div class="notes-entry-title">📹 ${n.title}</div>
-            <div class="notes-entry-text">${n.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-          </div>`).join('')}
-      </div>`).join('');
-  }
-
-  function copyAllNotes() {
-    const entries = Object.entries(videoNotes).filter(([,n]) => n && n.text && n.text.trim());
-    if (!entries.length) { alert('No notes to copy yet!'); return; }
-
-    const grouped = {};
-    entries.forEach(([id, n]) => {
-      const mod = n.module || 'General';
-      if (!grouped[mod]) grouped[mod] = [];
-      grouped[mod].push(n);
-    });
-
-    let text = '=== MY TRAINING NOTES ===\n\n';
-    Object.entries(grouped).forEach(([mod, notes]) => {
-      text += `── ${mod} ──\n`;
-      notes.forEach(n => {
-        text += `\n${n.title}\n${n.text.trim()}\n`;
-      });
-      text += '\n';
-    });
-
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.querySelector('.notes-copy-btn');
-      if (btn) { const orig = btn.textContent; btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = orig, 2000); }
-    }).catch(() => alert('Could not copy — try manually selecting the notes.'));
-  }
-
-  // Init on load
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      loadVideoNotes();
-      setTimeout(renderAllNotes, 600);
-    }, 400);
-  });
-
-  // ── THEME TOGGLE (same localStorage key as main dashboard) ──
-  function toggleTheme() {
-    const isLight = document.body.classList.toggle('light-mode');
-    localStorage.setItem('sub_theme', isLight ? 'light' : 'dark');
-    const thumb = document.getElementById('theme-thumb');
-    if (thumb) thumb.textContent = isLight ? '☀️' : '🌙';
-  }
-  (function initTheme() {
-    const saved = localStorage.getItem('sub_theme');
-    // Light mode is the default — only use dark if explicitly saved as 'dark'
-    if (saved !== 'dark') {
-      document.body.classList.add('light-mode');
-      const thumb = document.getElementById('theme-thumb');
-      if (thumb) thumb.textContent = '☀️';
-    }
-  })();
-
-  // ── NOTES SCRATCHPAD ──
-
-
-
 </script>
-</div><!-- /page-wrap -->
 </body>
 </html>
