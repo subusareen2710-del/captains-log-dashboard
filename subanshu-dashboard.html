@@ -1996,7 +1996,8 @@
   .bucket-item[draggable="true"] { cursor:grab; }
   .bucket-item[draggable="true"]:active { cursor:grabbing; }
   .bucket-item.drag-over { opacity:0.4; outline:2px dashed var(--gold); outline-offset:2px; border-radius:6px; }
-  .bucket-items.drag-target { background:rgba(255,182,39,0.06); border-radius:8px; transition:background 0.2s; }
+  .bucket-items { min-height: 80px; }
+  .bucket-items.drag-target { background:rgba(255,182,39,0.06); border-radius:8px; outline: 2px dashed var(--gold); outline-offset:-2px; transition:background 0.2s, outline 0.15s; }
 
   /* Light mode extras */
   body.light-mode .eod-input { background:rgba(255,255,255,0.7); color:#1a1f2e; }
@@ -2276,33 +2277,33 @@
     <button onclick="clearBuckets()" style="font-size:0.72rem;font-weight:800;color:var(--text-muted);background:none;border:none;cursor:pointer;font-family:inherit;">Clear all</button>
   </div>
   <div class="buckets">
-    <div class="bucket bucket-urgent">
+    <div class="bucket bucket-urgent"
+         ondragover="bucketDragOver(event,'urgent')"
+         ondragleave="bucketDragLeave(event,'urgent')"
+         ondrop="bucketDrop(event,'urgent')">
       <div class="bucket-label">🔴 Urgent</div>
-      <div class="bucket-items" id="bucket-urgent"
-           ondragover="bucketDragOver(event,'urgent')"
-           ondragleave="bucketDragLeave(event,'urgent')"
-           ondrop="bucketDrop(event,'urgent')"><div class="bucket-empty">Nothing yet</div></div>
+      <div class="bucket-items" id="bucket-urgent"><div class="bucket-empty">Nothing yet</div></div>
     </div>
-    <div class="bucket bucket-week">
+    <div class="bucket bucket-week"
+         ondragover="bucketDragOver(event,'week')"
+         ondragleave="bucketDragLeave(event,'week')"
+         ondrop="bucketDrop(event,'week')">
       <div class="bucket-label">🟡 This Week</div>
-      <div class="bucket-items" id="bucket-week"
-           ondragover="bucketDragOver(event,'week')"
-           ondragleave="bucketDragLeave(event,'week')"
-           ondrop="bucketDrop(event,'week')"><div class="bucket-empty">Nothing yet</div></div>
+      <div class="bucket-items" id="bucket-week"><div class="bucket-empty">Nothing yet</div></div>
     </div>
-    <div class="bucket bucket-later">
+    <div class="bucket bucket-later"
+         ondragover="bucketDragOver(event,'later')"
+         ondragleave="bucketDragLeave(event,'later')"
+         ondrop="bucketDrop(event,'later')">
       <div class="bucket-label">🟢 Later</div>
-      <div class="bucket-items" id="bucket-later"
-           ondragover="bucketDragOver(event,'later')"
-           ondragleave="bucketDragLeave(event,'later')"
-           ondrop="bucketDrop(event,'later')"><div class="bucket-empty">Nothing yet</div></div>
+      <div class="bucket-items" id="bucket-later"><div class="bucket-empty">Nothing yet</div></div>
     </div>
-    <div class="bucket bucket-drop">
+    <div class="bucket bucket-drop"
+         ondragover="bucketDragOver(event,'drop')"
+         ondragleave="bucketDragLeave(event,'drop')"
+         ondrop="bucketDrop(event,'drop')">
       <div class="bucket-label">⚫ Drop / Delegate</div>
-      <div class="bucket-items" id="bucket-drop"
-           ondragover="bucketDragOver(event,'drop')"
-           ondragleave="bucketDragLeave(event,'drop')"
-           ondrop="bucketDrop(event,'drop')"><div class="bucket-empty">Nothing yet</div></div>
+      <div class="bucket-items" id="bucket-drop"><div class="bucket-empty">Nothing yet</div></div>
     </div>
   </div>
 
@@ -3753,12 +3754,15 @@ async function loadCrypto() {
   // ── Drag handlers (called via inline onXxx on bucket containers) ──
   function bucketDragOver(e, bucketId) {
     e.preventDefault();
+    e.stopPropagation(); // prevent parent picking it up
     e.dataTransfer.dropEffect = 'move';
     document.getElementById('bucket-' + bucketId).classList.add('drag-target');
   }
   function bucketDragLeave(e, bucketId) {
-    const el = document.getElementById('bucket-' + bucketId);
-    if (!el.contains(e.relatedTarget)) el.classList.remove('drag-target');
+    // Only clear highlight when leaving the whole card (not moving between children)
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      document.getElementById('bucket-' + bucketId).classList.remove('drag-target');
+    }
   }
   function bucketDrop(e, bucketId) {
     e.preventDefault();
