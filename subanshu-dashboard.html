@@ -1061,6 +1061,88 @@
   /* ======== ARCHIVE ALWAYS OPEN IN LOG TAB ======== */
   #archive-body-auto { display: block; padding: 20px; }
 
+
+  /* ═══════════════════════════════════════════════
+     DYNAMIC PER-TAB COLOUR THEMES
+     Today=gold  Focus=teal  Training=orange
+     Portfolio=purple  Log=blue
+  ═══════════════════════════════════════════════ */
+
+  /* ── Active tab button text colours ── */
+  .tab-btn-today.active    { color: #ffb627 !important; box-shadow: 0 2px 14px rgba(255,182,39,0.25), inset 0 1px 0 rgba(255,255,255,0.06) !important; }
+  .tab-btn-focus.active    { color: #00d4c8 !important; box-shadow: 0 2px 14px rgba(0,212,200,0.25),  inset 0 1px 0 rgba(255,255,255,0.06) !important; }
+  .tab-btn-training.active { color: #ff6b35 !important; box-shadow: 0 2px 14px rgba(255,107,53,0.25), inset 0 1px 0 rgba(255,255,255,0.06) !important; }
+  .tab-btn-portfolio.active{ color: #c084fc !important; box-shadow: 0 2px 14px rgba(192,132,252,0.25),inset 0 1px 0 rgba(255,255,255,0.06) !important; }
+  .tab-btn-log.active      { color: #60a5fa !important; box-shadow: 0 2px 14px rgba(96,165,250,0.25),  inset 0 1px 0 rgba(255,255,255,0.06) !important; }
+
+  /* ── Section ambient glow ── */
+  #tab-today.active    { background: radial-gradient(ellipse at 25% 0%,  rgba(255,182,39,0.07)  0%, transparent 55%); }
+  #tab-focus.active    { background: radial-gradient(ellipse at 25% 0%,  rgba(0,212,200,0.06)   0%, transparent 55%); }
+  #tab-training.active { background: radial-gradient(ellipse at 25% 0%,  rgba(255,107,53,0.07)  0%, transparent 55%); }
+  #tab-portfolio.active{ background: radial-gradient(ellipse at 25% 0%,  rgba(192,132,252,0.06) 0%, transparent 55%); }
+  #tab-log.active      { background: radial-gradient(ellipse at 25% 0%,  rgba(96,165,250,0.06)  0%, transparent 55%); }
+
+  /* ── Card top accent bar per tab ── */
+  #tab-today .card::before    { content:''; display:block; height:2px; margin:-22px -22px 18px; border-radius:14px 14px 0 0; background:linear-gradient(90deg, rgba(255,182,39,0.8), transparent); }
+  #tab-focus .card::before    { content:''; display:block; height:2px; margin:-22px -22px 18px; border-radius:14px 14px 0 0; background:linear-gradient(90deg, rgba(0,212,200,0.8), transparent); }
+  #tab-training .card::before { content:''; display:block; height:2px; margin:-22px -22px 18px; border-radius:14px 14px 0 0; background:linear-gradient(90deg, rgba(255,107,53,0.8), transparent); }
+  #tab-portfolio .card::before{ content:''; display:block; height:2px; margin:-22px -22px 18px; border-radius:14px 14px 0 0; background:linear-gradient(90deg, rgba(192,132,252,0.8), transparent); }
+  #tab-log .card::before      { content:''; display:block; height:2px; margin:-22px -22px 18px; border-radius:14px 14px 0 0; background:linear-gradient(90deg, rgba(96,165,250,0.8), transparent); }
+
+  /* ── Card border tint per tab ── */
+  #tab-today .card    { border-color: rgba(255,182,39,0.22); background: linear-gradient(160deg, rgba(255,182,39,0.03) 0%, var(--surface) 40%); }
+  #tab-focus .card    { border-color: rgba(0,212,200,0.22);  background: linear-gradient(160deg, rgba(0,212,200,0.03)  0%, var(--surface) 40%); }
+  #tab-training .card { border-color: rgba(255,107,53,0.22); background: linear-gradient(160deg, rgba(255,107,53,0.03) 0%, var(--surface) 40%); }
+  #tab-portfolio .card{ border-color: rgba(192,132,252,0.22);background: linear-gradient(160deg, rgba(192,132,252,0.03)0%, var(--surface) 40%); }
+  #tab-log .card      { border-color: rgba(96,165,250,0.22); background: linear-gradient(160deg, rgba(96,165,250,0.03)  0%, var(--surface) 40%); }
+
+  /* ── Card hover glow per tab ── */
+  #tab-today .card:hover    { border-color: rgba(255,182,39,0.55); box-shadow: 0 18px 52px rgba(0,0,0,0.5), 0 0 40px rgba(255,182,39,0.14); }
+  #tab-focus .card:hover    { border-color: rgba(0,212,200,0.55);  box-shadow: 0 18px 52px rgba(0,0,0,0.5), 0 0 40px rgba(0,212,200,0.13); }
+  #tab-training .card:hover { border-color: rgba(255,107,53,0.55); box-shadow: 0 18px 52px rgba(0,0,0,0.5), 0 0 40px rgba(255,107,53,0.14); }
+  #tab-portfolio .card:hover{ border-color: rgba(192,132,252,0.55);box-shadow: 0 18px 52px rgba(0,0,0,0.5), 0 0 40px rgba(192,132,252,0.13); }
+  #tab-log .card:hover      { border-color: rgba(96,165,250,0.55); box-shadow: 0 18px 52px rgba(0,0,0,0.5), 0 0 40px rgba(96,165,250,0.14); }
+
+  /* ── Section label accent lines ── */
+  #tab-today .section-label    { color: #ffb627; }
+  #tab-focus .section-label    { color: #00d4c8; }
+  #tab-training .section-label { color: #ff6b35; }
+  #tab-portfolio .section-label{ color: #c084fc; }
+  #tab-log .section-label      { color: #60a5fa; }
+  #tab-today .section-label::before,    #tab-today .section-label::after    { background: linear-gradient(90deg, rgba(255,182,39,0.45), transparent); }
+  #tab-focus .section-label::before,    #tab-focus .section-label::after    { background: linear-gradient(90deg, rgba(0,212,200,0.4),  transparent); }
+  #tab-training .section-label::before, #tab-training .section-label::after { background: linear-gradient(90deg, rgba(255,107,53,0.45), transparent); }
+  #tab-portfolio .section-label::before,#tab-portfolio .section-label::after{ background: linear-gradient(90deg, rgba(192,132,252,0.4),transparent); }
+  #tab-log .section-label::before,      #tab-log .section-label::after      { background: linear-gradient(90deg, rgba(96,165,250,0.4),  transparent); }
+
+  /* ── Card title dot glow per tab ── */
+  #tab-today .card-title .dot    { box-shadow: 0 0 8px rgba(255,182,39,0.6); }
+  #tab-focus .card-title .dot    { box-shadow: 0 0 8px rgba(0,212,200,0.6); }
+  #tab-training .card-title .dot { box-shadow: 0 0 8px rgba(255,107,53,0.6); }
+  #tab-portfolio .card-title .dot{ box-shadow: 0 0 8px rgba(192,132,252,0.6); }
+  #tab-log .card-title .dot      { box-shadow: 0 0 8px rgba(96,165,250,0.6); }
+
+  /* ── Progress bars use tab accent ── */
+  #tab-today .daily-progress-fill    { background: linear-gradient(90deg, #ffb627, #ff8c42, #ffb627); background-size:200% 100%; animation: shimmer 3s linear infinite; }
+  #tab-training .pl300-fill          { background: linear-gradient(90deg, #ff6b35, #ff4444, #ff6b35); background-size:200% 100%; animation: shimmer 3s linear infinite; }
+
+  /* ── Intention bar Today accent ── */
+  #tab-today .intention-bar { border-color: rgba(255,182,39,0.6); background: rgba(255,182,39,0.06); }
+
+  /* ── Focus tab — breathing card teal tint ── */
+  #tab-focus .mindful-card { border-color: rgba(0,212,200,0.25); }
+
+  /* ── Portfolio tab — visa card purple tint ── */
+  #tab-portfolio .visa-card { border-left-color: #c084fc; border-color: rgba(192,132,252,0.25); background: rgba(192,132,252,0.04); }
+  #tab-portfolio .visa-title { color: #c084fc; }
+
+  /* ── Archive section blue tint ── */
+  #tab-log .archive-section { border-color: rgba(96,165,250,0.25); }
+  #tab-log .archive-header:hover { background: rgba(96,165,250,0.06); }
+  #tab-log .archive-header-title { color: #60a5fa; }
+  #tab-log .save-today-btn { background: #60a5fa; }
+  #tab-log .save-today-btn:hover { background: #3b82f6; }
+
 </style>
 </head>
 <body>
@@ -1083,11 +1165,11 @@
 
 <!-- TAB NAVIGATION -->
 <nav class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('today',this)">🌅 Today</button>
-  <button class="tab-btn" onclick="switchTab('focus',this)">🎯 Focus</button>
-  <button class="tab-btn" onclick="switchTab('training',this)">📊 Training</button>
-  <button class="tab-btn" onclick="switchTab('portfolio',this)">💰 Portfolio</button>
-  <button class="tab-btn" onclick="switchTab('log',this)">📖 Log</button>
+  <button class="tab-btn tab-btn-today active" onclick="switchTab('today',this)">🌅 Today</button>
+  <button class="tab-btn tab-btn-focus" onclick="switchTab('focus',this)">🎯 Focus</button>
+  <button class="tab-btn tab-btn-training" onclick="switchTab('training',this)">📊 Training</button>
+  <button class="tab-btn tab-btn-portfolio" onclick="switchTab('portfolio',this)">💰 Portfolio</button>
+  <button class="tab-btn tab-btn-log" onclick="switchTab('log',this)">📖 Log</button>
 </nav>
 
 <!-- ═══ TAB: TODAY ═══ -->
