@@ -2623,7 +2623,13 @@ function save(key, val) {
 }
 
 function load(key, def) {
-  try { const v = localStorage.getItem('sub_' + key); return v !== null ? JSON.parse(v) : def; } catch(e) { return def; }
+  try {
+    const v = localStorage.getItem('sub_' + key);
+    if (v === null) return def;
+    const parsed = JSON.parse(v);
+    // Guard against stored "null" string (can happen from Firestore sync)
+    return (parsed !== null && parsed !== undefined) ? parsed : def;
+  } catch(e) { return def; }
 }
 
 function pushAllToFirestore() {
@@ -2643,6 +2649,7 @@ function applyFirestoreData(data) {
   let changed = false;
   Object.keys(data).forEach(k => {
     if (k === '_ts') return;
+    if (data[k] === null || data[k] === undefined) return; // never overwrite with null
     const local = localStorage.getItem('sub_' + k);
     const incoming = JSON.stringify(data[k]);
     if (local !== incoming) {
