@@ -2278,19 +2278,31 @@
   <div class="buckets">
     <div class="bucket bucket-urgent">
       <div class="bucket-label">🔴 Urgent</div>
-      <div class="bucket-items" id="bucket-urgent"><div class="bucket-empty">Nothing yet</div></div>
+      <div class="bucket-items" id="bucket-urgent"
+           ondragover="bucketDragOver(event,'urgent')"
+           ondragleave="bucketDragLeave(event,'urgent')"
+           ondrop="bucketDrop(event,'urgent')"><div class="bucket-empty">Nothing yet</div></div>
     </div>
     <div class="bucket bucket-week">
       <div class="bucket-label">🟡 This Week</div>
-      <div class="bucket-items" id="bucket-week"><div class="bucket-empty">Nothing yet</div></div>
+      <div class="bucket-items" id="bucket-week"
+           ondragover="bucketDragOver(event,'week')"
+           ondragleave="bucketDragLeave(event,'week')"
+           ondrop="bucketDrop(event,'week')"><div class="bucket-empty">Nothing yet</div></div>
     </div>
     <div class="bucket bucket-later">
       <div class="bucket-label">🟢 Later</div>
-      <div class="bucket-items" id="bucket-later"><div class="bucket-empty">Nothing yet</div></div>
+      <div class="bucket-items" id="bucket-later"
+           ondragover="bucketDragOver(event,'later')"
+           ondragleave="bucketDragLeave(event,'later')"
+           ondrop="bucketDrop(event,'later')"><div class="bucket-empty">Nothing yet</div></div>
     </div>
     <div class="bucket bucket-drop">
       <div class="bucket-label">⚫ Drop / Delegate</div>
-      <div class="bucket-items" id="bucket-drop"><div class="bucket-empty">Nothing yet</div></div>
+      <div class="bucket-items" id="bucket-drop"
+           ondragover="bucketDragOver(event,'drop')"
+           ondragleave="bucketDragLeave(event,'drop')"
+           ondrop="bucketDrop(event,'drop')"><div class="bucket-empty">Nothing yet</div></div>
     </div>
   </div>
 
@@ -3738,8 +3750,35 @@ async function loadCrypto() {
   // ══════════════════════════════════════════
   let _dragSource = null; // { bucketId, idx }
 
-  // Override renderBucket — re-attach per-item dragstart only
-  // (item divs are replaced on each innerHTML update so listeners must be re-added)
+  // ── Drag handlers (called via inline onXxx on bucket containers) ──
+  function bucketDragOver(e, bucketId) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.getElementById('bucket-' + bucketId).classList.add('drag-target');
+  }
+  function bucketDragLeave(e, bucketId) {
+    const el = document.getElementById('bucket-' + bucketId);
+    if (!el.contains(e.relatedTarget)) el.classList.remove('drag-target');
+  }
+  function bucketDrop(e, bucketId) {
+    e.preventDefault();
+    const el = document.getElementById('bucket-' + bucketId);
+    el.classList.remove('drag-target');
+    if (!_dragSource || _dragSource.bucketId === bucketId) return;
+
+    const b = load('buckets', { urgent:[], week:[], later:[], drop:[] });
+    const srcItems = b[_dragSource.bucketId] || [];
+    const [moved]  = srcItems.splice(_dragSource.idx, 1);
+    b[_dragSource.bucketId] = srcItems;
+    if (!b[bucketId]) b[bucketId] = [];
+    b[bucketId].push(moved);
+    save('buckets', b);
+    ['urgent','week','later','drop'].forEach(bk => renderBucket(bk, b[bk]));
+    _dragSource = null;
+  }
+
+  // Override renderBucket — re-attach per-item dragstart
+  // (items are replaced each innerHTML update so must be re-wired each render)
   const _origRenderBucket = renderBucket;
   renderBucket = function(bucketId, items) {
     _origRenderBucket(bucketId, items);
@@ -3747,41 +3786,17 @@ async function loadCrypto() {
     if (!el) return;
     el.querySelectorAll('.bucket-item').forEach((div, idx) => {
       div.setAttribute('draggable', 'true');
-      div.addEventListener('dragstart', e => {
+      div.ondragstart = e => {
         _dragSource = { bucketId, idx };
         e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', idx); // required for Firefox
         setTimeout(() => div.style.opacity = '0.45', 0);
-      });
-      div.addEventListener('dragend', () => { div.style.opacity = ''; });
+      };
+      div.ondragend = () => { div.style.opacity = ''; };
+      // Also allow drop ON items (prevents browser cancelling dragover mid-item)
+      div.ondragover = e => e.preventDefault();
     });
   };
-
-  // Attach drop-zone listeners ONCE on each static bucket container
-  // (containers are never replaced, only their innerHTML changes)
-  ;['urgent','week','later','drop'].forEach(bucketId => {
-    const el = document.getElementById('bucket-' + bucketId);
-    if (!el) return;
-    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-target'); });
-    el.addEventListener('dragleave', e => {
-      // Only remove highlight when leaving the container itself, not child items
-      if (!el.contains(e.relatedTarget)) el.classList.remove('drag-target');
-    });
-    el.addEventListener('drop', e => {
-      e.preventDefault();
-      el.classList.remove('drag-target');
-      if (!_dragSource || _dragSource.bucketId === bucketId) return;
-
-      const b = load('buckets', { urgent:[], week:[], later:[], drop:[] });
-      const srcItems = b[_dragSource.bucketId] || [];
-      const [moved]  = srcItems.splice(_dragSource.idx, 1);
-      b[_dragSource.bucketId] = srcItems;
-      if (!b[bucketId]) b[bucketId] = [];
-      b[bucketId].push(moved);
-      save('buckets', b);
-      ['urgent','week','later','drop'].forEach(bk => renderBucket(bk, b[bk]));
-      _dragSource = null;
-    });
-  });
 
 </script>
 <!-- FLOATING QUICK-CAPTURE -->
