@@ -1437,9 +1437,189 @@
   body.light-mode select { background: rgba(255,255,255,0.8); color: #1a1f2e; }
   body.light-mode .footer { color: #9aaabf; }
 
+
+  /* ═══════════════════════════════════════
+     LOCK SCREEN
+  ═══════════════════════════════════════ */
+  #lock-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #080d1a;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #lock-screen.unlocking {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  #lock-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,182,39,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 90%, rgba(96,165,250,0.10) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .lock-card {
+    position: relative;
+    background: rgba(15,23,41,0.92);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 48px 44px 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    text-align: center;
+    backdrop-filter: blur(12px);
+  }
+  .lock-icon {
+    font-size: 52px;
+    margin-bottom: 8px;
+    display: block;
+    filter: drop-shadow(0 0 18px rgba(255,182,39,0.5));
+    animation: lockBob 3s ease-in-out infinite;
+  }
+  @keyframes lockBob {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+  }
+  .lock-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #f0f4ff;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+  }
+  .lock-subtitle {
+    font-size: 13px;
+    color: rgba(180,195,230,0.6);
+    margin-bottom: 32px;
+  }
+  .lock-input-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  #lock-password {
+    width: 100%;
+    padding: 14px 48px 14px 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    color: #f0f4ff;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.08em;
+  }
+  #lock-password:focus {
+    border-color: rgba(255,182,39,0.6);
+    box-shadow: 0 0 0 3px rgba(255,182,39,0.12);
+  }
+  #lock-password.shake {
+    animation: lockShake 0.4s ease;
+    border-color: rgba(255,80,80,0.7) !important;
+    box-shadow: 0 0 0 3px rgba(255,80,80,0.15) !important;
+  }
+  @keyframes lockShake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-8px); }
+    40%       { transform: translateX(8px); }
+    60%       { transform: translateX(-6px); }
+    80%       { transform: translateX(6px); }
+  }
+  .lock-eye-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: rgba(180,195,230,0.5);
+    padding: 4px;
+    transition: color 0.2s;
+  }
+  .lock-eye-btn:hover { color: rgba(255,182,39,0.9); }
+  #lock-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #ffb627, #ff6b35);
+    border: none;
+    border-radius: 12px;
+    color: #080d1a;
+    font-size: 15px;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(255,182,39,0.35);
+    letter-spacing: 0.3px;
+  }
+  #lock-submit:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 28px rgba(255,182,39,0.45);
+  }
+  #lock-submit:active { transform: translateY(0); opacity: 1; }
+  #lock-error {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #ff6b6b;
+    min-height: 18px;
+    transition: opacity 0.2s;
+  }
+  .lock-footer {
+    margin-top: 28px;
+    font-size: 11px;
+    color: rgba(180,195,230,0.25);
+  }
+
+  /* Logout button in header */
+  .logout-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: rgba(180,195,230,0.6);
+    font-size: 13px;
+    font-family: inherit;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .logout-btn:hover {
+    border-color: rgba(255,100,100,0.5);
+    color: rgba(255,130,130,0.9);
+  }
+
 </style>
 </head>
 <body>
+
+<div id="lock-screen">
+  <div class="lock-card">
+    <span class="lock-icon">🏴‍☠️</span>
+    <div class="lock-title">Captain's Log</div>
+    <div class="lock-subtitle">Enter your passphrase to board the ship</div>
+    <div class="lock-input-wrap">
+      <input id="lock-password" type="password" placeholder="Passphrase…"
+             autocomplete="current-password" autofocus
+             onkeydown="if(event.key==='Enter')submitLock()">
+      <button class="lock-eye-btn" onclick="toggleLockEye()" title="Show / hide">👁</button>
+      <button class="logout-btn" onclick="lockDashboard()" title="Lock dashboard">🔒 Lock</button>
+    </div>
+    <button id="lock-submit" onclick="submitLock()">⚓ Set Sail</button>
+    <div id="lock-error"></div>
+    <div class="lock-footer">Personal dashboard · Captain Subanshu</div>
+  </div>
+</div>
+
 
 <!-- HEADER -->
 <div class="header">
@@ -2676,6 +2856,65 @@ async function loadCrypto() {
     c.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.8rem;font-weight:700;padding:10px 0;">Sea fog — check your connection</div>';
   }
 }
+
+
+  /* ══════════════════════════════
+     LOCK SCREEN
+  ══════════════════════════════ */
+  // Password hash (SHA-256 of your passphrase).
+  // Default passphrase: captain2710
+  // To change: run  python3 -c "import hashlib; print(hashlib.sha256('YourNewPass'.encode()).hexdigest())"
+  // then replace the hash string below.
+  const PASS_HASH = '8d04abc5bcf0a3399873d0f16bd88534adfb7eb0ae788a9438badf66a5eee74f';
+  const LOCK_KEY  = 'sub_unlocked_v1';
+
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray  = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function submitLock() {
+    const input = document.getElementById('lock-password');
+    const errEl = document.getElementById('lock-error');
+    const val   = input.value.trim();
+    if (!val) return;
+
+    const hash = await sha256(val);
+    if (hash === PASS_HASH) {
+      sessionStorage.setItem(LOCK_KEY, '1');
+      const ls = document.getElementById('lock-screen');
+      ls.classList.add('unlocking');
+      setTimeout(() => { ls.style.display = 'none'; }, 650);
+      errEl.textContent = '';
+    } else {
+      input.classList.remove('shake');
+      void input.offsetWidth; // reflow to restart animation
+      input.classList.add('shake');
+      errEl.textContent = 'Wrong passphrase. Try again.';
+      input.value = '';
+      setTimeout(() => input.classList.remove('shake'), 500);
+    }
+  }
+
+  function toggleLockEye() {
+    const input = document.getElementById('lock-password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  function lockDashboard() {
+    sessionStorage.removeItem(LOCK_KEY);
+    location.reload();
+  }
+
+  // On load: skip lock screen if already unlocked this session
+  (function checkLock() {
+    if (sessionStorage.getItem(LOCK_KEY) === '1') {
+      const ls = document.getElementById('lock-screen');
+      if (ls) ls.style.display = 'none';
+    }
+  })();
 
 </script>
 </body>
