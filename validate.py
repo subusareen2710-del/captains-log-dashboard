@@ -6,7 +6,7 @@ missing IDs, broken function references, etc.)
 Usage: python3 validate.py
 """
 
-import re, sys
+import re, sys, subprocess, tempfile, os
 
 FILES = {
     'subanshu-dashboard.html': {
@@ -109,14 +109,31 @@ for filename, rules in FILES.items():
         else:
             print(f'  ✅ ORDER: {check_name}')
 
-    # Basic JS bracket balance check (script blocks only)
+    # JS syntax check via Node (catches literal newlines in strings, etc.)
     script_blocks = re.findall(r'<script[^>]*>(.*?)</script>', content, re.DOTALL)
     for i, block in enumerate(script_blocks):
+        # Brace balance
         opens  = block.count('{')
         closes = block.count('}')
         if abs(opens - closes) > 5:
             warnings.append(f'[{filename}] Script block {i+1}: brace mismatch ({opens} open, {closes} close)')
             print(f'  ⚠️  Script block {i+1} brace imbalance: {opens}{{ vs {closes}}}')
+        # Node syntax check
+        try:
+            with tempfile.NamedTemporaryFile(suffix='.js', mode='w', delete=False) as tf:
+                tf.write(block)
+                tf_name = tf.name
+            result = subprocess.run(['node', '--check', tf_name],
+                                    capture_output=True, text=True)
+            os.unlink(tf_name)
+            if result.returncode != 0:
+                err_line = result.stderr.split('\n')[1] if '\n' in result.stderr else result.stderr
+                errors.append(f'[{filename}] JS SYNTAX ERROR in script block {i+1}: {err_line.strip()}')
+                print(f'  ❌ JS syntax error in script block {i+1}: {err_line.strip()}')
+            else:
+                print(f'  ✅ JS syntax OK (script block {i+1})')
+        except FileNotFoundError:
+            pass  # node not installed — skip silently
 
 print('\n' + '─'*50)
 if errors:

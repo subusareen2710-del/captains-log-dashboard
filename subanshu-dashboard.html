@@ -3655,8 +3655,7 @@ async function loadCrypto() {
       const val = input.value.trim();
       if (!val) return;
       const bd = document.getElementById('brain-dump');
-      bd.value = (bd.value.trim() ? bd.value.trim() + '
-' : '') + val;
+      bd.value = (bd.value.trim() ? bd.value.trim() + '\n' : '') + val;
       save('brainDump', bd.value);
       input.value = '';
       input.placeholder = '✅ Added to brain dump!';
