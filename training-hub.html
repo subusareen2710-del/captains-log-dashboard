@@ -32,6 +32,7 @@
   --excel: #217346; --excel-light: #eaf5ee;
   --pbi: #f2c811; --pbi-dark: #e8a500; --pbi-light: #fffbeb;
   --r-blue: #276DC3; --r-blue-dark: #1a5299; --r-light: #eef4fc;
+  --dmaic: #2E7D32; --dmaic-dark: #1B5E20; --dmaic-light: #E8F5E9;
   --text: #2c1810; --text-muted: #8b6e5a; --text-dim: #c9b09a;
   --radius: 14px; --radius-sm: 9px;
   --shadow: 0 2px 12px rgba(44,24,16,0.07);
@@ -144,6 +145,12 @@ body {
   color: white;
   box-shadow: 0 3px 10px rgba(39,109,195,0.35);
 }
+.tab-btn.active-dmaic {
+  background: var(--dmaic);
+  color: white;
+  box-shadow: 0 3px 10px rgba(46,125,50,0.35);
+}
+.dmaic-fill { background: linear-gradient(90deg, var(--dmaic-dark), var(--dmaic)); }
 /* Generic active state for dynamically added tabs */
 .tab-btn.active-new {
   background: var(--navy);
@@ -373,6 +380,7 @@ body {
 .pbi-num { background: var(--pbi-light); color: var(--pbi-dark); border: 2px solid var(--pbi); }
 .excel-num { background: var(--excel-light); color: var(--excel); border: 2px solid #a8d5b5; }
 .r-num     { background: var(--r-light); color: var(--r-blue-dark); border: 2px solid var(--r-blue); }
+.dmaic-num { background: var(--dmaic-light); color: var(--dmaic-dark); border: 2px solid var(--dmaic); }
 
 /* Channel badge colours */
 .badge-giac { background: #fef3c7; color: #92400e; }
@@ -727,6 +735,44 @@ const CURRICULUM = {
         { id:'r-v7', title:"Harvard CS50's Intro to R Programming – Full University Course", channel:'freeCodeCamp.org / CS50', badge:'badge-fcc', dur:'8h 48m', type:'course', url:'https://www.youtube.com/watch?v=g_3IKHG-rfA' },
       ]
     },
+  ],
+  dmaic: [
+    {
+      id: 'dmaic-m1', title: 'DMAIC Overview & Six Sigma Foundations', sub: 'What is DMAIC · Six Sigma philosophy · problem-solving framework',
+      videos: [
+        { id:'dmaic-v1', title:'What is DMAIC? Lean Six Sigma Framework Explained', channel:'Six Sigma Global Institute', badge:'badge-ssgi', dur:'7 min', type:'video', url:'https://www.youtube.com/watch?v=QvspEbkTuAM' },
+        { id:'dmaic-v2', title:'What is Six Sigma? ...and DMAIC', channel:'Online PM Courses – Mike Clayton', badge:'badge-pm', dur:'7 min', type:'video', url:'https://www.youtube.com/watch?v=GmEARqTY8TY' },
+      ]
+    },
+    {
+      id: 'dmaic-m2', title: 'The 5 Phases — Step by Step', sub: 'Define · Measure · Analyze · Improve · Control in depth',
+      videos: [
+        { id:'dmaic-v3', title:'Six Sigma DMAIC Step by Step', channel:'Lean Six Sigma Training', badge:'badge-lsst', dur:'27 min', type:'course', url:'https://www.youtube.com/watch?v=1JbDR8F4U34' },
+        { id:'dmaic-v4', title:'An Ultimate Guide to DMAIC Methodology', channel:'Invensis Learning', badge:'badge-inv', dur:'21 min', type:'course', url:'https://www.youtube.com/watch?v=cSqFhqarYHE' },
+      ]
+    },
+    {
+      id: 'dmaic-m3', title: 'DMAIC Applied — Process Walk-Throughs', sub: 'Process maps · fishbone · root cause · control charts',
+      videos: [
+        { id:'dmaic-v5', title:'DMAIC Process Explained with Example', channel:'EPM', badge:'badge-epm', dur:'10 min', type:'video', url:'https://www.youtube.com/watch?v=TzPPuvciE-Y' },
+        { id:'dmaic-v6', title:'Lean Six Sigma Project Example with DMAIC', channel:'Six Sigma Global Institute', badge:'badge-ssgi', dur:'20 min', type:'video', url:'https://www.youtube.com/watch?v=lg_pm9Ziquw' },
+      ]
+    },
+    {
+      id: 'dmaic-m4', title: 'DMAIC Case Studies', sub: 'Call centre · manufacturing defect reduction · automotive',
+      videos: [
+        { id:'dmaic-v7', title:'DMAIC Case Study — Call Centre', channel:'Six Sigma Mania', badge:'badge-ssm', dur:'6 min', type:'video', url:'https://www.youtube.com/watch?v=6ax4j0gW4O4' },
+        { id:'dmaic-v8', title:'Complete DMAIC Case Study — AC Defect Reduction', channel:'SIX SIGMA by MBB Mohit Sharma', badge:'badge-mbb', dur:'10 min', type:'video', url:'https://www.youtube.com/watch?v=KO0LVm-nS2I' },
+        { id:'dmaic-v9', title:'Six Sigma DMAIC Case Study — Automotive Industry', channel:'Opexity', badge:'badge-opexity', dur:'9 min', type:'video', url:'https://www.youtube.com/watch?v=VHsAVQfjIXc' },
+      ]
+    },
+    {
+      id: 'dmaic-m5', title: 'Lean Six Sigma for Operations & S&OP', sub: 'Supply chain · ops management · Green Belt toolkit · S&OP integration',
+      videos: [
+        { id:'dmaic-v10', title:'Six Sigma In 9 Minutes', channel:'Simplilearn', badge:'badge-simpli', dur:'9 min', type:'video', url:'https://www.youtube.com/watch?v=4EDYfSl-fmc' },
+        { id:'dmaic-v11', title:'Lean Six Sigma DMAIC Explained', channel:'ICEQBS', badge:'badge-ice', dur:'16 min', type:'course', url:'https://www.youtube.com/watch?v=hXpytkZ0jNI' },
+      ]
+    },
   ]
 };
 
@@ -752,6 +798,13 @@ const TRACK_META = {
     activeClass: 'active-r', fillClass: 'r-fill',
     numClass: 'r-num', accentColor: 'var(--r-blue)',
     fillColor: 'var(--r-blue)', statPctId: 'stat-r-pct',
+    startLabel: '→ Start with Module 1'
+  },
+  dmaic: {
+    label: 'DMAIC / Six Sigma', icon: '⚙️',
+    activeClass: 'active-dmaic', fillClass: 'dmaic-fill',
+    numClass: 'dmaic-num', accentColor: 'var(--dmaic)',
+    fillColor: 'var(--dmaic)', statPctId: 'stat-dmaic-pct',
     startLabel: '→ Start with Module 1'
   }
   // ── Add new courses here, e.g.: ──
