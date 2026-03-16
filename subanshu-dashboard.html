@@ -1200,6 +1200,243 @@
   body.active-tab-portfolio{ background-color: #0d0813; }
   body.active-tab-log      { background-color: #080d1a; }
 
+
+  /* ═══════════════════════════════════════════════════════════
+     THEME TOGGLE BUTTON
+  ═══════════════════════════════════════════════════════════ */
+  .theme-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .theme-toggle-track {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 26px;
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 20px;
+    padding: 3px;
+    transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .theme-toggle:hover .theme-toggle-track {
+    border-color: var(--navy);
+    box-shadow: 0 0 12px rgba(77,142,255,0.3), inset 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .theme-toggle-thumb {
+    font-size: 1rem;
+    line-height: 1;
+    display: block;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    transform: translateX(-8px);
+  }
+  body.light-mode .theme-toggle-thumb {
+    transform: translateX(8px);
+  }
+  body.light-mode .theme-toggle-track {
+    background: rgba(255,255,255,0.7);
+    border-color: rgba(0,0,0,0.15);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LIGHT MODE — CSS VARIABLE OVERRIDES
+  ═══════════════════════════════════════════════════════════ */
+  body.light-mode {
+    --bg: #fefefe;
+    --surface: rgba(255,255,255,0.72);
+    --surface2: rgba(255,255,255,0.5);
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1a1f2e;
+    --text-muted: #52637a;
+    --text-dim: #9aaabf;
+    --shadow: 0 2px 20px rgba(0,0,0,0.07);
+    --shadow-hover: 0 10px 40px rgba(0,0,0,0.14);
+    --glow-red: 0 0 20px rgba(220,38,38,0.2);
+    --glow-gold: 0 0 20px rgba(217,119,6,0.2);
+    --glow-teal: 0 0 20px rgba(13,148,136,0.2);
+    --glow-navy: 0 0 20px rgba(37,99,235,0.2);
+  }
+
+  /* ═══ LIGHT MODE: BODY BACKGROUNDS PER TAB ═══ */
+  body.light-mode { background-color: #fffbf0; }
+
+  body.light-mode.active-tab-today    { background-color: #fffbeb; }
+  body.light-mode.active-tab-focus    { background-color: #f0fdf9; }
+  body.light-mode.active-tab-training { background-color: #fff7ed; }
+  body.light-mode.active-tab-portfolio{ background-color: #faf5ff; }
+  body.light-mode.active-tab-log      { background-color: #eff6ff; }
+
+  /* Light mode ::before — strong vibrant gradients using the tab accent colour */
+  body.light-mode::before { transition: background 0.45s ease; }
+
+  body.light-mode.active-tab-today::before {
+    background:
+      radial-gradient(ellipse at 15% -5%,  rgba(251,191,36,0.55) 0%, transparent 50%),
+      radial-gradient(ellipse at 88% 108%, rgba(249,115,22,0.40) 0%, transparent 50%),
+      radial-gradient(ellipse at 55% 50%,  rgba(253,230,138,0.25) 0%, transparent 60%);
+  }
+  body.light-mode.active-tab-focus::before {
+    background:
+      radial-gradient(ellipse at 15% -5%,  rgba(20,184,166,0.50)  0%, transparent 50%),
+      radial-gradient(ellipse at 88% 108%, rgba(56,189,248,0.35)  0%, transparent 50%),
+      radial-gradient(ellipse at 55% 50%,  rgba(167,243,208,0.25) 0%, transparent 60%);
+  }
+  body.light-mode.active-tab-training::before {
+    background:
+      radial-gradient(ellipse at 15% -5%,  rgba(249,115,22,0.55) 0%, transparent 50%),
+      radial-gradient(ellipse at 88% 108%, rgba(239,68,68,0.38)  0%, transparent 50%),
+      radial-gradient(ellipse at 55% 50%,  rgba(254,215,170,0.28) 0%, transparent 60%);
+  }
+  body.light-mode.active-tab-portfolio::before {
+    background:
+      radial-gradient(ellipse at 15% -5%,  rgba(168,85,247,0.50) 0%, transparent 50%),
+      radial-gradient(ellipse at 88% 108%, rgba(192,132,252,0.38) 0%, transparent 50%),
+      radial-gradient(ellipse at 55% 50%,  rgba(233,213,255,0.28) 0%, transparent 60%);
+  }
+  body.light-mode.active-tab-log::before {
+    background:
+      radial-gradient(ellipse at 15% -5%,  rgba(59,130,246,0.50) 0%, transparent 50%),
+      radial-gradient(ellipse at 88% 108%, rgba(96,165,250,0.38)  0%, transparent 50%),
+      radial-gradient(ellipse at 55% 50%,  rgba(191,219,254,0.28) 0%, transparent 60%);
+  }
+
+  /* ═══ LIGHT MODE: GLASSMORPHISM CARDS ═══ */
+  body.light-mode .card {
+    background: rgba(255,255,255,0.68);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95);
+  }
+  body.light-mode .card:hover {
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,1);
+  }
+
+  /* ═══ LIGHT MODE: TAB NAV ═══ */
+  body.light-mode .tab-nav {
+    background: rgba(255,255,255,0.65);
+    border-color: rgba(255,255,255,0.9);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+  }
+  body.light-mode .tab-btn { color: rgba(30,41,59,0.5); }
+  body.light-mode .tab-btn:hover { color: #1a1f2e; background: rgba(255,255,255,0.5); }
+  body.light-mode .tab-btn.active { background: rgba(255,255,255,0.92); color: #1a1f2e; }
+
+  body.light-mode .tab-btn-today.active    { color: #d97706 !important; }
+  body.light-mode .tab-btn-focus.active    { color: #0d9488 !important; }
+  body.light-mode .tab-btn-training.active { color: #ea580c !important; }
+  body.light-mode .tab-btn-portfolio.active{ color: #9333ea !important; }
+  body.light-mode .tab-btn-log.active      { color: #2563eb !important; }
+
+  /* ═══ LIGHT MODE: SECTION LABELS ═══ */
+  body.light-mode #tab-today .section-label    { color: #d97706; }
+  body.light-mode #tab-focus .section-label    { color: #0d9488; }
+  body.light-mode #tab-training .section-label { color: #ea580c; }
+  body.light-mode #tab-portfolio .section-label{ color: #9333ea; }
+  body.light-mode #tab-log .section-label      { color: #2563eb; }
+
+  /* ═══ LIGHT MODE: HEADER ═══ */
+  body.light-mode .header-titles h1 { color: #1a1f2e; }
+  body.light-mode .header-titles h1 span { color: #dc2626; }
+  body.light-mode .header-titles .subtitle { color: #52637a; }
+  body.light-mode .date-badge { background: rgba(30,41,59,0.85); }
+
+  /* ═══ LIGHT MODE: INPUTS & TEXTAREAS ═══ */
+  body.light-mode .brain-dump-area,
+  body.light-mode .win-input,
+  body.light-mode .add-habit-input {
+    background: rgba(255,255,255,0.8);
+    color: #1a1f2e;
+    border-color: rgba(0,0,0,0.12);
+  }
+  body.light-mode .brain-dump-area::placeholder,
+  body.light-mode .win-input::placeholder,
+  body.light-mode .add-habit-input::placeholder { color: #9aaabf; }
+
+  /* ═══ LIGHT MODE: INTENTION BAR ═══ */
+  body.light-mode .intention-bar { border-color: rgba(217,119,6,0.5); background: rgba(254,243,199,0.7); }
+  body.light-mode .intention-bar input { color: #1a1f2e; }
+  body.light-mode .intention-bar label { color: #d97706; }
+
+  /* ═══ LIGHT MODE: HABIT TILES ═══ */
+  body.light-mode .habit-tile { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.09); }
+  body.light-mode .habit-tile:hover { background: rgba(255,255,255,0.85); border-color: rgba(217,119,6,0.4); }
+  body.light-mode .habit-name { color: #1a1f2e; }
+  body.light-mode .habit-streak { color: #52637a; }
+
+  /* ═══ LIGHT MODE: MOOD BUTTONS ═══ */
+  body.light-mode .mood-btn { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+
+  /* ═══ LIGHT MODE: BUCKETS ═══ */
+  body.light-mode .bucket { background: rgba(255,255,255,0.55); border-color: rgba(0,0,0,0.08); }
+  body.light-mode .bucket-item { background: rgba(255,255,255,0.8); color: #1a1f2e; border-color: rgba(0,0,0,0.08); }
+
+  /* ═══ LIGHT MODE: TIMER ═══ */
+  body.light-mode .timer-display { color: #1e40af; }
+  body.light-mode .timer-reset { background: rgba(255,255,255,0.7); color: #52637a; border-color: rgba(0,0,0,0.1); }
+
+  /* ═══ LIGHT MODE: WINS ═══ */
+  body.light-mode .win-item { background: rgba(254,243,199,0.7); border-color: rgba(217,119,6,0.25); }
+  body.light-mode .win-item span { color: #1a1f2e; }
+
+  /* ═══ LIGHT MODE: MODULE ITEMS ═══ */
+  body.light-mode .module-item { background: rgba(255,255,255,0.65); border-color: rgba(0,0,0,0.09); }
+  body.light-mode .module-name { color: #1a1f2e; }
+
+  /* ═══ LIGHT MODE: ARCHIVE ═══ */
+  body.light-mode .archive-section { background: rgba(255,255,255,0.65); border-color: rgba(0,0,0,0.09); }
+  body.light-mode .archive-header { background: rgba(255,255,255,0.5); }
+  body.light-mode .archive-header:hover { background: rgba(255,255,255,0.75); }
+  body.light-mode .log-entry { background: rgba(255,255,255,0.65); border-color: rgba(0,0,0,0.08); }
+  body.light-mode .week-day-card { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.09); }
+  body.light-mode .week-stat { background: rgba(255,255,255,0.65); border-color: rgba(0,0,0,0.09); }
+
+  /* ═══ LIGHT MODE: VISA CARD ═══ */
+  body.light-mode .visa-card { background: rgba(245,243,255,0.75); }
+  body.light-mode .visa-item span { color: #1a1f2e; }
+
+  /* ═══ LIGHT MODE: CRYPTO ═══ */
+  body.light-mode .crypto-name strong { color: #1a1f2e; }
+
+  /* ═══ LIGHT MODE: MINDFUL CARD ═══ */
+  body.light-mode .mindful-card { background: rgba(255,255,255,0.65); border-color: rgba(0,0,0,0.08); }
+  body.light-mode .mindful-quote { color: #0d9488; }
+  body.light-mode .mindful-why { background: rgba(255,255,255,0.6); color: #1a1f2e; border-color: rgba(0,0,0,0.08); }
+  body.light-mode .mindful-why strong { color: #2563eb; }
+  body.light-mode .phase-pill { background: rgba(255,255,255,0.7); color: #52637a; }
+
+  /* ═══ ARTISTIC: GRADIENT TEXT ON TITLES (both modes) ═══ */
+  .header-titles h1 {
+    background: linear-gradient(135deg, var(--text) 40%, var(--navy));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-titles h1 span {
+    background: linear-gradient(135deg, var(--red), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ═══ ARTISTIC: SCROLLBAR IN LIGHT MODE ═══ */
+  body.light-mode ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+  body.light-mode ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); }
+
+  /* ═══ ARTISTIC: ADD EMOJI PICK LIGHT MODE ═══ */
+  body.light-mode .emoji-opt { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+  body.light-mode .lofi-toggle { background: rgba(255,255,255,0.65); color: #1e40af; border-color: rgba(0,0,0,0.1); }
+  body.light-mode select { background: rgba(255,255,255,0.8); color: #1a1f2e; }
+  body.light-mode .footer { color: #9aaabf; }
+
 </style>
 </head>
 <body>
@@ -1214,7 +1451,14 @@
     </div>
   </div>
   <div class="header-right">
-    <div class="date-badge" id="header-date">Loading...</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="date-badge" id="header-date">Loading...</div>
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb" id="theme-thumb">🌙</span>
+        </span>
+      </button>
+    </div>
     <div class="evening-badge" id="evening-badge">🌙 Wind-down — 9PM</div>
     <div id="sync-status" style="font-size:0.7rem;font-weight:800;color:var(--text-muted);display:flex;align-items:center;gap:4px;">⏳ Connecting...</div>
   </div>
@@ -1591,6 +1835,22 @@ function switchTab(name, btn) {
 }
 // Set initial body class for today tab
 document.body.classList.add('active-tab-today');
+
+// ===================== THEME TOGGLE =====================
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('sub_theme', isLight ? 'light' : 'dark');
+  const thumb = document.getElementById('theme-thumb');
+  if (thumb) thumb.textContent = isLight ? '☀️' : '🌙';
+}
+(function initTheme() {
+  const saved = localStorage.getItem('sub_theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-mode');
+    const thumb = document.getElementById('theme-thumb');
+    if (thumb) thumb.textContent = '☀️';
+  }
+})();
 
 
 // ===================== DATE & TIME =====================
