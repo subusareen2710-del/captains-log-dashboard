@@ -495,7 +495,7 @@ body {
   <a href="subanshu-dashboard.html" class="back-btn">← Captain's Log</a>
   <div class="header-title">
     <h1>📺 Training <span>Hub</span></h1>
-    <p>Excel · Power BI · PL-300 — tick off as you go</p>
+    <p id="hub-subtitle">Excel · Power BI · R Programming — tick off as you go</p>
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
     <button class="populate-btn" onclick="showPopulateModal()">
@@ -535,7 +535,7 @@ body {
 </div>
 
 <!-- STATS -->
-<div class="stats-row">
+<div class="stats-row" id="stats-row">
   <div class="stat-card">
     <div class="stat-val" id="stat-total-done" style="color:var(--teal)">0</div>
     <div class="stat-label">Videos Done</div>
@@ -544,14 +544,7 @@ body {
     <div class="stat-val" id="stat-total-pct" style="color:var(--navy)">0%</div>
     <div class="stat-label">Overall Progress</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-val" id="stat-pbi-pct" style="color:var(--pbi-dark)">0%</div>
-    <div class="stat-label">Power BI Done</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-val" id="stat-excel-pct" style="color:var(--excel)">0%</div>
-    <div class="stat-label">Excel Done</div>
-  </div>
+  <!-- Per-track stat cards injected dynamically by buildStatCards() -->
 </div>
 
 <!-- Tab bar and panels are built dynamically from TRACK_META + CURRICULUM -->
@@ -1151,8 +1144,30 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePopulateModal();
 });
 
+// ===== BUILD STAT CARDS (data-driven, matches TRACK_META) =====
+function buildStatCards() {
+  const row = document.getElementById('stats-row');
+  // Update subtitle dynamically from track labels
+  const subtitle = document.getElementById('hub-subtitle');
+  if (subtitle) {
+    const labels = Object.keys(TRACK_META).map(k => TRACK_META[k].label);
+    subtitle.textContent = labels.join(' · ') + ' — tick off as you go';
+  }
+  // Append one stat card per track
+  Object.keys(TRACK_META).forEach(track => {
+    const meta = TRACK_META[track];
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    card.innerHTML = `
+      <div class="stat-val" id="${meta.statPctId}" style="color:${meta.fillColor}">0%</div>
+      <div class="stat-label">${meta.label} Done</div>`;
+    row.appendChild(card);
+  });
+}
+
 // ===== INIT =====
-buildTabsAndPanels(); // generate tabs + panels from CURRICULUM before first render
+buildStatCards();        // inject per-track stat cards before first render
+buildTabsAndPanels();    // generate tabs + panels from CURRICULUM
 renderAll();
 </script>
 </body>
