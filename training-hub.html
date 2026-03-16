@@ -619,7 +619,66 @@ body {
     border-color: rgba(0,0,0,0.1);
   }
 
-  /* ── Notes scratchpad ── */
+  /* ── Per-video notes ── */
+  .vn-toggle-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    color: var(--text-dim);
+  }
+  .vn-toggle-btn:hover { border-color: rgba(255,107,53,0.5); background: rgba(255,107,53,0.08); transform: scale(1.1); }
+  .vn-toggle-btn.has-notes { border-color: rgba(255,107,53,0.45); color: #ff6b35; background: rgba(255,107,53,0.08); }
+  .vn-area {
+    display: none;
+    padding: 0 10px 10px 44px;
+    border-bottom: 1px solid var(--border);
+    animation: vnSlideIn 0.2s ease;
+  }
+  .vn-area.open { display: block; }
+  @keyframes vnSlideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .vn-textarea {
+    width: 100%;
+    min-height: 80px;
+    max-height: 280px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-top: 8px;
+  }
+  .vn-textarea:focus {
+    border-color: rgba(255,107,53,0.5);
+    box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+  }
+  .vn-textarea::placeholder { color: var(--text-dim); font-weight: 600; font-style: italic; }
+  .vn-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5px;
+  }
+  .vn-status { font-size: 0.62rem; font-weight: 700; color: var(--text-dim); transition: color 0.25s; }
+  .vn-status.saving { color: #ffb627; }
+  .vn-status.saved  { color: #22c55e; }
+
+  /* ── Compiled notes card ── */
   .notes-card {
     background: var(--surface);
     border: 1.5px solid var(--border);
@@ -632,24 +691,16 @@ body {
       box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       border-color 0.2s;
   }
-  .notes-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
-    border-color: rgba(255,107,53,0.35);
-  }
-  .notes-card::before {
-    content: '';
-    display: block;
-    height: 2px;
-    background: linear-gradient(90deg, rgba(255,107,53,0.8), transparent);
-  }
+  .notes-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: rgba(255,107,53,0.35); }
+  .notes-card::before { content:''; display:block; height:2px; background:linear-gradient(90deg, rgba(255,107,53,0.8), transparent); }
   .notes-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px 0;
+    padding: 14px 18px;
     cursor: pointer;
     user-select: none;
+    border-bottom: 1px solid var(--border);
   }
   .notes-title {
     font-size: 0.72rem;
@@ -661,66 +712,61 @@ body {
     align-items: center;
     gap: 7px;
   }
-  .notes-title .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #ff6b35;
-    box-shadow: 0 0 8px rgba(255,107,53,0.6);
-    display: inline-block;
+  .notes-title .dot { width:8px; height:8px; border-radius:50%; background:#ff6b35; box-shadow:0 0 8px rgba(255,107,53,0.6); display:inline-block; }
+  .notes-count-badge {
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: rgba(255,107,53,0.12);
+    border: 1px solid rgba(255,107,53,0.25);
+    color: #ff6b35;
   }
-  .notes-status {
-    font-size: 0.65rem;
-    font-weight: 700;
+  .notes-actions { display: flex; align-items: center; gap: 8px; }
+  .notes-copy-btn {
+    font-size: 0.68rem; font-weight: 800; color: var(--text-muted);
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 7px; padding: 4px 10px; cursor: pointer; font-family: inherit;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .notes-copy-btn:hover { border-color: rgba(255,107,53,0.4); color: #ff6b35; }
+  .notes-body { padding: 16px 18px; }
+  .notes-empty {
+    text-align: center;
+    padding: 24px;
     color: var(--text-dim);
-    transition: color 0.3s;
+    font-size: 0.82rem;
+    font-weight: 700;
   }
-  .notes-status.saved { color: #22c55e; }
-  .notes-status.saving { color: #ffb627; }
-  .notes-body { padding: 12px 18px 0; }
-  .notes-textarea {
-    width: 100%;
-    min-height: 140px;
-    max-height: 420px;
+  .notes-module-group { margin-bottom: 18px; }
+  .notes-module-group:last-child { margin-bottom: 0; }
+  .notes-module-label {
+    font-size: 0.65rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #ff6b35;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .notes-module-label::after { content:''; flex:1; height:1px; background: rgba(255,107,53,0.2); }
+  .notes-entry {
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 12px 14px;
-    font-family: inherit;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.6;
-    resize: vertical;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 8px;
+    border-left: 3px solid rgba(255,107,53,0.5);
   }
-  .notes-textarea:focus {
-    border-color: rgba(255,107,53,0.5);
-    box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
-  }
-  .notes-textarea::placeholder { color: var(--text-dim); font-weight: 600; }
-  .notes-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 18px 14px;
-    border-top: 1px solid var(--border);
-    margin-top: 10px;
-  }
-  .notes-hint { font-size: 0.65rem; font-weight: 700; color: var(--text-dim); }
-  .notes-clear-btn {
-    font-size: 0.68rem;
-    font-weight: 800;
-    color: var(--text-dim);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: color 0.2s, background 0.2s;
-  }
-  .notes-clear-btn:hover { color: #ff6b35; background: rgba(255,107,53,0.08); }
+  .notes-entry:last-child { margin-bottom: 0; }
+  .notes-entry-title { font-size: 0.78rem; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+  .notes-entry-text { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; }
+
+  /* light mode extras */
+  body.light-mode .vn-textarea { background: rgba(255,255,255,0.6); color: #1a1f2e; }
+  body.light-mode .notes-entry { background: rgba(255,255,255,0.6); }
 
 </style>
 </head>
@@ -771,19 +817,21 @@ body {
 
 <!-- TABS -->
 
-<!-- ── NOTES SCRATCHPAD ── -->
+<!-- ── MY NOTES — compiled view ── -->
 <div class="notes-card">
   <div class="notes-header">
-    <div class="notes-title"><span class="dot"></span>Training Notes</div>
-    <span class="notes-status" id="notes-status">—</span>
+    <div class="notes-title">
+      <span class="dot"></span>My Notes
+      <span class="notes-count-badge" id="notes-count-badge">0 notes</span>
+    </div>
+    <div class="notes-actions">
+      <button class="notes-copy-btn" onclick="copyAllNotes()" title="Copy all notes to clipboard">📋 Copy All</button>
+    </div>
   </div>
-  <div class="notes-body">
-    <textarea class="notes-textarea" id="notes-area"
-      placeholder="Jot anything down — module notes, DAX formulas, questions to revisit, exam tips...&#10;&#10;Auto-saves to your account as you type."></textarea>
-  </div>
-  <div class="notes-toolbar">
-    <span class="notes-hint">Auto-saves · synced across devices</span>
-    <button class="notes-clear-btn" onclick="clearNotes()">Clear</button>
+  <div class="notes-body" id="all-notes-body">
+    <div class="notes-empty" id="notes-empty-msg">
+      📝 No notes yet — click the 📝 button on any video to start taking notes.
+    </div>
   </div>
 </div>
 
@@ -1164,7 +1212,7 @@ function renderTrack(track) {
           <div class="module-chevron" id="chev-${mod.id}">▼</div>
         </div>
         <div class="module-body" id="mb-${mod.id}">
-          ${modVids.map(v => renderVideoRow(v)).join('')}
+          ${modVids.map(v => renderVideoRow(v, false, mod.title)).join('')}
         </div>
       </div>`;
   }).join('');
@@ -1183,14 +1231,19 @@ function renderTrack(track) {
           <div class="module-chevron" id="chev-custom-${track}">▼</div>
         </div>
         <div class="module-body open" id="mb-custom-${track}">
-          ${orphanCustom.map(v => renderVideoRow(v, true)).join('')}
+          ${orphanCustom.map(v => renderVideoRow(v, true, 'My Custom Resources')).join('')}
         </div>
       </div>`;
   }
 }
 
-function renderVideoRow(v, canDelete = false) {
-  const isDone = !!checked[v.id];
+function renderVideoRow(v, canDelete = false, moduleName = '') {
+  const isDone  = !!checked[v.id];
+  const hasNote = !!(videoNotes[v.id] && videoNotes[v.id].text && videoNotes[v.id].text.trim());
+  const noteText = hasNote ? videoNotes[v.id].text : '';
+  const safeTitle  = v.title.replace(/'/g, "\'").replace(/`/g, '\`');
+  const safeMod    = moduleName.replace(/'/g, "\'").replace(/`/g, '\`');
+
   const linkBtn = v.url && v.url.startsWith('http')
     ? `<a class="${v.url.includes('youtube') || v.url.includes('youtu.be') ? 'yt-btn' : 'resource-btn'}" href="${v.url}" target="_blank" rel="noopener">${v.url.includes('youtube') || v.url.includes('youtu.be') ? '▶ Watch' : '🔗 Open'}</a>`
     : '';
@@ -1198,19 +1251,35 @@ function renderVideoRow(v, canDelete = false) {
     ? `<button style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-weight:900;font-size:0.72rem;padding:6px;font-family:inherit;" onclick="deleteCustomVideo('${v.id}','${currentTab}')" title="Remove">✕</button>`
     : '';
   const typeTag = v.type ? `<span class="type-tag tag-${v.type}">${v.type}</span>` : '';
+
   return `
-    <div class="video-row${isDone ? ' done' : ''}" id="vrow-${v.id}">
-      <div class="video-check" onclick="toggleVideo('${v.id}')">${isDone ? '✓' : ''}</div>
-      <div class="video-info">
-        <span class="video-title">${v.title}</span>
-        <div class="video-meta">
-          <span class="channel-badge ${v.badge || 'badge-custom'}">${v.channel}</span>
-          ${v.dur ? `<span class="duration-tag">⏱ ${v.dur}</span>` : ''}
-          ${typeTag}
+    <div id="vrow-wrap-${v.id}">
+      <div class="video-row${isDone ? ' done' : ''}" id="vrow-${v.id}">
+        <div class="video-check" onclick="toggleVideo('${v.id}')">${isDone ? '✓' : ''}</div>
+        <div class="video-info">
+          <span class="video-title">${v.title}</span>
+          <div class="video-meta">
+            <span class="channel-badge ${v.badge || 'badge-custom'}">${v.channel}</span>
+            ${v.dur ? `<span class="duration-tag">⏱ ${v.dur}</span>` : ''}
+            ${typeTag}
+          </div>
+        </div>
+        ${linkBtn}
+        <button class="vn-toggle-btn${hasNote ? ' has-notes' : ''}"
+          id="vnbtn-${v.id}"
+          onclick="toggleVideoNote('${v.id}', '${safeTitle}', '${safeMod}')"
+          title="${hasNote ? 'View / edit notes' : 'Add notes'}">📝</button>
+        ${delBtn}
+      </div>
+      <div class="vn-area" id="vna-${v.id}">
+        <textarea class="vn-textarea" id="vnt-${v.id}"
+          placeholder="Your notes for this video — formulas, key takeaways, questions..."
+          oninput="scheduleVideoNoteSave('${v.id}', '${safeTitle}', '${safeMod}')"
+        >${noteText}</textarea>
+        <div class="vn-footer">
+          <span class="vn-status" id="vns-${v.id}"></span>
         </div>
       </div>
-      ${linkBtn}
-      ${delBtn}
     </div>`;
 }
 
@@ -1260,6 +1329,137 @@ function deleteCustomVideo(id, track) {
 // ===== INIT =====
 renderAll();
 
+  // ── PER-VIDEO NOTES ──────────────────────────────────────
+  let videoNotes = {};       // { [videoId]: { text, title, module } }
+  let vnSaveTimers = {};
+
+  function loadVideoNotes() {
+    db.collection('captain').doc('video-notes').get()
+      .then(snap => {
+        if (snap.exists) videoNotes = snap.data() || {};
+        // Fallback: try localStorage
+      })
+      .catch(() => {
+        try { videoNotes = JSON.parse(localStorage.getItem('video_notes') || '{}'); } catch(e) {}
+      });
+  }
+
+  function toggleVideoNote(id, title, moduleName) {
+    const area = document.getElementById('vna-' + id);
+    const btn  = document.getElementById('vnbtn-' + id);
+    if (!area) return;
+    const isOpen = area.classList.contains('open');
+    area.classList.toggle('open', !isOpen);
+    if (!isOpen) {
+      // Opening — populate textarea if notes exist
+      const ta = document.getElementById('vnt-' + id);
+      if (ta && videoNotes[id]) ta.value = videoNotes[id].text || '';
+      if (ta) setTimeout(() => ta.focus(), 50);
+    }
+    if (btn) btn.title = isOpen ? 'Add notes' : 'Close notes';
+  }
+
+  function scheduleVideoNoteSave(id, title, moduleName) {
+    const status = document.getElementById('vns-' + id);
+    if (status) { status.textContent = 'Unsaved…'; status.className = 'vn-status saving'; }
+    clearTimeout(vnSaveTimers[id]);
+    vnSaveTimers[id] = setTimeout(() => saveVideoNote(id, title, moduleName), 1200);
+  }
+
+  function saveVideoNote(id, title, moduleName) {
+    const ta     = document.getElementById('vnt-' + id);
+    const status = document.getElementById('vns-' + id);
+    const btn    = document.getElementById('vnbtn-' + id);
+    if (!ta) return;
+    const text = ta.value;
+    if (text.trim()) {
+      videoNotes[id] = { text, title, module: moduleName };
+      if (btn) btn.classList.add('has-notes');
+    } else {
+      delete videoNotes[id];
+      if (btn) btn.classList.remove('has-notes');
+    }
+    // Persist
+    localStorage.setItem('video_notes', JSON.stringify(videoNotes));
+    db.collection('captain').doc('video-notes').set(videoNotes)
+      .then(() => {
+        if (status) { status.textContent = 'Saved ✓'; status.className = 'vn-status saved'; }
+        setTimeout(() => { if (status) { status.textContent = ''; status.className = 'vn-status'; } }, 2500);
+        renderAllNotes();
+      })
+      .catch(() => {
+        if (status) { status.textContent = 'Saved locally'; status.className = 'vn-status saved'; }
+        renderAllNotes();
+      });
+  }
+
+  function renderAllNotes() {
+    const body  = document.getElementById('all-notes-body');
+    const badge = document.getElementById('notes-count-badge');
+    const empty = document.getElementById('notes-empty-msg');
+    if (!body) return;
+
+    const entries = Object.entries(videoNotes).filter(([,n]) => n && n.text && n.text.trim());
+    if (badge) badge.textContent = entries.length + (entries.length === 1 ? ' note' : ' notes');
+
+    if (!entries.length) {
+      body.innerHTML = '<div class="notes-empty" id="notes-empty-msg">📝 No notes yet — click the 📝 button on any video to start taking notes.</div>';
+      return;
+    }
+
+    // Group by module
+    const grouped = {};
+    entries.forEach(([id, n]) => {
+      const mod = n.module || 'General';
+      if (!grouped[mod]) grouped[mod] = [];
+      grouped[mod].push({ id, ...n });
+    });
+
+    body.innerHTML = Object.entries(grouped).map(([mod, notes]) => `
+      <div class="notes-module-group">
+        <div class="notes-module-label">${mod}</div>
+        ${notes.map(n => `
+          <div class="notes-entry">
+            <div class="notes-entry-title">📹 ${n.title}</div>
+            <div class="notes-entry-text">${n.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+
+  function copyAllNotes() {
+    const entries = Object.entries(videoNotes).filter(([,n]) => n && n.text && n.text.trim());
+    if (!entries.length) { alert('No notes to copy yet!'); return; }
+
+    const grouped = {};
+    entries.forEach(([id, n]) => {
+      const mod = n.module || 'General';
+      if (!grouped[mod]) grouped[mod] = [];
+      grouped[mod].push(n);
+    });
+
+    let text = '=== MY TRAINING NOTES ===\n\n';
+    Object.entries(grouped).forEach(([mod, notes]) => {
+      text += `── ${mod} ──\n`;
+      notes.forEach(n => {
+        text += `\n${n.title}\n${n.text.trim()}\n`;
+      });
+      text += '\n';
+    });
+
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.notes-copy-btn');
+      if (btn) { const orig = btn.textContent; btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = orig, 2000); }
+    }).catch(() => alert('Could not copy — try manually selecting the notes.'));
+  }
+
+  // Init on load
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      loadVideoNotes();
+      setTimeout(renderAllNotes, 600);
+    }, 400);
+  });
+
   // ── THEME TOGGLE (same localStorage key as main dashboard) ──
   function toggleTheme() {
     const isLight = document.body.classList.toggle('light-mode');
@@ -1277,66 +1477,8 @@ renderAll();
   })();
 
   // ── NOTES SCRATCHPAD ──
-  let notesSaveTimer = null;
 
-  function initNotes() {
-    const area   = document.getElementById('notes-area');
-    const status = document.getElementById('notes-status');
-    if (!area) return;
 
-    // Load from Firestore
-    db.collection('captain').doc('training-notes').get().then(snap => {
-      if (snap.exists && snap.data().text !== undefined) {
-        area.value = snap.data().text;
-        status.textContent = 'Loaded ✓';
-        status.className = 'notes-status saved';
-        setTimeout(() => { status.textContent = '—'; status.className = 'notes-status'; }, 2000);
-      }
-    }).catch(() => {
-      // Fallback to localStorage
-      const local = localStorage.getItem('training_notes');
-      if (local) area.value = local;
-    });
-
-    area.addEventListener('input', () => {
-      status.textContent = 'Unsaved…';
-      status.className = 'notes-status saving';
-      clearTimeout(notesSaveTimer);
-      notesSaveTimer = setTimeout(() => saveNotes(), 1200);
-    });
-  }
-
-  function saveNotes() {
-    const area   = document.getElementById('notes-area');
-    const status = document.getElementById('notes-status');
-    if (!area) return;
-    const text = area.value;
-    localStorage.setItem('training_notes', text);
-    db.collection('captain').doc('training-notes').set({ text, updatedAt: new Date().toISOString() })
-      .then(() => {
-        status.textContent = 'Saved ✓';
-        status.className = 'notes-status saved';
-        setTimeout(() => { status.textContent = '—'; status.className = 'notes-status'; }, 2500);
-      })
-      .catch(() => {
-        status.textContent = 'Saved locally';
-        status.className = 'notes-status saved';
-      });
-  }
-
-  function clearNotes() {
-    const area = document.getElementById('notes-area');
-    if (!area || !area.value.trim()) return;
-    if (!confirm('Clear all training notes? This cannot be undone.')) return;
-    area.value = '';
-    saveNotes();
-  }
-
-  // Call initNotes once Firebase is ready (after db is defined)
-  document.addEventListener('DOMContentLoaded', () => {
-    // small delay to ensure db is initialised by the existing Firebase block
-    setTimeout(initNotes, 400);
-  });
 
 </script>
 </div><!-- /page-wrap -->
