@@ -2616,7 +2616,12 @@ function setSyncStatus(s) {
 }
 
 function save(key, val) {
-  try { localStorage.setItem('sub_' + key, JSON.stringify(val)); } catch(e) {}
+  try {
+    localStorage.setItem('sub_' + key, JSON.stringify(val));
+    // Stamp local time immediately so any Firestore snapshot with an older _ts
+    // cannot race-overwrite data we just wrote locally
+    localStorage.setItem('sub__ts', String(Date.now()));
+  } catch(e) {}
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(pushAllToFirestore, 1200);
   setSyncStatus('syncing');
