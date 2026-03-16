@@ -2,8 +2,8 @@
   "name": "Captain Subanshu's Log",
   "short_name": "Captain's Log",
   "description": "Daily command centre — habits, goals, training, brain dump",
-  "start_url": "/subanshu-dashboard.html",
-  "scope": "/",
+  "start_url": "/captains-log-dashboard/subanshu-dashboard.html",
+  "scope": "/captains-log-dashboard/",
   "display": "standalone",
   "background_color": "#080d1a",
   "theme_color": "#080d1a",
@@ -17,7 +17,7 @@
     {
       "name": "Training Hub",
       "short_name": "Training",
-      "url": "/training-hub.html",
+      "url": "/captains-log-dashboard/training-hub.html",
       "description": "Excel & Power BI training tracker"
     }
   ],
