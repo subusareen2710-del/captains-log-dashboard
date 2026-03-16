@@ -1865,6 +1865,144 @@
   body.light-mode .exam-readiness-card { background: rgba(255,255,255,0.75); }
   body.light-mode .readiness-seg { background: rgba(0,0,0,0.08); }
 
+
+  /* ══════════════════════════════════════
+     FEATURE 1 — END-OF-DAY REVIEW
+  ══════════════════════════════════════ */
+  .eod-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.3s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .eod-card::before { content:''; display:block; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--gold),var(--red),transparent); }
+  .eod-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-hover); border-color:rgba(255,182,39,0.4); }
+  .eod-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .eod-title  { font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); display:flex;align-items:center;gap:7px; }
+  .eod-saved-badge { font-size:0.62rem; font-weight:800; padding:2px 8px; border-radius:6px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); color:#22c55e; display:none; }
+  .eod-row    { margin-bottom:14px; }
+  .eod-label  { font-size:0.68rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+  .eod-emoji-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .eod-emoji-btn {
+    background:var(--surface2); border:1.5px solid var(--border); border-radius:10px;
+    padding:8px 12px; font-size:1.1rem; cursor:pointer; transition:all 0.18s;
+  }
+  .eod-emoji-btn:hover  { border-color:var(--gold); transform:scale(1.12); }
+  .eod-emoji-btn.picked { border-color:var(--gold); background:var(--gold-light); box-shadow:0 0 12px rgba(255,182,39,0.2); }
+  .eod-input {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:10px; padding:10px 13px; font-family:inherit; font-size:0.85rem;
+    font-weight:600; color:var(--text); outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .eod-input:focus { border-color:rgba(255,182,39,0.5); box-shadow:0 0 0 3px rgba(255,182,39,0.1); }
+  .eod-input::placeholder { color:var(--text-dim); font-style:italic; }
+  .eod-close-btn {
+    width:100%; padding:12px; background:linear-gradient(135deg,var(--gold),var(--red));
+    border:none; border-radius:11px; color:#080d1a; font-size:0.88rem; font-weight:900;
+    cursor:pointer; font-family:inherit; transition:opacity 0.2s, transform 0.15s;
+    box-shadow:0 4px 16px rgba(255,182,39,0.3); margin-top:6px;
+  }
+  .eod-close-btn:hover { opacity:0.88; transform:translateY(-1px); }
+
+  /* ══════════════════════════════════════
+     FEATURE 2 — HABIT 7-DAY DOT CALENDAR
+  ══════════════════════════════════════ */
+  .habit-week-dots { display:flex; gap:4px; margin-top:5px; }
+  .habit-week-dot {
+    width:10px; height:10px; border-radius:3px;
+    background:var(--border); flex-shrink:0;
+    transition:background 0.2s;
+  }
+  .habit-week-dot.done-dot  { background:var(--teal); }
+  .habit-week-dot.today-dot { outline:2px solid var(--gold); outline-offset:1px; }
+
+  /* ══════════════════════════════════════
+     FEATURE 3 — FLOATING QUICK-CAPTURE
+  ══════════════════════════════════════ */
+  .quick-fab {
+    position:fixed; bottom:28px; right:24px; z-index:500;
+    width:52px; height:52px; border-radius:50%;
+    background:linear-gradient(135deg,var(--gold),var(--red));
+    border:none; cursor:pointer; box-shadow:0 4px 20px rgba(255,182,39,0.45);
+    font-size:1.5rem; display:flex; align-items:center; justify-content:center;
+    transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+    color:#080d1a;
+  }
+  .quick-fab:hover { transform:scale(1.1); box-shadow:0 6px 28px rgba(255,182,39,0.55); }
+  .quick-fab.open  { transform:rotate(45deg); }
+  .quick-menu {
+    position:fixed; bottom:92px; right:24px; z-index:500;
+    display:flex; flex-direction:column; gap:10px; align-items:flex-end;
+    opacity:0; pointer-events:none;
+    transform:translateY(12px) scale(0.95);
+    transform-origin:bottom right;
+    transition:opacity 0.2s ease, transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .quick-menu.open { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
+  .quick-menu-item {
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:14px; padding:0; overflow:hidden;
+    box-shadow:var(--shadow); transition:border-color 0.2s;
+  }
+  .quick-menu-item:hover { border-color:var(--gold); }
+  .quick-menu-label {
+    font-size:0.75rem; font-weight:800; color:var(--text-muted);
+    padding:0 12px; white-space:nowrap; cursor:default;
+  }
+  .quick-menu-input {
+    background:transparent; border:none; outline:none;
+    font-family:inherit; font-size:0.82rem; font-weight:700;
+    color:var(--text); padding:10px 12px 10px 0; min-width:160px; max-width:220px;
+  }
+  .quick-menu-input::placeholder { color:var(--text-dim); font-style:italic; }
+  .quick-menu-send {
+    background:var(--gold); border:none; padding:10px 14px; cursor:pointer;
+    font-size:0.85rem; font-weight:900; color:#080d1a;
+    transition:background 0.2s; height:100%;
+  }
+  .quick-menu-send:hover { background:var(--red); }
+  body.light-mode .quick-fab { color:#1a1f2e; }
+  body.light-mode .quick-menu-item { background:rgba(255,255,255,0.9); }
+
+  /* ══════════════════════════════════════
+     FEATURE 4 — POMODORO 7-DAY CHART
+  ══════════════════════════════════════ */
+  .pomo-chart {
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+  }
+  .pomo-chart-label { font-size:0.62rem; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:7px; }
+  .pomo-bars { display:flex; align-items:flex-end; gap:5px; height:36px; }
+  .pomo-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .pomo-bar {
+    width:100%; border-radius:3px 3px 0 0;
+    background:linear-gradient(180deg,var(--red),var(--gold));
+    transition:height 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+    min-height:2px;
+  }
+  .pomo-bar.today-bar { background:linear-gradient(180deg,var(--gold),var(--orange)); box-shadow:0 0 8px rgba(255,182,39,0.4); }
+  .pomo-day-label { font-size:0.55rem; font-weight:800; color:var(--text-dim); }
+
+  /* ══════════════════════════════════════
+     FEATURE 5 — DRAGGABLE BUCKETS
+  ══════════════════════════════════════ */
+  .bucket-item[draggable="true"] { cursor:grab; }
+  .bucket-item[draggable="true"]:active { cursor:grabbing; }
+  .bucket-item.drag-over { opacity:0.4; outline:2px dashed var(--gold); outline-offset:2px; border-radius:6px; }
+  .bucket-items.drag-target { background:rgba(255,182,39,0.06); border-radius:8px; transition:background 0.2s; }
+
+  /* Light mode extras */
+  body.light-mode .eod-input { background:rgba(255,255,255,0.7); color:#1a1f2e; }
+  body.light-mode .eod-emoji-btn { background:rgba(255,255,255,0.7); }
+  body.light-mode .pomo-bar { background:linear-gradient(180deg,#ea580c,#f59e0b); }
+
 </style>
 </head>
 <body>
@@ -2010,6 +2148,10 @@
       <div class="session-dot"></div><div class="session-dot"></div><div class="session-dot"></div><div class="session-dot"></div>
     </div>
     <div class="timer-done-msg" id="timer-done-msg">⏰ Session complete! Take a break — even Luffy rests.</div>
+    <div class="pomo-chart">
+      <div class="pomo-chart-label">Sessions this week</div>
+      <div class="pomo-bars" id="pomo-bars"></div>
+    </div>
   </div>
 
   <div class="card">
@@ -2025,6 +2167,35 @@
       <div class="win-empty" id="win-empty">No victories yet. Go find your One Piece.</div>
     </div>
   </div>
+</div>
+
+
+<!-- END-OF-DAY REVIEW -->
+<div class="section-label">🌙 Close the Day — Captain's Evening Log</div>
+<div class="eod-card" id="eod-card">
+  <div class="eod-header">
+    <div class="eod-title"><span class="dot" style="background:var(--gold)"></span>Evening Review</div>
+    <span class="eod-saved-badge" id="eod-saved-badge">✓ Saved</span>
+  </div>
+  <div class="eod-row">
+    <div class="eod-label">How did the day land?</div>
+    <div class="eod-emoji-row" id="eod-energy-row">
+      <button class="eod-emoji-btn" onclick="pickEODEnergy(this,'🔥')">🔥</button>
+      <button class="eod-emoji-btn" onclick="pickEODEnergy(this,'💪')">💪</button>
+      <button class="eod-emoji-btn" onclick="pickEODEnergy(this,'😐')">😐</button>
+      <button class="eod-emoji-btn" onclick="pickEODEnergy(this,'😮‍💨')">😮‍💨</button>
+      <button class="eod-emoji-btn" onclick="pickEODEnergy(this,'💀')">💀</button>
+    </div>
+  </div>
+  <div class="eod-row">
+    <div class="eod-label">One thing I'm proud of today</div>
+    <input class="eod-input" id="eod-proud" type="text" maxlength="120" placeholder="Even small wins count, Captain..." />
+  </div>
+  <div class="eod-row">
+    <div class="eod-label">Tomorrow's top priority</div>
+    <input class="eod-input" id="eod-tomorrow" type="text" maxlength="120" placeholder="The one thing that must happen tomorrow..." />
+  </div>
+  <button class="eod-close-btn" onclick="closeTheDay()">⚓ Close the Day & Save to Log</button>
 </div>
 
 </div><!-- /tab-today -->
@@ -3356,6 +3527,273 @@ async function loadCrypto() {
     }
   })();
 
+
+  // ══════════════════════════════════════════
+  // FEATURE 1 — END-OF-DAY REVIEW
+  // ══════════════════════════════════════════
+  let eodEnergy = '';
+
+  function pickEODEnergy(btn, emoji) {
+    document.querySelectorAll('.eod-emoji-btn').forEach(b => b.classList.remove('picked'));
+    btn.classList.add('picked');
+    eodEnergy = emoji;
+  }
+
+  function closeTheDay() {
+    const proud    = document.getElementById('eod-proud').value.trim();
+    const tomorrow = document.getElementById('eod-tomorrow').value.trim();
+    if (!proud && !tomorrow && !eodEnergy) return;
+
+    const review = {
+      date:     new Date().toDateString(),
+      energy:   eodEnergy || '—',
+      proud:    proud    || '—',
+      tomorrow: tomorrow || '—',
+      ts:       Date.now()
+    };
+    save('eod_' + review.date, review);
+
+    // Also push into the Captain's Log snapshot so it shows in Log tab
+    try {
+      const snaps = load('log_snapshots', []);
+      const today = snaps.find(s => s.date === review.date);
+      if (today) {
+        today.eod = review;
+        save('log_snapshots', snaps);
+      }
+    } catch(e) {}
+
+    const badge = document.getElementById('eod-saved-badge');
+    if (badge) { badge.style.display = 'inline'; setTimeout(() => badge.style.display = 'none', 3000); }
+    document.getElementById('eod-proud').value    = '';
+    document.getElementById('eod-tomorrow').value = '';
+    document.querySelectorAll('.eod-emoji-btn').forEach(b => b.classList.remove('picked'));
+    eodEnergy = '';
+  }
+
+  // Restore today's EOD if already saved
+  (function loadEOD() {
+    const review = load('eod_' + new Date().toDateString(), null);
+    if (!review) return;
+    if (review.proud    && review.proud    !== '—') document.getElementById('eod-proud').value    = review.proud;
+    if (review.tomorrow && review.tomorrow !== '—') document.getElementById('eod-tomorrow').value = review.tomorrow;
+    if (review.energy) {
+      document.querySelectorAll('.eod-emoji-btn').forEach(btn => {
+        if (btn.textContent.trim() === review.energy) btn.classList.add('picked');
+      });
+      eodEnergy = review.energy;
+    }
+  })();
+
+  // ══════════════════════════════════════════
+  // FEATURE 2 — HABIT 7-DAY DOT CALENDAR
+  // ══════════════════════════════════════════
+  function getHabitWeekDots(habitId) {
+    const dots = [];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = 'habits_checked_' + d.toDateString();
+      const dayChecked = load(key, {});
+      dots.push({
+        done:    !!dayChecked[habitId],
+        isToday: i === 0,
+        label:   ['S','M','T','W','T','F','S'][d.getDay()]
+      });
+    }
+    return dots;
+  }
+
+  // Patch renderHabits to inject dot calendars
+  const _origRenderHabits = renderHabits;
+  renderHabits = function() {
+    _origRenderHabits();
+    // After render, inject week dots into each habit tile
+    const habits = getHabits();
+    habits.forEach(h => {
+      const tile = document.getElementById('tile-' + h.id);
+      if (!tile) return;
+      // Remove existing dot row if re-rendering
+      const existing = tile.querySelector('.habit-week-dots');
+      if (existing) existing.remove();
+      const dots = getHabitWeekDots(h.id);
+      const dotsHtml = '<div class="habit-week-dots">' +
+        dots.map(d => `<div class="habit-week-dot${d.done ? ' done-dot' : ''}${d.isToday ? ' today-dot' : ''}" title="${d.label}"></div>`).join('') +
+        '</div>';
+      const info = tile.querySelector('.habit-info');
+      if (info) info.insertAdjacentHTML('beforeend', dotsHtml);
+    });
+  };
+
+  // ══════════════════════════════════════════
+  // FEATURE 3 — FLOATING QUICK-CAPTURE
+  // ══════════════════════════════════════════
+  function toggleQuickFab() {
+    const fab  = document.getElementById('quick-fab');
+    const menu = document.getElementById('quick-menu');
+    fab.classList.toggle('open');
+    menu.classList.toggle('open');
+    if (menu.classList.contains('open')) {
+      setTimeout(() => document.getElementById('qc-win').focus(), 120);
+    }
+  }
+
+  function quickCapture(type) {
+    if (type === 'win') {
+      const input = document.getElementById('qc-win');
+      const val = input.value.trim();
+      if (!val) return;
+      wins.push(val);
+      save('wins_' + new Date().toDateString(), wins);
+      renderWins();
+      input.value = '';
+      input.placeholder = '✅ Win saved!';
+      setTimeout(() => input.placeholder = 'What did you nail?', 2000);
+    } else if (type === 'dump') {
+      const input = document.getElementById('qc-dump');
+      const val = input.value.trim();
+      if (!val) return;
+      const bd = document.getElementById('brain-dump');
+      bd.value = (bd.value.trim() ? bd.value.trim() + '
+' : '') + val;
+      save('brainDump', bd.value);
+      input.value = '';
+      input.placeholder = '✅ Added to brain dump!';
+      setTimeout(() => input.placeholder = 'Task on your mind...', 2000);
+    }
+  }
+
+  // Close quick-menu on outside click
+  document.addEventListener('click', e => {
+    const fab  = document.getElementById('quick-fab');
+    const menu = document.getElementById('quick-menu');
+    if (!fab || !menu) return;
+    if (!fab.contains(e.target) && !menu.contains(e.target)) {
+      fab.classList.remove('open');
+      menu.classList.remove('open');
+    }
+  });
+
+  // ══════════════════════════════════════════
+  // FEATURE 4 — POMODORO 7-DAY CHART
+  // ══════════════════════════════════════════
+  const _pomoDateKey = () => new Date().toDateString();
+
+  // Load saved today count on init
+  (function initPomoCount() {
+    const saved = load('pomo_' + _pomoDateKey(), 0);
+    if (saved > 0) {
+      sessionCount = saved;
+      document.getElementById('session-count').textContent = sessionCount;
+      const dots = document.querySelectorAll('.session-dot');
+      for (let i = 0; i < Math.min(saved, 4); i++) dots[i].classList.add('filled');
+    }
+    renderPomoChart();
+  })();
+
+  // Override session completion to also save to localStorage
+  const _origStartTimer = startTimer;
+  startTimer = function() {
+    // Wrap to intercept session completion
+    _origStartTimer();
+    // Patch the interval to also save pomo count
+    // (We re-patch after original sets up the interval)
+  };
+
+  // Simpler approach: patch the part where sessionCount increments
+  // We watch sessionCount changes via a small polling check
+  let _lastPomoCount = sessionCount;
+  setInterval(() => {
+    if (sessionCount !== _lastPomoCount) {
+      _lastPomoCount = sessionCount;
+      save('pomo_' + _pomoDateKey(), sessionCount);
+      renderPomoChart();
+    }
+  }, 1000);
+
+  function renderPomoChart() {
+    const container = document.getElementById('pomo-bars');
+    if (!container) return;
+    const today = new Date();
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const count = load('pomo_' + d.toDateString(), 0);
+      const label = ['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];
+      days.push({ count, label, isToday: i === 0 });
+    }
+    const max = Math.max(...days.map(d => d.count), 1);
+    container.innerHTML = days.map(d => {
+      const h = Math.round((d.count / max) * 32);
+      return `<div class="pomo-bar-wrap">
+        <div class="pomo-bar${d.isToday ? ' today-bar' : ''}" style="height:${h}px" title="${d.count} sessions"></div>
+        <div class="pomo-day-label">${d.label}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ══════════════════════════════════════════
+  // FEATURE 5 — DRAG-TO-MOVE BUCKET ITEMS
+  // ══════════════════════════════════════════
+  let _dragSource = null; // { bucketId, idx }
+
+  // Override renderBucket to add drag attributes
+  const _origRenderBucket = renderBucket;
+  renderBucket = function(bucketId, items) {
+    _origRenderBucket(bucketId, items);
+    // Re-wire items with drag events
+    const el = document.getElementById('bucket-' + bucketId);
+    if (!el) return;
+    el.querySelectorAll('.bucket-item').forEach((div, idx) => {
+      div.setAttribute('draggable', 'true');
+      div.addEventListener('dragstart', e => {
+        _dragSource = { bucketId, idx };
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => div.style.opacity = '0.45', 0);
+      });
+      div.addEventListener('dragend', () => { div.style.opacity = ''; });
+    });
+
+    // Drop zone on the bucket items container
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-target'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-target'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-target');
+      if (!_dragSource || _dragSource.bucketId === bucketId) return;
+
+      const b = load('buckets', { urgent:[], week:[], later:[], drop:[] });
+      const srcItems = b[_dragSource.bucketId] || [];
+      const [moved]  = srcItems.splice(_dragSource.idx, 1);
+      b[_dragSource.bucketId] = srcItems;
+      if (!b[bucketId]) b[bucketId] = [];
+      b[bucketId].push(moved);
+      save('buckets', b);
+      ['urgent','week','later','drop'].forEach(bk => renderBucket(bk, b[bk]));
+      _dragSource = null;
+    });
+  };
+
 </script>
+<!-- FLOATING QUICK-CAPTURE -->
+<div class="quick-menu" id="quick-menu">
+  <div class="quick-menu-item">
+    <span class="quick-menu-label">⭐ Win</span>
+    <input class="quick-menu-input" id="qc-win" placeholder="What did you nail?" maxlength="80"
+           onkeydown="if(event.key==='Enter')quickCapture('win')" />
+    <button class="quick-menu-send" onclick="quickCapture('win')">→</button>
+  </div>
+  <div class="quick-menu-item">
+    <span class="quick-menu-label">🧠 Dump</span>
+    <input class="quick-menu-input" id="qc-dump" placeholder="Task on your mind..." maxlength="100"
+           onkeydown="if(event.key==='Enter')quickCapture('dump')" />
+    <button class="quick-menu-send" onclick="quickCapture('dump')">→</button>
+  </div>
+</div>
+<button class="quick-fab" id="quick-fab" onclick="toggleQuickFab()" title="Quick capture">+</button>
+
+
 </body>
 </html>
