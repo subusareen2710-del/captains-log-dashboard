@@ -55,11 +55,6 @@
   body {
     font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
-    background-image:
-      radial-gradient(ellipse at 15% 0%, rgba(77,142,255,0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 85% 100%, rgba(255,68,68,0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, rgba(0,212,200,0.03) 0%, transparent 70%),
-      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L32 18 L45 12 L38 24 L52 26 L40 33 L48 45 L35 40 L30 53 L25 40 L12 45 L20 33 L8 26 L22 24 L15 12 L28 18 Z' fill='none' stroke='%23ffb627' stroke-width='0.4' opacity='0.08'/%3E%3C/svg%3E");
     color: var(--text);
     min-height: 100vh;
     padding: 24px;
@@ -1075,12 +1070,7 @@
   .tab-btn-portfolio.active{ color: #c084fc !important; box-shadow: 0 2px 14px rgba(192,132,252,0.25),inset 0 1px 0 rgba(255,255,255,0.06) !important; }
   .tab-btn-log.active      { color: #60a5fa !important; box-shadow: 0 2px 14px rgba(96,165,250,0.25),  inset 0 1px 0 rgba(255,255,255,0.06) !important; }
 
-  /* ── Section ambient glow ── */
-  #tab-today.active    { background: radial-gradient(ellipse at 25% 0%,  rgba(255,182,39,0.07)  0%, transparent 55%); }
-  #tab-focus.active    { background: radial-gradient(ellipse at 25% 0%,  rgba(0,212,200,0.06)   0%, transparent 55%); }
-  #tab-training.active { background: radial-gradient(ellipse at 25% 0%,  rgba(255,107,53,0.07)  0%, transparent 55%); }
-  #tab-portfolio.active{ background: radial-gradient(ellipse at 25% 0%,  rgba(192,132,252,0.06) 0%, transparent 55%); }
-  #tab-log.active      { background: radial-gradient(ellipse at 25% 0%,  rgba(96,165,250,0.06)  0%, transparent 55%); }
+  /* ambient glow handled by body::before */
 
   /* ── Card top accent bar per tab ── */
   #tab-today .card::before    { content:''; display:block; height:2px; margin:-22px -22px 18px; border-radius:14px 14px 0 0; background:linear-gradient(90deg, rgba(255,182,39,0.8), transparent); }
@@ -1142,6 +1132,73 @@
   #tab-log .archive-header-title { color: #60a5fa; }
   #tab-log .save-today-btn { background: #60a5fa; }
   #tab-log .save-today-btn:hover { background: #3b82f6; }
+
+
+  /* ═══ DYNAMIC BACKGROUND GRADIENT PER TAB ═══
+     body::before is a fixed overlay that smoothly interpolates between
+     tab colours (modern Chrome supports gradient interpolation when
+     structure is identical across states)
+  ═══════════════════════════════════════════════ */
+  body {
+    transition: background-color 0.4s ease;
+    /* Remove old faint gradient — body::before handles it */
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L32 18 L45 12 L38 24 L52 26 L40 33 L48 45 L35 40 L30 53 L25 40 L12 45 L20 33 L8 26 L22 24 L15 12 L28 18 Z' fill='none' stroke='%23ffb627' stroke-width='0.4' opacity='0.08'/%3E%3C/svg%3E");
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    /* Default (today) */
+    background:
+      radial-gradient(ellipse at 20% -5%,  rgba(255,182,39,0.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 110%, rgba(255,107,53,0.14) 0%, transparent 50%);
+    transition: background 0.45s ease;
+  }
+
+  /* TODAY — amber/gold sunrise */
+  body.active-tab-today::before {
+    background:
+      radial-gradient(ellipse at 20% -5%,  rgba(255,182,39,0.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 110%, rgba(255,107,53,0.14) 0%, transparent 50%);
+  }
+
+  /* FOCUS — electric teal */
+  body.active-tab-focus::before {
+    background:
+      radial-gradient(ellipse at 20% -5%,  rgba(0,212,200,0.20)  0%, transparent 55%),
+      radial-gradient(ellipse at 85% 110%, rgba(77,142,255,0.16) 0%, transparent 50%);
+  }
+
+  /* TRAINING — hot orange */
+  body.active-tab-training::before {
+    background:
+      radial-gradient(ellipse at 20% -5%,  rgba(255,107,53,0.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 110%, rgba(255,68,68,0.16)  0%, transparent 50%);
+  }
+
+  /* PORTFOLIO — deep purple */
+  body.active-tab-portfolio::before {
+    background:
+      radial-gradient(ellipse at 20% -5%,  rgba(168,85,247,0.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 110%, rgba(192,132,252,0.15)0%, transparent 50%);
+  }
+
+  /* LOG — deep ocean blue */
+  body.active-tab-log::before {
+    background:
+      radial-gradient(ellipse at 20% -5%,  rgba(96,165,250,0.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 110%, rgba(77,142,255,0.18) 0%, transparent 50%);
+  }
+
+  /* Subtle background-color tint per tab */
+  body.active-tab-today    { background-color: #0e0c12; }
+  body.active-tab-focus    { background-color: #071410; }
+  body.active-tab-training { background-color: #110c08; }
+  body.active-tab-portfolio{ background-color: #0d0813; }
+  body.active-tab-log      { background-color: #080d1a; }
 
 </style>
 </head>
@@ -1517,17 +1574,23 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
+  // Swap body background class for dynamic colour
+  document.body.className = document.body.className
+    .replace(/\bactive-tab-\S+/g, '').trim();
+  document.body.classList.add('active-tab-' + name);
   // Auto-open archive when Log tab is selected
   if (name === 'log') {
-    const body = document.getElementById('archive-body');
+    const archiveBody = document.getElementById('archive-body');
     const icon = document.getElementById('archive-toggle-icon');
-    if (!body.classList.contains('open')) {
-      body.classList.add('open');
+    if (!archiveBody.classList.contains('open')) {
+      archiveBody.classList.add('open');
       if (icon) icon.classList.add('open');
       renderArchive();
     }
   }
 }
+// Set initial body class for today tab
+document.body.classList.add('active-tab-today');
 
 
 // ===================== DATE & TIME =====================
