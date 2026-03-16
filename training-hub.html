@@ -501,6 +501,227 @@ body {
 ::-webkit-scrollbar-track { background: var(--surface2); }
 ::-webkit-scrollbar-thumb { background: rgba(255,107,53,0.35); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,107,53,0.6); }
+
+  /* ── Theme toggle — identical to main dashboard ── */
+  .theme-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .theme-toggle-track {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 26px;
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 20px;
+    padding: 3px;
+    transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .theme-toggle:hover .theme-toggle-track {
+    border-color: rgba(255,107,53,0.6);
+    box-shadow: 0 0 12px rgba(255,107,53,0.25), inset 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .theme-toggle-thumb {
+    font-size: 1rem;
+    line-height: 1;
+    display: block;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    transform: translateX(-8px);
+  }
+  body.light-mode .theme-toggle-thumb { transform: translateX(8px); }
+  body.light-mode .theme-toggle-track {
+    background: rgba(255,255,255,0.7);
+    border-color: rgba(0,0,0,0.15);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  /* ── Light mode variable overrides ── */
+  body.light-mode {
+    --bg: #fefefe;
+    --surface: rgba(255,255,255,0.82);
+    --surface2: rgba(255,255,255,0.55);
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1a1f2e;
+    --text-muted: #52637a;
+    --text-dim: #9aaabf;
+    --shadow: 0 2px 20px rgba(0,0,0,0.07);
+    --shadow-hover: 0 10px 40px rgba(0,0,0,0.12);
+  }
+  body.light-mode {
+    background: #fff7ed;
+    background-image:
+      radial-gradient(ellipse at 20% -5%,   rgba(255,107,53,0.30) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 110%,  rgba(255,182,39,0.22) 0%, transparent 50%);
+  }
+  body.light-mode .hub-header {
+    background: rgba(255,247,237,0.88);
+    border-bottom-color: rgba(255,107,53,0.15);
+  }
+  body.light-mode .hub-titles h1 {
+    background: linear-gradient(135deg, #1a1f2e 40%, #ff6b35);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  body.light-mode .back-btn {
+    background: rgba(255,255,255,0.7);
+    border-color: rgba(0,0,0,0.1);
+    color: #52637a;
+  }
+  body.light-mode .back-btn:hover {
+    background: rgba(255,107,53,0.1);
+    border-color: rgba(255,107,53,0.4);
+    color: #ff6b35;
+  }
+  body.light-mode .stat-card,
+  body.light-mode .module-block,
+  body.light-mode .tab-bar,
+  body.light-mode .add-video-section,
+  body.light-mode .notes-card {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-color: rgba(255,255,255,0.9);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95);
+  }
+  body.light-mode .module-head { background: rgba(255,255,255,0.5); }
+  body.light-mode .module-head:hover { background: rgba(255,107,53,0.06); }
+  body.light-mode .tab-btn { color: #52637a; }
+  body.light-mode .add-input {
+    background: rgba(255,255,255,0.9);
+    border-color: rgba(0,0,0,0.1);
+    color: #1a1f2e;
+  }
+  body.light-mode .add-input:focus {
+    border-color: rgba(255,107,53,0.5);
+    box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+  }
+  body.light-mode .video-row:hover { background: rgba(255,107,53,0.05); }
+  body.light-mode .notes-textarea {
+    background: rgba(255,255,255,0.6);
+    color: #1a1f2e;
+    border-color: rgba(0,0,0,0.08);
+  }
+  body.light-mode .notes-textarea:focus {
+    border-color: rgba(255,107,53,0.45);
+  }
+  body.light-mode .notes-toolbar { border-top-color: rgba(0,0,0,0.08); }
+  body.light-mode .date-badge {
+    background: rgba(255,255,255,0.7);
+    color: #52637a;
+    border-color: rgba(0,0,0,0.1);
+  }
+
+  /* ── Notes scratchpad ── */
+  .notes-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    transition:
+      transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      border-color 0.2s;
+  }
+  .notes-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(255,107,53,0.35);
+  }
+  .notes-card::before {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,107,53,0.8), transparent);
+  }
+  .notes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .notes-title {
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .notes-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #ff6b35;
+    box-shadow: 0 0 8px rgba(255,107,53,0.6);
+    display: inline-block;
+  }
+  .notes-status {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    transition: color 0.3s;
+  }
+  .notes-status.saved { color: #22c55e; }
+  .notes-status.saving { color: #ffb627; }
+  .notes-body { padding: 12px 18px 0; }
+  .notes-textarea {
+    width: 100%;
+    min-height: 140px;
+    max-height: 420px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .notes-textarea:focus {
+    border-color: rgba(255,107,53,0.5);
+    box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+  }
+  .notes-textarea::placeholder { color: var(--text-dim); font-weight: 600; }
+  .notes-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px 14px;
+    border-top: 1px solid var(--border);
+    margin-top: 10px;
+  }
+  .notes-hint { font-size: 0.65rem; font-weight: 700; color: var(--text-dim); }
+  .notes-clear-btn {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .notes-clear-btn:hover { color: #ff6b35; background: rgba(255,107,53,0.08); }
+
 </style>
 </head>
 <body>
@@ -517,6 +738,11 @@ body {
   <div class="hub-header-right">
     <div class="date-badge" id="date-badge">Loading...</div>
     <div id="th-sync" style="font-size:0.68rem;font-weight:800;color:var(--text-muted);">⏳ Syncing...</div>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">
+      <span class="theme-toggle-track">
+        <span class="theme-toggle-thumb" id="theme-thumb">🌙</span>
+      </span>
+    </button>
     <a href="subanshu-dashboard.html" class="back-btn">← Log</a>
   </div>
 </div>
@@ -544,6 +770,23 @@ body {
 </div>
 
 <!-- TABS -->
+
+<!-- ── NOTES SCRATCHPAD ── -->
+<div class="notes-card">
+  <div class="notes-header">
+    <div class="notes-title"><span class="dot"></span>Training Notes</div>
+    <span class="notes-status" id="notes-status">—</span>
+  </div>
+  <div class="notes-body">
+    <textarea class="notes-textarea" id="notes-area"
+      placeholder="Jot anything down — module notes, DAX formulas, questions to revisit, exam tips...&#10;&#10;Auto-saves to your account as you type."></textarea>
+  </div>
+  <div class="notes-toolbar">
+    <span class="notes-hint">Auto-saves · synced across devices</span>
+    <button class="notes-clear-btn" onclick="clearNotes()">Clear</button>
+  </div>
+</div>
+
 <div class="tab-bar">
   <button class="tab-btn active-pbi" id="tab-pbi" onclick="switchTab('pbi')">
     ⚡ Power BI / PL-300
@@ -1016,6 +1259,85 @@ function deleteCustomVideo(id, track) {
 
 // ===== INIT =====
 renderAll();
+
+  // ── THEME TOGGLE (same localStorage key as main dashboard) ──
+  function toggleTheme() {
+    const isLight = document.body.classList.toggle('light-mode');
+    localStorage.setItem('sub_theme', isLight ? 'light' : 'dark');
+    const thumb = document.getElementById('theme-thumb');
+    if (thumb) thumb.textContent = isLight ? '☀️' : '🌙';
+  }
+  (function initTheme() {
+    const saved = localStorage.getItem('sub_theme');
+    if (saved === 'light') {
+      document.body.classList.add('light-mode');
+      const thumb = document.getElementById('theme-thumb');
+      if (thumb) thumb.textContent = '☀️';
+    }
+  })();
+
+  // ── NOTES SCRATCHPAD ──
+  let notesSaveTimer = null;
+
+  function initNotes() {
+    const area   = document.getElementById('notes-area');
+    const status = document.getElementById('notes-status');
+    if (!area) return;
+
+    // Load from Firestore
+    db.collection('captain').doc('training-notes').get().then(snap => {
+      if (snap.exists && snap.data().text !== undefined) {
+        area.value = snap.data().text;
+        status.textContent = 'Loaded ✓';
+        status.className = 'notes-status saved';
+        setTimeout(() => { status.textContent = '—'; status.className = 'notes-status'; }, 2000);
+      }
+    }).catch(() => {
+      // Fallback to localStorage
+      const local = localStorage.getItem('training_notes');
+      if (local) area.value = local;
+    });
+
+    area.addEventListener('input', () => {
+      status.textContent = 'Unsaved…';
+      status.className = 'notes-status saving';
+      clearTimeout(notesSaveTimer);
+      notesSaveTimer = setTimeout(() => saveNotes(), 1200);
+    });
+  }
+
+  function saveNotes() {
+    const area   = document.getElementById('notes-area');
+    const status = document.getElementById('notes-status');
+    if (!area) return;
+    const text = area.value;
+    localStorage.setItem('training_notes', text);
+    db.collection('captain').doc('training-notes').set({ text, updatedAt: new Date().toISOString() })
+      .then(() => {
+        status.textContent = 'Saved ✓';
+        status.className = 'notes-status saved';
+        setTimeout(() => { status.textContent = '—'; status.className = 'notes-status'; }, 2500);
+      })
+      .catch(() => {
+        status.textContent = 'Saved locally';
+        status.className = 'notes-status saved';
+      });
+  }
+
+  function clearNotes() {
+    const area = document.getElementById('notes-area');
+    if (!area || !area.value.trim()) return;
+    if (!confirm('Clear all training notes? This cannot be undone.')) return;
+    area.value = '';
+    saveNotes();
+  }
+
+  // Call initNotes once Firebase is ready (after db is defined)
+  document.addEventListener('DOMContentLoaded', () => {
+    // small delay to ensure db is initialised by the existing Firebase block
+    setTimeout(initNotes, 400);
+  });
+
 </script>
 </div><!-- /page-wrap -->
 </body>
