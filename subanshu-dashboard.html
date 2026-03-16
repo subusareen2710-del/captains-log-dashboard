@@ -2474,10 +2474,7 @@ function applyFirestoreData(data) {
     try { const bd = load('brainDump',''); if (bd) document.getElementById('brain-dump').value = bd; } catch(e) {}
     try {
       const b = load('buckets', null);
-      if (b) ['urgent','week','later','drop'].forEach(bk => {
-        const el = document.getElementById('bucket-'+bk);
-        if (el && b[bk] && b[bk].length) el.innerHTML = b[bk].map(t=>`<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('');
-      });
+      if (b) ['urgent','week','later','drop'].forEach(bk => renderBucket(bk, b[bk]));
     } catch(e) {}
   }
 }
@@ -2613,38 +2610,85 @@ function classify(task) {
   return 'week';
 }
 
+// Render a single bucket from its saved item array {text, done}
+function renderBucket(bucketId, items) {
+  const el = document.getElementById('bucket-' + bucketId);
+  if (!el) return;
+  if (!items || !items.length) {
+    el.innerHTML = '<div class="bucket-empty">Nothing yet</div>';
+    return;
+  }
+  el.innerHTML = items.map((item, idx) => {
+    const text = typeof item === 'string' ? item : item.text;
+    const done = typeof item === 'object' ? !!item.done : false;
+    return `<div class="bucket-item${done ? ' crossed' : ''}" onclick="toggleBucketItem('${bucketId}',${idx})">${text}</div>`;
+  }).join('');
+}
+
+function toggleBucketItem(bucketId, idx) {
+  const b = load('buckets', {urgent:[], week:[], later:[], drop:[]});
+  if (!b[bucketId] || !b[bucketId][idx]) return;
+  const item = b[bucketId][idx];
+  if (typeof item === 'string') b[bucketId][idx] = { text: item, done: true };
+  else b[bucketId][idx] = { ...item, done: !item.done };
+  save('buckets', b);
+  renderBucket(bucketId, b[bucketId]);
+}
+
 function sortTasks() {
-  const tasks = document.getElementById('brain-dump').value.split('\n').map(t => t.trim()).filter(t => t.length > 1);
+  const bd = document.getElementById('brain-dump');
+  const tasks = bd.value.split('\n').map(t => t.trim()).filter(t => t.length > 1);
   if (!tasks.length) {
-    const bd = document.getElementById('brain-dump');
     bd.style.borderColor = 'var(--red)';
     bd.placeholder = 'Empty your head first, Captain — one task per line!';
     setTimeout(() => { bd.style.borderColor = ''; bd.placeholder = 'Empty your head, Captain...\nOne task per line.'; }, 2500);
     return;
   }
-  const buckets = {urgent:[], week:[], later:[], drop:[]};
-  tasks.forEach(t => buckets[classify(t)].push(t));
-  ['urgent','week','later','drop'].forEach(b => {
-    const el = document.getElementById('bucket-'+b);
-    el.innerHTML = buckets[b].length
-      ? buckets[b].map(t => `<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('')
-      : '<div class="bucket-empty">Nothing here</div>';
-  });
-  save('buckets', buckets);
 
-  // Feed urgent (then week) tasks into One Thing picker
-  const oneThingPool = [...buckets.urgent, ...buckets.week];
-  showOneThing(oneThingPool);
+  // Load existing buckets — APPEND new items, don't replace
+  const existing = load('buckets', {urgent:[], week:[], later:[], drop:[]});
+  const existingTexts = new Set(
+    ['urgent','week','later','drop'].flatMap(k =>
+      (existing[k] || []).map(i => (typeof i === 'string' ? i : i.text).toLowerCase())
+    )
+  );
+
+  // Classify and append only genuinely new tasks
+  let addedCount = 0;
+  tasks.forEach(t => {
+    if (existingTexts.has(t.toLowerCase())) return; // skip duplicates
+    const bucket = classify(t);
+    if (!existing[bucket]) existing[bucket] = [];
+    existing[bucket].push({ text: t, done: false });
+    addedCount++;
+  });
+
+  ['urgent','week','later','drop'].forEach(b => renderBucket(b, existing[b]));
+  save('buckets', existing);
+
+  // Clear the textarea and confirm
+  bd.value = '';
+  save('brainDump', '');
+  bd.placeholder = addedCount > 0
+    ? `✅ ${addedCount} task${addedCount > 1 ? 's' : ''} sorted into islands! Add more any time.`
+    : '⚓ No new tasks — everything was already sorted!';
+  setTimeout(() => { bd.placeholder = 'Empty your head, Captain...\nOne task per line.'; }, 3000);
+
+  // Feed urgent+week into One Thing picker
+  const pool = [...(existing.urgent||[]), ...(existing.week||[])]
+    .filter(i => !(typeof i === 'object' && i.done))
+    .map(i => typeof i === 'string' ? i : i.text);
+  showOneThing(pool);
 }
 
 function clearBuckets() {
-  ['urgent','week','later','drop'].forEach(b => { document.getElementById('bucket-'+b).innerHTML = '<div class="bucket-empty">Nothing yet</div>'; });
+  ['urgent','week','later','drop'].forEach(b => renderBucket(b, []));
   document.getElementById('brain-dump').value = '';
   save('buckets', null);
   save('brainDump', '');
 }
 
-// Auto-save raw brain dump text as you type → syncs to Firestore → weekly task reads it
+// Auto-save raw brain dump text as you type
 (function(){
   const bd = document.getElementById('brain-dump');
   const saved = load('brainDump', '');
@@ -2656,16 +2700,15 @@ function clearBuckets() {
   });
 })();
 
+// Restore buckets on load (supports both old string[] and new {text,done}[] formats)
 (function(){
   const b = load('buckets', null);
   if (!b) return;
-  ['urgent','week','later','drop'].forEach(bk => {
-    const el = document.getElementById('bucket-'+bk);
-    if (b[bk] && b[bk].length) el.innerHTML = b[bk].map(t => `<div class="bucket-item" onclick="this.classList.toggle('crossed')">${t}</div>`).join('');
-  });
-  // Restore one thing picker if tasks exist
-  const oneThingPool = [...(b.urgent||[]), ...(b.week||[])];
-  if (oneThingPool.length) showOneThing(oneThingPool);
+  ['urgent','week','later','drop'].forEach(bk => renderBucket(bk, b[bk]));
+  const pool = [...(b.urgent||[]), ...(b.week||[])]
+    .filter(i => !(typeof i === 'object' && i.done))
+    .map(i => typeof i === 'string' ? i : i.text);
+  if (pool.length) showOneThing(pool);
 })();
 
 // ===================== FOCUS TIMER =====================
