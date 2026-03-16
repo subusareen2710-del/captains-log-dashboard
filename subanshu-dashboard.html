@@ -3738,11 +3738,11 @@ async function loadCrypto() {
   // ══════════════════════════════════════════
   let _dragSource = null; // { bucketId, idx }
 
-  // Override renderBucket to add drag attributes
+  // Override renderBucket — re-attach per-item dragstart only
+  // (item divs are replaced on each innerHTML update so listeners must be re-added)
   const _origRenderBucket = renderBucket;
   renderBucket = function(bucketId, items) {
     _origRenderBucket(bucketId, items);
-    // Re-wire items with drag events
     const el = document.getElementById('bucket-' + bucketId);
     if (!el) return;
     el.querySelectorAll('.bucket-item').forEach((div, idx) => {
@@ -3754,10 +3754,18 @@ async function loadCrypto() {
       });
       div.addEventListener('dragend', () => { div.style.opacity = ''; });
     });
+  };
 
-    // Drop zone on the bucket items container
+  // Attach drop-zone listeners ONCE on each static bucket container
+  // (containers are never replaced, only their innerHTML changes)
+  ;['urgent','week','later','drop'].forEach(bucketId => {
+    const el = document.getElementById('bucket-' + bucketId);
+    if (!el) return;
     el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-target'); });
-    el.addEventListener('dragleave', () => el.classList.remove('drag-target'));
+    el.addEventListener('dragleave', e => {
+      // Only remove highlight when leaving the container itself, not child items
+      if (!el.contains(e.relatedTarget)) el.classList.remove('drag-target');
+    });
     el.addEventListener('drop', e => {
       e.preventDefault();
       el.classList.remove('drag-target');
@@ -3773,7 +3781,7 @@ async function loadCrypto() {
       ['urgent','week','later','drop'].forEach(bk => renderBucket(bk, b[bk]));
       _dragSource = null;
     });
-  };
+  });
 
 </script>
 <!-- FLOATING QUICK-CAPTURE -->
