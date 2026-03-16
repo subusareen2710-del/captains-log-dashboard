@@ -1598,6 +1598,273 @@
     color: rgba(255,130,130,0.9);
   }
 
+
+  /* ═══════════════════════════════════════
+     TRAINING TAB — ENHANCED VISUALS
+  ═══════════════════════════════════════ */
+
+  /* Hero banner */
+  .training-hero {
+    display: block;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1c0d02 0%, #2a1205 40%, #1a0e0a 100%);
+    border: 1px solid rgba(255,107,53,0.3);
+    border-radius: 20px;
+    padding: 28px 28px 22px;
+    margin-bottom: 20px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 8px 32px rgba(255,107,53,0.12);
+  }
+  .training-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 0% 0%,  rgba(255,107,53,0.28) 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(255,182,39,0.14) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .training-hero:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(255,107,53,0.22);
+    border-color: rgba(255,107,53,0.55);
+  }
+  .training-hero-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .training-hero-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .training-hero-icon {
+    font-size: 3rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 18px rgba(255,107,53,0.55));
+    flex-shrink: 0;
+  }
+  .training-hero-text h2 {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.3px;
+    margin-bottom: 3px;
+  }
+  .training-hero-text p {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255,200,150,0.65);
+    letter-spacing: 0.2px;
+  }
+  .training-hero-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .training-hero-progress-label {
+    font-size: 0.62rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: rgba(255,200,150,0.5);
+  }
+  .training-hero-bar-wrap {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    height: 8px;
+    width: 130px;
+    overflow: hidden;
+  }
+  .training-hero-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b35, #ffb627);
+    border-radius: 10px;
+    transition: width 0.6s ease;
+    width: 0%;
+  }
+  .training-hero-pct {
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: #ffb627;
+  }
+  .training-hero-arrow {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: rgba(255,107,53,0.7);
+    transition: transform 0.2s;
+  }
+  .training-hero:hover .training-hero-arrow { transform: translateX(4px); }
+
+  /* Stats row */
+  .training-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .training-stat-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,107,53,0.2);
+    border-radius: 16px;
+    padding: 18px 16px 14px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .training-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,107,53,0.8), transparent);
+    border-radius: 16px 16px 0 0;
+  }
+  .training-stat-card:hover { border-color: rgba(255,107,53,0.45); transform: translateY(-2px); }
+  .training-stat-icon  { font-size: 1.6rem; line-height: 1; margin-bottom: 6px; display: block; }
+  .training-stat-value { font-size: 1.6rem; font-weight: 900; color: #ff6b35; line-height: 1; margin-bottom: 3px; letter-spacing: -0.5px; }
+  .training-stat-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+
+  /* Module list improvements */
+  .module-chapter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .module-chapter:hover { border-color: rgba(255,107,53,0.5); background: rgba(255,107,53,0.04); transform: translateX(2px); }
+  .module-chapter.done { opacity: 0.55; background: rgba(0,212,200,0.06); border-color: rgba(0,212,200,0.22); }
+  .module-chapter.done .module-chapter-name { text-decoration: line-through; color: var(--text-muted); }
+  .module-chapter-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255,107,53,0.12);
+    border: 1px solid rgba(255,107,53,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: #ff6b35;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .module-chapter.done .module-chapter-num {
+    background: rgba(0,212,200,0.15);
+    border-color: rgba(0,212,200,0.4);
+    color: var(--teal);
+  }
+  .module-chapter.done .module-chapter-num::after { content: '✓'; }
+  .module-chapter-name { font-size: 0.84rem; font-weight: 700; flex: 1; color: var(--text); }
+  .module-chapter-time {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .module-chapter.done .module-chapter-time { color: var(--teal); border-color: rgba(0,212,200,0.2); }
+
+  /* "Currently on" pill */
+  .chapter-current-pill {
+    font-size: 0.58rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ff6b35;
+    background: rgba(255,107,53,0.12);
+    border: 1px solid rgba(255,107,53,0.3);
+    border-radius: 6px;
+    padding: 2px 6px;
+    white-space: nowrap;
+    display: none;
+  }
+  /* Show "Up Next" on first non-done chapter */
+  .module-chapter:not(.done) ~ .module-chapter:not(.done) .chapter-current-pill { display: none; }
+
+  /* Exam readiness meter */
+  .exam-readiness-card {
+    border: 1px solid rgba(255,107,53,0.22);
+    border-radius: 16px;
+    padding: 20px 22px;
+    background: linear-gradient(135deg, rgba(255,107,53,0.04), var(--surface));
+    margin-bottom: 0;
+  }
+  .exam-readiness-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .exam-readiness-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .exam-badge {
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(255,107,53,0.15);
+    border: 1px solid rgba(255,107,53,0.3);
+    color: #ff6b35;
+  }
+  .readiness-segments {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .readiness-seg {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    transition: background 0.4s ease;
+  }
+  .readiness-seg.filled { background: linear-gradient(90deg, #ff6b35, #ffb627); }
+  .readiness-tip {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .readiness-tip span { color: #ff6b35; font-weight: 900; }
+
+  /* Light mode overrides */
+  body.light-mode .training-hero { background: linear-gradient(135deg, #fff4ee, #fff0e6); }
+  body.light-mode .training-hero-text h2 { color: #1a1f2e; }
+  body.light-mode .training-hero-text p { color: rgba(120,80,40,0.8); }
+  body.light-mode .training-stat-card { background: rgba(255,255,255,0.75); }
+  body.light-mode .training-stat-label { color: #777; }
+  body.light-mode .module-chapter { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.08); }
+  body.light-mode .module-chapter-name { color: #1a1f2e; }
+  body.light-mode .module-chapter-time { background: rgba(255,255,255,0.9); }
+  body.light-mode .exam-readiness-card { background: rgba(255,255,255,0.75); }
+  body.light-mode .readiness-seg { background: rgba(0,0,0,0.08); }
+
 </style>
 </head>
 <body>
@@ -1872,48 +2139,137 @@
 <!-- ═══ TAB: TRAINING ═══ -->
 <div class="tab-section" id="tab-training">
 
-<div class="section-label">🗺️ The Log Pose — Brain Dump & PL-300 Chart</div>
+<div class="section-label">⚔️ The Training Grounds — PL-300 Mission Log</div>
 
-<!-- TRAINING HUB LINK BANNER -->
-<a href="training-hub.html" style="text-decoration:none;display:block;margin-bottom:18px;">
-  <div style="background:linear-gradient(135deg,#1a3a6b,#2d5a9e);border-radius:var(--radius);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 4px 16px rgba(26,58,107,0.25);transition:all 0.2s;flex-wrap:wrap;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(26,58,107,0.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(26,58,107,0.25)'">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <span style="font-size:2rem;line-height:1;">📺</span>
-      <div>
-        <div style="font-size:0.88rem;font-weight:900;color:white;letter-spacing:0.3px;">Training Hub — Excel &amp; Power BI</div>
-        <div style="font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.65);margin-top:3px;">Curated video curriculum · Tick off as you go · Progress tracked</div>
+<!-- TRAINING HERO BANNER -->
+<a class="training-hero" href="training-hub.html">
+  <div class="training-hero-inner">
+    <div class="training-hero-left">
+      <span class="training-hero-icon">📺</span>
+      <div class="training-hero-text">
+        <h2>Training Hub — Excel &amp; Power BI</h2>
+        <p>Curated video curriculum · Tick off as you go · Progress synced</p>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="text-align:right;">
-        <div style="font-size:0.65rem;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.5);margin-bottom:4px;">Your Progress</div>
-        <div style="background:rgba(255,255,255,0.15);border-radius:10px;height:6px;width:100px;overflow:hidden;">
-          <div id="dashboard-training-bar" style="height:100%;background:linear-gradient(90deg,#f5a623,#f2c811);border-radius:10px;width:0%;transition:width 0.5s;"></div>
-        </div>
-        <div style="font-size:0.68rem;font-weight:900;color:rgba(255,255,255,0.7);margin-top:3px;" id="dashboard-training-pct">0% complete</div>
+    <div class="training-hero-right">
+      <div class="training-hero-progress-label">Your Progress</div>
+      <div class="training-hero-bar-wrap">
+        <div class="training-hero-bar-fill" id="dashboard-training-bar"></div>
       </div>
-      <span style="color:white;font-size:1.2rem;font-weight:900;">→</span>
+      <div class="training-hero-pct" id="dashboard-training-pct">0% complete</div>
     </div>
+    <span class="training-hero-arrow">→</span>
   </div>
 </a>
 
+<!-- STATS ROW -->
+<div class="training-stats-row">
+  <div class="training-stat-card">
+    <span class="training-stat-icon">📚</span>
+    <div class="training-stat-value" id="stat-modules-done">0/9</div>
+    <div class="training-stat-label">Modules Done</div>
+  </div>
+  <div class="training-stat-card">
+    <span class="training-stat-icon">⏱</span>
+    <div class="training-stat-value" id="stat-hours-left">39h</div>
+    <div class="training-stat-label">Hours Remaining</div>
+  </div>
+  <div class="training-stat-card">
+    <span class="training-stat-icon">🎯</span>
+    <div class="training-stat-value" id="stat-readiness">0%</div>
+    <div class="training-stat-label">Exam Readiness</div>
+  </div>
+</div>
+
+<!-- PL-300 CHAPTER LIST -->
 <div class="card" style="margin-bottom:18px;">
   <div class="card-header">
-    <div class="card-title"><span class="dot" style="background:var(--red)"></span>PL-300 Study Log</div>
-    <span style="font-size:0.72rem;font-weight:900;color:var(--red)" id="pl300-pct-label">0% done</span>
+    <div class="card-title"><span class="dot" style="background:#ff6b35;box-shadow:0 0 8px rgba(255,107,53,0.6)"></span>PL-300 Certification — 9 Chapters</div>
+    <span style="font-size:0.72rem;font-weight:900;color:#ff6b35" id="pl300-pct-label">0% done</span>
   </div>
   <div class="pl300-progress"><div class="pl300-fill" id="pl300-bar" style="width:0%"></div></div>
-  <div class="pl300-stats"><span>Modules: <span id="pl300-done">0</span>/9</span><span id="pl300-eta">~9 weeks est.</span></div>
+  <div class="pl300-stats"><span>Chapters: <span id="pl300-done">0</span>/9</span><span id="pl300-eta">~9 weeks est.</span></div>
   <div class="pl300-modules" id="pl300-modules">
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">1. Power BI Desktop basics</span><span class="module-time">~4h</span></div>
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">2. Data transformation (Power Query)</span><span class="module-time">~5h</span></div>
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">3. Data modelling & relationships</span><span class="module-time">~5h</span></div>
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">4. DAX fundamentals</span><span class="module-time">~6h</span></div>
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">5. Advanced DAX & measures</span><span class="module-time">~5h</span></div>
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">6. Report design & visuals</span><span class="module-time">~4h</span></div>
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">7. Row-level security & deployment</span><span class="module-time">~3h</span></div>
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">8. Power BI Service & workspaces</span><span class="module-time">~3h</span></div>
-    <div class="module-item" onclick="toggleModule(this)"><div class="module-check"></div><span class="module-name">9. Practice exams × 2</span><span class="module-time">~4h</span></div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="1" data-hours="4">
+      <div class="module-chapter-num">1</div>
+      <span class="module-chapter-name">Power BI Desktop basics</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~4h</span>
+    </div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="2" data-hours="5">
+      <div class="module-chapter-num">2</div>
+      <span class="module-chapter-name">Data transformation (Power Query)</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~5h</span>
+    </div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="3" data-hours="5">
+      <div class="module-chapter-num">3</div>
+      <span class="module-chapter-name">Data modelling &amp; relationships</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~5h</span>
+    </div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="4" data-hours="6">
+      <div class="module-chapter-num">4</div>
+      <span class="module-chapter-name">DAX fundamentals</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~6h</span>
+    </div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="5" data-hours="5">
+      <div class="module-chapter-num">5</div>
+      <span class="module-chapter-name">Advanced DAX &amp; measures</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~5h</span>
+    </div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="6" data-hours="4">
+      <div class="module-chapter-num">6</div>
+      <span class="module-chapter-name">Report design &amp; visuals</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~4h</span>
+    </div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="7" data-hours="3">
+      <div class="module-chapter-num">7</div>
+      <span class="module-chapter-name">Row-level security &amp; deployment</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~3h</span>
+    </div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="8" data-hours="3">
+      <div class="module-chapter-num">8</div>
+      <span class="module-chapter-name">Power BI Service &amp; workspaces</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~3h</span>
+    </div>
+    <div class="module-chapter" onclick="toggleModule(this)" data-num="9" data-hours="4">
+      <div class="module-chapter-num">9</div>
+      <span class="module-chapter-name">Practice exams × 2</span>
+      <span class="chapter-current-pill">Up Next</span>
+      <span class="module-chapter-time">~4h</span>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM READINESS METER -->
+<div class="card exam-readiness-card">
+  <div class="exam-readiness-header">
+    <div class="exam-readiness-title">
+      🏆 Exam Readiness Meter
+      <span class="exam-badge" id="exam-badge-text">PL-300</span>
+    </div>
+    <span style="font-size:0.78rem;font-weight:900;color:#ff6b35" id="readiness-pct-text">0% ready</span>
+  </div>
+  <div class="readiness-segments" id="readiness-segs">
+    <div class="readiness-seg"></div>
+    <div class="readiness-seg"></div>
+    <div class="readiness-seg"></div>
+    <div class="readiness-seg"></div>
+    <div class="readiness-seg"></div>
+    <div class="readiness-seg"></div>
+    <div class="readiness-seg"></div>
+    <div class="readiness-seg"></div>
+    <div class="readiness-seg"></div>
+  </div>
+  <div class="readiness-tip" id="readiness-tip">
+    Complete chapters to build readiness — <span>each module = 1 bar</span>.
+    Hit 9/9 to unlock your exam booking prompt!
   </div>
 </div>
 
@@ -2181,22 +2537,62 @@ function selectMood(btn, label) {
 // ===================== PL-300 =====================
 function toggleModule(el) { el.classList.toggle('done'); updatePL300(); savePL300(); }
 function updatePL300() {
-  const all = document.querySelectorAll('.module-item');
-  const done = document.querySelectorAll('.module-item.done').length;
-  const pct = Math.round((done/all.length)*100);
-  document.getElementById('pl300-bar').style.width = pct+'%';
-  document.getElementById('pl300-done').textContent = done;
-  document.getElementById('pl300-pct-label').textContent = pct+'% done';
+  const all  = document.querySelectorAll('.module-chapter, .module-item');
+  const done = document.querySelectorAll('.module-chapter.done, .module-item.done').length;
+  const pct  = Math.round((done / all.length) * 100);
+
+  // Progress bar + labels
+  const bar = document.getElementById('pl300-bar');
+  if (bar) bar.style.width = pct + '%';
+  const doneLbl = document.getElementById('pl300-done');
+  if (doneLbl) doneLbl.textContent = done;
+  const pctLbl = document.getElementById('pl300-pct-label');
+  if (pctLbl) pctLbl.textContent = pct + '% done';
   const left = all.length - done;
-  document.getElementById('pl300-eta').textContent = left > 0 ? `~${left} week${left!==1?'s':''} left` : '🎉 Book your exam!';
+  const eta = document.getElementById('pl300-eta');
+  if (eta) eta.textContent = left > 0 ? `~${left} week${left !== 1 ? 's' : ''} left` : '🎉 Book your exam!';
+
+  // "Up Next" pill — highlight first non-done chapter
+  document.querySelectorAll('.chapter-current-pill').forEach(p => p.style.display = 'none');
+  const firstPending = document.querySelector('.module-chapter:not(.done)');
+  if (firstPending) {
+    const pill = firstPending.querySelector('.chapter-current-pill');
+    if (pill) pill.style.display = 'inline-block';
+  }
+
+  // Stats row
+  const totalHours = 39;
+  let doneHours = 0;
+  document.querySelectorAll('.module-chapter.done').forEach(ch => {
+    doneHours += parseInt(ch.dataset.hours || 0);
+  });
+  const hoursLeft = totalHours - doneHours;
+  const readinessPct = Math.round((done / 9) * 100);
+  const statMod = document.getElementById('stat-modules-done');
+  const statHrs = document.getElementById('stat-hours-left');
+  const statRdy = document.getElementById('stat-readiness');
+  if (statMod) statMod.textContent = done + '/9';
+  if (statHrs) statHrs.textContent = hoursLeft + 'h';
+  if (statRdy) statRdy.textContent = readinessPct + '%';
+
+  // Readiness segments (9 bars)
+  const segs = document.querySelectorAll('.readiness-seg');
+  segs.forEach((seg, i) => seg.classList.toggle('filled', i < done));
+  const rdyTxt = document.getElementById('readiness-pct-text');
+  if (rdyTxt) rdyTxt.textContent = readinessPct + '% ready';
+  const rdyTip = document.getElementById('readiness-tip');
+  if (rdyTip) {
+    if (done === 9) rdyTip.innerHTML = '🎉 <span>All chapters done!</span> Time to book your PL-300 exam, Captain!';
+    else rdyTip.innerHTML = 'Complete chapters to build readiness — <span>each module = 1 bar</span>. Hit 9/9 to unlock your exam booking prompt!';
+  }
 }
 function savePL300() {
-  const states = Array.from(document.querySelectorAll('.module-item')).map(el => el.classList.contains('done'));
+  const states = Array.from(document.querySelectorAll('.module-chapter, .module-item')).map(el => el.classList.contains('done'));
   save('pl300', states);
 }
 (function(){
   const states = load('pl300', []);
-  const items = document.querySelectorAll('.module-item');
+  const items  = document.querySelectorAll('.module-chapter, .module-item');
   states.forEach((done, i) => { if (done && items[i]) items[i].classList.add('done'); });
   updatePL300();
 })();
