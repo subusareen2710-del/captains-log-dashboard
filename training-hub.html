@@ -789,6 +789,62 @@ body {
   body.light-mode .vn-textarea { background: rgba(255,255,255,0.6); color: #1a1f2e; }
   body.light-mode .notes-entry { background: rgba(255,255,255,0.6); }
 
+
+  /* ── Archive drawer ── */
+  .archive-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 18px 0 6px;
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .archive-toggle:hover { color: var(--text-muted); }
+  .archive-toggle-chevron { transition: transform 0.2s; font-size: 0.7rem; }
+  .archive-toggle-chevron.open { transform: rotate(90deg); }
+  .archive-list { display: none; }
+  .archive-list.open { display: block; }
+  .module-block.archived {
+    opacity: 0.6;
+    border-style: dashed;
+    border-color: var(--border);
+  }
+  .module-block.archived:hover { opacity: 0.85; transform: none; }
+  .archive-btn {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .archive-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .restore-btn {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .restore-btn:hover { border-color: var(--excel); color: var(--excel); }
 </style>
 </head>
 <body>
@@ -856,60 +912,9 @@ body {
   </div>
 </div>
 
-<div class="tab-bar">
-  <button class="tab-btn active-pbi" id="tab-pbi" onclick="switchTab('pbi')">
-    ⚡ Power BI / PL-300
-    <span class="tab-badge" id="pbi-badge">0%</span>
-  </button>
-  <button class="tab-btn" id="tab-excel" onclick="switchTab('excel')">
-    📊 Excel
-    <span class="tab-badge" id="excel-badge">0%</span>
-  </button>
-</div>
-
-<!-- ========== POWER BI PANEL ========== -->
-<div class="track-panel active" id="panel-pbi">
-  <div class="track-progress-bar"><div class="track-progress-fill pbi-fill" id="pbi-fill" style="width:0%"></div></div>
-  <div class="track-stats">
-    <span>Power BI / PL-300: <span id="pbi-done-count">0</span> / <span id="pbi-total-count">0</span> videos complete</span>
-    <span id="pbi-next-label" style="color:var(--orange)">→ Start with Module 1</span>
-  </div>
-  <div id="pbi-modules"></div>
-  <div class="add-video-section" id="add-video-pbi">
-    <div class="add-video-title">➕ Add Your Own Resource</div>
-    <div class="add-video-grid">
-      <input class="add-input" id="add-pbi-title" placeholder="Video / resource title" />
-      <input class="add-input" id="add-pbi-url" placeholder="https://youtube.com/watch?v=..." />
-    </div>
-    <div class="add-video-grid">
-      <input class="add-input" id="add-pbi-channel" placeholder="Channel / source name" />
-      <input class="add-input" id="add-pbi-duration" placeholder="Duration (e.g. 45m)" />
-    </div>
-    <button class="add-video-btn" onclick="addCustomVideo('pbi')">+ Add to Power BI Track</button>
-  </div>
-</div>
-
-<!-- ========== EXCEL PANEL ========== -->
-<div class="track-panel" id="panel-excel">
-  <div class="track-progress-bar"><div class="track-progress-fill excel-fill" id="excel-fill" style="width:0%"></div></div>
-  <div class="track-stats">
-    <span>Excel: <span id="excel-done-count">0</span> / <span id="excel-total-count">0</span> videos complete</span>
-    <span id="excel-next-label" style="color:var(--excel)">→ Start with Module 1</span>
-  </div>
-  <div id="excel-modules"></div>
-  <div class="add-video-section">
-    <div class="add-video-title">➕ Add Your Own Resource</div>
-    <div class="add-video-grid">
-      <input class="add-input" id="add-excel-title" placeholder="Video / resource title" />
-      <input class="add-input" id="add-excel-url" placeholder="https://youtube.com/watch?v=..." />
-    </div>
-    <div class="add-video-grid">
-      <input class="add-input" id="add-excel-channel" placeholder="Channel / source name" />
-      <input class="add-input" id="add-excel-duration" placeholder="Duration (e.g. 45m)" />
-    </div>
-    <button class="add-video-btn" onclick="addCustomVideo('excel')">+ Add to Excel Track</button>
-  </div>
-</div>
+<!-- Tab bar and panels are built dynamically from TRACK_META + CURRICULUM -->
+<div class="tab-bar" id="tab-bar"></div>
+<div id="panel-container"></div>
 
 <div class="footer">⚓ Training Hub · Part of <span>Captain Subanshu's</span> Command Centre · Data saved locally</div>
 
@@ -1139,6 +1144,101 @@ let customVideos = load('custom_videos', { pbi: [], excel: [] });
 })();
 
 // ===== TABS =====
+// ── TRACK META ──────────────────────────────────────────────────────
+// To add a new course: add an entry to CURRICULUM AND to TRACK_META below.
+// Everything else (tabs, panels, stats, progress) is auto-generated.
+const TRACK_META = {
+  pbi: {
+    label: 'Power BI / PL-300', icon: '⚡',
+    activeClass: 'active-pbi', fillClass: 'pbi-fill',
+    numClass: 'pbi-num', accentColor: 'var(--orange)',
+    fillColor: 'var(--pbi-dark)', statPctId: 'stat-pbi-pct',
+    startLabel: '→ Start with Module 1'
+  },
+  excel: {
+    label: 'Excel', icon: '📊',
+    activeClass: 'active-excel', fillClass: 'excel-fill',
+    numClass: 'excel-num', accentColor: 'var(--excel)',
+    fillColor: 'var(--excel)', statPctId: 'stat-excel-pct',
+    startLabel: '→ Start with Module 1'
+  }
+  // ── Add new courses here, e.g.: ──
+  // sql: { label: 'SQL Fundamentals', icon: '🗄️', activeClass: 'active-new',
+  //   fillClass: 'pbi-fill', numClass: 'pbi-num', accentColor: 'var(--blue)',
+  //   fillColor: 'var(--blue)', startLabel: '→ Start with Module 1' }
+};
+
+// Build tabs and panels dynamically — runs once at startup
+function buildTabsAndPanels() {
+  const tabBar   = document.getElementById('tab-bar');
+  const container = document.getElementById('panel-container');
+  const tracks   = Object.keys(CURRICULUM);
+
+  tracks.forEach((track, i) => {
+    const meta = TRACK_META[track] || {
+      label: track.toUpperCase(), icon: '📚', activeClass: 'active-new',
+      fillClass: 'pbi-fill', numClass: 'pbi-num',
+      accentColor: 'var(--orange)', fillColor: 'var(--orange)', startLabel: '→ Start'
+    };
+
+    // Tab button
+    const btn = document.createElement('button');
+    btn.id        = 'tab-' + track;
+    btn.className = 'tab-btn' + (i === 0 ? ' ' + meta.activeClass : '');
+    btn.onclick   = () => switchTab(track);
+    btn.innerHTML = `${meta.icon} ${meta.label} <span class="tab-badge" id="${track}-badge">0%</span>`;
+    tabBar.appendChild(btn);
+
+    // Panel
+    const panel = document.createElement('div');
+    panel.id        = 'panel-' + track;
+    panel.className = 'track-panel' + (i === 0 ? ' active' : '');
+    panel.innerHTML = `
+      <div class="track-progress-bar">
+        <div class="track-progress-fill ${meta.fillClass}" id="${track}-fill" style="width:0%"></div>
+      </div>
+      <div class="track-stats">
+        <span>${meta.label}: <span id="${track}-done-count">0</span> / <span id="${track}-total-count">0</span> videos complete</span>
+        <span id="${track}-next-label" style="color:${meta.accentColor}">${meta.startLabel}</span>
+      </div>
+      <div id="${track}-modules"></div>
+      <div class="add-video-section">
+        <div class="add-video-title">➕ Add Your Own Resource</div>
+        <div class="add-video-grid">
+          <input class="add-input" id="add-${track}-title" placeholder="Video / resource title" />
+          <input class="add-input" id="add-${track}-url"   placeholder="https://youtube.com/watch?v=..." />
+        </div>
+        <div class="add-video-grid">
+          <input class="add-input" id="add-${track}-channel"  placeholder="Channel / source name" />
+          <input class="add-input" id="add-${track}-duration" placeholder="Duration (e.g. 45m)" />
+        </div>
+        <button class="add-video-btn" onclick="addCustomVideo('${track}')">+ Add to ${meta.label} Track</button>
+      </div>`;
+    container.appendChild(panel);
+  });
+}
+
+// ── ARCHIVE ─────────────────────────────────────────────────────────
+let archivedModules = new Set(load('archivedModules', []));
+
+function archiveModule(modId) {
+  archivedModules.add(modId);
+  save('archivedModules', [...archivedModules]);
+  renderAll();
+}
+function restoreModule(modId) {
+  archivedModules.delete(modId);
+  save('archivedModules', [...archivedModules]);
+  renderAll();
+}
+function toggleArchiveDrawer(track) {
+  const list = document.getElementById('arch-list-' + track);
+  const chev = document.getElementById('arch-chev-' + track);
+  if (!list) return;
+  list.classList.toggle('open');
+  if (chev) chev.classList.toggle('open', list.classList.contains('open'));
+}
+
 let currentTab = 'pbi';
 const KNOWN_TAB_STYLES = { pbi: 'active-pbi', excel: 'active-excel' };
 function switchTab(tab) {
@@ -1171,8 +1271,7 @@ function toggleModule(id) {
 
 // ===== RENDER =====
 function renderAll() {
-  renderTrack('pbi');
-  renderTrack('excel');
+  Object.keys(CURRICULUM).forEach(track => renderTrack(track));
   updateStats();
 }
 
@@ -1206,37 +1305,64 @@ function renderTrack(track) {
   }
 
   const container = document.getElementById(track + '-modules');
-  const numClass = track === 'pbi' ? 'pbi-num' : 'excel-num';
-  const modules = CURRICULUM[track];
+  const meta      = TRACK_META[track] || { numClass: 'pbi-num', fillColor: 'var(--pbi-dark)', accentColor: 'var(--orange)' };
+  const numClass  = meta.numClass;
+  const fillColor = meta.fillColor;
+  const modules   = CURRICULUM[track];
 
-  container.innerHTML = modules.map((mod, idx) => {
+  // Split into active and archived
+  const activeMods   = modules.filter(m => !archivedModules.has(m.id));
+  const archivedMods = modules.filter(m =>  archivedModules.has(m.id));
+
+  function renderModBlock(mod, idx, isArchived) {
     const modVids = [...mod.videos, ...(customVideos[track] || []).filter(v => v.moduleId === mod.id)];
     const modDone = modVids.filter(v => checked[v.id]).length;
-    const modPct = modVids.length ? Math.round(modDone / modVids.length * 100) : 0;
-    const modFillColor = track === 'pbi' ? 'var(--pbi-dark)' : 'var(--excel)';
-    const allModDone = modDone === modVids.length && modVids.length > 0;
-
+    const modPct  = modVids.length ? Math.round(modDone / modVids.length * 100) : 0;
+    const allDone = modDone === modVids.length && modVids.length > 0;
+    const archiveBtn = (allDone && !isArchived)
+      ? `<button class="archive-btn" onclick="event.stopPropagation();archiveModule('${mod.id}')" title="Archive this completed chapter">📦 Archive</button>`
+      : '';
+    const restoreBtn = isArchived
+      ? `<button class="restore-btn" onclick="event.stopPropagation();restoreModule('${mod.id}')" title="Restore chapter">↩ Restore</button>`
+      : '';
     return `
-      <div class="module-block">
-        <div class="module-head" id="mh-${mod.id}" onclick="toggleModule('${mod.id}')">
+      <div class="module-block${isArchived ? ' archived' : ''}">
+        <div class="module-head${isArchived ? '' : ''}" id="mh-${mod.id}" onclick="toggleModule('${mod.id}')">
           <div class="module-num ${numClass}">${idx + 1}</div>
           <div class="module-head-info">
-            <div class="module-head-title">${allModDone ? '✅ ' : ''}${mod.title}</div>
+            <div class="module-head-title">${allDone ? '✅ ' : ''}${mod.title}</div>
             <div class="module-head-sub">${mod.sub}</div>
           </div>
           <div class="module-mini-bar">
             <div class="module-mini-track">
-              <div class="module-mini-fill" style="width:${modPct}%;background:${modFillColor}"></div>
+              <div class="module-mini-fill" style="width:${modPct}%;background:${fillColor}"></div>
             </div>
-            <div class="module-mini-pct" style="color:${modFillColor}">${modDone}/${modVids.length}</div>
+            <div class="module-mini-pct" style="color:${fillColor}">${modDone}/${modVids.length}</div>
           </div>
+          ${archiveBtn}${restoreBtn}
           <div class="module-chevron" id="chev-${mod.id}">▼</div>
         </div>
         <div class="module-body" id="mb-${mod.id}">
           ${modVids.map(v => renderVideoRow(v, false, mod.title)).join('')}
         </div>
       </div>`;
-  }).join('');
+  }
+
+  container.innerHTML = activeMods.map((mod, idx) => renderModBlock(mod, idx, false)).join('');
+
+  // Append archived drawer if any
+  if (archivedMods.length) {
+    const archiveDrawerId = 'arch-list-' + track;
+    const archiveChevId   = 'arch-chev-' + track;
+    container.innerHTML += `
+      <div class="archive-toggle" onclick="toggleArchiveDrawer('${track}')">
+        <span class="archive-toggle-chevron" id="${archiveChevId}">▶</span>
+        📦 Archived chapters (${archivedMods.length})
+      </div>
+      <div class="archive-list" id="${archiveDrawerId}">
+        ${archivedMods.map((mod, idx) => renderModBlock(mod, activeMods.length + idx, true)).join('')}
+      </div>`;
+  }
 
   // Render custom videos not attached to a module separately
   const orphanCustom = (customVideos[track] || []).filter(v => !v.moduleId);
@@ -1305,20 +1431,23 @@ function renderVideoRow(v, canDelete = false, moduleName = '') {
 }
 
 function updateStats() {
-  const pbiVids = getAllVideos('pbi');
-  const excelVids = getAllVideos('excel');
-  const allVids = [...pbiVids, ...excelVids];
-  const pbiDone = pbiVids.filter(v => checked[v.id]).length;
-  const excelDone = excelVids.filter(v => checked[v.id]).length;
-  const totalDone = pbiDone + excelDone;
-  const totalVids = allVids.length;
-  const pbiPct = pbiVids.length ? Math.round(pbiDone / pbiVids.length * 100) : 0;
-  const excelPct = excelVids.length ? Math.round(excelDone / excelVids.length * 100) : 0;
-
-  document.getElementById('stat-total-done').textContent = totalDone;
-  document.getElementById('stat-total-pct').textContent = totalVids ? Math.round(totalDone / totalVids * 100) + '%' : '0%';
-  document.getElementById('stat-pbi-pct').textContent = pbiPct + '%';
-  document.getElementById('stat-excel-pct').textContent = excelPct + '%';
+  const tracks = Object.keys(CURRICULUM);
+  let totalDone = 0, totalVids = 0;
+  tracks.forEach(track => {
+    const vids = getAllVideos(track);
+    const done = vids.filter(v => checked[v.id]).length;
+    totalDone += done; totalVids += vids.length;
+    const pct = vids.length ? Math.round(done / vids.length * 100) : 0;
+    const meta = TRACK_META[track];
+    if (meta && meta.statPctId) {
+      const el = document.getElementById(meta.statPctId);
+      if (el) el.textContent = pct + '%';
+    }
+  });
+  const statDone = document.getElementById('stat-total-done');
+  const statPct  = document.getElementById('stat-total-pct');
+  if (statDone) statDone.textContent = totalDone;
+  if (statPct)  statPct.textContent  = totalVids ? Math.round(totalDone / totalVids * 100) + '%' : '0%';
 }
 
 // ===== ADD CUSTOM VIDEO =====
@@ -1351,6 +1480,7 @@ function deleteCustomVideo(id, track) {
 // videoNotes must be declared BEFORE renderAll() so renderVideoRow can access it
 let videoNotes = {};       // { [videoId]: { text, title, module } }
 let vnSaveTimers = {};
+buildTabsAndPanels(); // generate tabs + panels from CURRICULUM before first render
 renderAll();
 
   // ── PER-VIDEO NOTES ──────────────────────────────────────
