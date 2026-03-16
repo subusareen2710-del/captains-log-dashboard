@@ -1327,11 +1327,12 @@ function deleteCustomVideo(id, track) {
 }
 
 // ===== INIT =====
+// videoNotes must be declared BEFORE renderAll() so renderVideoRow can access it
+let videoNotes = {};       // { [videoId]: { text, title, module } }
+let vnSaveTimers = {};
 renderAll();
 
   // ── PER-VIDEO NOTES ──────────────────────────────────────
-  let videoNotes = {};       // { [videoId]: { text, title, module } }
-  let vnSaveTimers = {};
 
   function loadVideoNotes() {
     db.collection('captain').doc('video-notes').get()
@@ -1469,7 +1470,8 @@ renderAll();
   }
   (function initTheme() {
     const saved = localStorage.getItem('sub_theme');
-    if (saved === 'light') {
+    // Light mode is the default — only use dark if explicitly saved as 'dark'
+    if (saved !== 'dark') {
       document.body.classList.add('light-mode');
       const thumb = document.getElementById('theme-thumb');
       if (thumb) thumb.textContent = '☀️';

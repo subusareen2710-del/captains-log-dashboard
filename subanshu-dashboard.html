@@ -2381,7 +2381,8 @@ function toggleTheme() {
 }
 (function initTheme() {
   const saved = localStorage.getItem('sub_theme');
-  if (saved === 'light') {
+  // Light mode is the default — only use dark if explicitly saved as 'dark'
+  if (saved !== 'dark') {
     document.body.classList.add('light-mode');
     const thumb = document.getElementById('theme-thumb');
     if (thumb) thumb.textContent = '☀️';
