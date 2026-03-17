@@ -86,11 +86,10 @@ body {
 /* ===== OVERALL STATS ===== */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
   gap: 14px;
   margin-bottom: 24px;
 }
-@media (max-width: 700px) { .stats-row { grid-template-columns: 1fr 1fr; } }
 .stat-card {
   background: var(--surface);
   border: 1.5px solid var(--border);
@@ -112,9 +111,12 @@ body {
   border-radius: var(--radius);
   padding: 6px;
   box-shadow: var(--shadow);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .tab-btn {
-  flex: 1;
+  flex: 1 0 auto;
+  min-width: 120px;
   padding: 12px 20px;
   border: none;
   border-radius: var(--radius-sm);
@@ -129,6 +131,7 @@ body {
   gap: 8px;
   color: var(--text-muted);
   background: transparent;
+  white-space: nowrap;
 }
 .tab-btn:hover { background: var(--surface2); }
 .tab-btn.active-pbi {
@@ -398,6 +401,7 @@ body {
 .badge-ms { background: #e0f2fe; color: #0369a1; }
 .badge-custom { background: var(--gold-light); color: #92400e; }
 .badge-mslearn { background: #f0fdf4; color: #166534; }
+.badge-fcc     { background: #d1fae5; color: #065f46; }
 
 /* Type tags */
 .tag-video { background: #fee2e2; color: #991b1b; }
@@ -928,7 +932,7 @@ TH_DOC.onSnapshot(doc => {
       try { localStorage.setItem('th_' + k, JSON.stringify(data[k])); } catch(e) {}
     });
     checked = load('checked', {});
-    customVideos = load('custom_videos', { pbi: [], excel: [] });
+    customVideos = load('custom_videos', {});
     renderAll();
   }
 }, () => setSyncBadge('offline'));
@@ -936,7 +940,7 @@ TH_DOC.onSnapshot(doc => {
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 let checked = load('checked', {});
-let customVideos = load('custom_videos', { pbi: [], excel: [] });
+let customVideos = load('custom_videos', {});
 
 // ===== DATE =====
 (function() {
@@ -998,6 +1002,10 @@ function buildTabsAndPanels() {
   });
 }
 
+// ===== OPEN MODULE STATE =====
+// Persists which modules are expanded across renderAll() calls
+let openModules = new Set();
+
 // ===== ARCHIVE =====
 let archivedModules = new Set(load('archivedModules', []));
 
@@ -1040,10 +1048,13 @@ function toggleVideo(id) {
 
 // ===== MODULE TOGGLE =====
 function toggleModule(id) {
+  if (openModules.has(id)) openModules.delete(id);
+  else openModules.add(id);
+  const isOpen = openModules.has(id);
   const body = document.getElementById('mb-' + id);
   const chev = document.getElementById('chev-' + id);
   const head = document.getElementById('mh-' + id);
-  const isOpen = body.classList.toggle('open');
+  if (body) body.classList.toggle('open', isOpen);
   if (chev) chev.classList.toggle('open', isOpen);
   if (head) head.classList.toggle('open', isOpen);
 }
@@ -1101,9 +1112,10 @@ function renderTrack(track) {
     const restoreBtn = isArchived
       ? `<button class="restore-btn" onclick="event.stopPropagation();restoreModule('${mod.id}')" title="Restore chapter">↩ Restore</button>`
       : '';
+    const isOpen = openModules.has(mod.id);
     return `
       <div class="module-block${isArchived ? ' archived' : ''}">
-        <div class="module-head" id="mh-${mod.id}" onclick="toggleModule('${mod.id}')">
+        <div class="module-head${isOpen ? ' open' : ''}" id="mh-${mod.id}" onclick="toggleModule('${mod.id}')">
           <div class="module-num ${numClass}">${idx + 1}</div>
           <div class="module-head-info">
             <div class="module-head-title">${allDone ? '✅ ' : ''}${mod.title}</div>
@@ -1116,10 +1128,10 @@ function renderTrack(track) {
             <div class="module-mini-pct" style="color:${fillColor}">${modDone}/${modVids.length}</div>
           </div>
           ${archiveBtn}${restoreBtn}
-          <div class="module-chevron" id="chev-${mod.id}">▼</div>
+          <div class="module-chevron${isOpen ? ' open' : ''}" id="chev-${mod.id}">▼</div>
         </div>
-        <div class="module-body" id="mb-${mod.id}">
-          ${modVids.map(v => renderVideoRow(v)).join('')}
+        <div class="module-body${isOpen ? ' open' : ''}" id="mb-${mod.id}">
+          ${modVids.map(v => renderVideoRow(v, false, track)).join('')}
         </div>
       </div>`;
   }
@@ -1139,30 +1151,34 @@ function renderTrack(track) {
 
   const orphanCustom = (customVideos[track] || []).filter(v => !v.moduleId);
   if (orphanCustom.length) {
+    const customId = 'custom-' + track;
+    // Default open the first time custom section appears
+    if (!openModules.has(customId)) openModules.add(customId);
+    const custOpen = openModules.has(customId);
     container.innerHTML += `
       <div class="module-block">
-        <div class="module-head" id="mh-custom-${track}" onclick="toggleModule('custom-${track}')">
+        <div class="module-head${custOpen ? ' open' : ''}" id="mh-${customId}" onclick="toggleModule('${customId}')">
           <div class="module-num ${numClass}">+</div>
           <div class="module-head-info">
             <div class="module-head-title">My Custom Resources</div>
             <div class="module-head-sub">Videos & links you've added</div>
           </div>
-          <div class="module-chevron" id="chev-custom-${track}">▼</div>
+          <div class="module-chevron${custOpen ? ' open' : ''}" id="chev-${customId}">▼</div>
         </div>
-        <div class="module-body open" id="mb-custom-${track}">
-          ${orphanCustom.map(v => renderVideoRow(v, true)).join('')}
+        <div class="module-body${custOpen ? ' open' : ''}" id="mb-${customId}">
+          ${orphanCustom.map(v => renderVideoRow(v, true, track)).join('')}
         </div>
       </div>`;
   }
 }
 
-function renderVideoRow(v, canDelete = false) {
+function renderVideoRow(v, canDelete = false, track = '') {
   const isDone = !!checked[v.id];
   const linkBtn = v.url && v.url.startsWith('http')
     ? `<a class="${v.url.includes('youtube') || v.url.includes('youtu.be') ? 'yt-btn' : 'resource-btn'}" href="${v.url}" target="_blank" rel="noopener">${v.url.includes('youtube') || v.url.includes('youtu.be') ? '▶ Watch' : '🔗 Open'}</a>`
     : '';
   const delBtn = canDelete
-    ? `<button style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-weight:900;font-size:0.72rem;padding:6px;font-family:inherit;" onclick="deleteCustomVideo('${v.id}','${currentTab}')" title="Remove">✕</button>`
+    ? `<button style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-weight:900;font-size:0.72rem;padding:6px;font-family:inherit;" onclick="deleteCustomVideo('${v.id}','${track || currentTab}')" title="Remove">✕</button>`
     : '';
   const typeTag = v.type ? `<span class="type-tag tag-${v.type}">${v.type}</span>` : '';
   return `
