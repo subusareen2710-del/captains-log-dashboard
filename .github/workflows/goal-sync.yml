@@ -1,0 +1,132 @@
+name: Goal Sync
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # Every hour
+  workflow_dispatch:        # Manual trigger from GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # Needed to commit learning-goals.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect new learning goals from Firestore
+        run: |
+          python3 << 'PYEOF'
+          import json, urllib.request, sys, os
+
+          # ── Fetch Firestore ──────────────────────────────────────────────
+          url = (
+            "https://firestore.googleapis.com/v1/projects/daily-planner-e61fc"
+            "/databases/(default)/documents/dashboard/main"
+            "?key=AIzaSyANpS7-0FwYHSZPapRy961cBgHLBd9hPu4"
+          )
+          with urllib.request.urlopen(url, timeout=15) as r:
+              data = json.loads(r.read())
+
+          # ── Extract all text items from buckets ──────────────────────────
+          texts = []
+          buckets = (data.get('fields', {})
+                         .get('buckets', {})
+                         .get('arrayValue', {})
+                         .get('values', []))
+          for bucket in buckets:
+              items = (bucket.get('mapValue', {})
+                             .get('fields', {})
+                             .get('items', {})
+                             .get('arrayValue', {})
+                             .get('values', []))
+              for item in items:
+                  text = (item.get('mapValue', {})
+                              .get('fields', {})
+                              .get('text', {})
+                              .get('stringValue', ''))
+                  if text:
+                      texts.append(text)
+
+          print(f"Scanned {len(texts)} Firestore items")
+
+          # ── Goal detection ───────────────────────────────────────────────
+          GOAL_PATTERNS = [
+              'learn', 'study', 'revise', 'review', 'practice', 'master',
+              'understand', 'prepare for', 'brush up on', 'read about',
+              'get certified in', 'explore',
+          ]
+          NON_GOALS = [
+              'groceries', 'dentist', 'visa', 'shipment', 'boxes', 'login',
+              'bug', 'server', 'chicken', 'recipe', 'food', 'cook',
+              'call', 'meeting', 'email', 'buy', 'order', 'pay', 'clean',
+              'laundry', 'gym',
+          ]
+          # Ordered longest-first so "data analytics" matches before "data"
+          GOAL_KEY_MAP = [
+              ('power bi',            'Power BI'),
+              ('r programming',       'R Programming'),
+              ('six sigma',           'DMAIC Principles'),
+              ('machine learning',    'Machine Learning'),
+              ('data analytics',      'Data Analytics'),
+              ('data analysis',       'Data Analytics'),
+              ('project management',  'Project Management'),
+              ('supply chain',        'Supply Chain'),
+              ('logistics',           'Supply Chain'),
+              ('financial modelling', 'Finance'),
+              ('statistics',          'Statistics'),
+              ('tableau',             'Tableau'),
+              ('python',              'Python'),
+              ('excel',               'Excel'),
+              ('dmaic',               'DMAIC Principles'),
+              ('finance',             'Finance'),
+              ('sql',                 'SQL'),
+          ]
+
+          def detect_goal(text):
+              lower = text.lower()
+              if any(w in lower for w in NON_GOALS):
+                  return None
+              if not any(p in lower for p in GOAL_PATTERNS):
+                  return None
+              for subject, label in GOAL_KEY_MAP:
+                  if subject in lower:
+                      return label
+              return None
+
+          detected = set(filter(None, (detect_goal(t) for t in texts)))
+          print(f"Detected goals in Firestore: {detected or 'none'}")
+
+          # ── Compare with learning-goals.json ────────────────────────────
+          with open('learning-goals.json') as f:
+              existing = json.load(f)
+
+          existing_lower = {g.lower() for g in existing}
+          new_goals = [g for g in detected if g.lower() not in existing_lower]
+
+          if not new_goals:
+              print("learning-goals.json is already up to date.")
+              sys.exit(0)
+
+          # ── Write updated file ───────────────────────────────────────────
+          updated = existing + sorted(new_goals)
+          with open('learning-goals.json', 'w') as f:
+              json.dump(updated, f, indent=2)
+              f.write('\n')
+
+          print(f"New goals added: {new_goals}")
+
+          # Signal to the commit step
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write(f"NEW_GOALS={', '.join(new_goals)}\n")
+              env.write("GOALS_CHANGED=true\n")
+          PYEOF
+
+      - name: Commit and push if goals changed
+        if: env.GOALS_CHANGED == 'true'
+        run: |
+          git config user.name  "goal-sync[bot]"
+          git config user.email "goal-sync@users.noreply.github.com"
+          git add learning-goals.json
+          git commit -m "Goal sync: add ${{ env.NEW_GOALS }}"
+          git push
