@@ -338,45 +338,6 @@ body {
 }
 .resource-btn:hover { background: var(--red); transform: scale(1.05); }
 
-/* ===== ADD CUSTOM VIDEO ===== */
-.add-video-section {
-  background: var(--surface2);
-  border: 1.5px dashed var(--border2);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-top: 14px;
-}
-.add-video-title { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 12px; }
-.add-video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-@media (max-width: 600px) { .add-video-grid { grid-template-columns: 1fr; } }
-.add-input {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  font-family: inherit;
-  font-size: 0.83rem;
-  font-weight: 700;
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.2s;
-  width: 100%;
-}
-.add-input:focus { border-color: var(--gold); background: var(--gold-light); }
-.add-input::placeholder { color: var(--text-dim); font-weight: 600; }
-.add-video-btn {
-  background: var(--navy);
-  color: white;
-  border: none;
-  padding: 9px 20px;
-  border-radius: var(--radius-sm);
-  font-weight: 900;
-  font-size: 0.82rem;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
-}
-.add-video-btn:hover { background: var(--red); }
 
 /* ===== SECTION LABEL ===== */
 .section-label {
@@ -408,6 +369,26 @@ body {
 .tag-course { background: #dbeafe; color: #1e40af; }
 .tag-practice { background: #d1fae5; color: #065f46; }
 .tag-article { background: #fef3c7; color: #92400e; }
+
+/* ===== TRACK COMPLETE BANNER ===== */
+.track-complete-banner {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 2px solid #86efac;
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  margin-bottom: 20px;
+  animation: celebrateIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes celebrateIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.track-complete-banner .tcb-emoji { font-size: 2rem; animation: spin 0.6s ease; }
+@keyframes spin { from { transform: rotate(-20deg) scale(0.8); } to { transform: rotate(0deg) scale(1); } }
+.track-complete-banner .tcb-text { text-align: left; }
+.track-complete-banner .tcb-title { font-size: 1rem; font-weight: 900; color: #166534; }
+.track-complete-banner .tcb-sub { font-size: 0.78rem; font-weight: 700; color: #4ade80; margin-top: 2px; }
 
 /* ===== FOOTER ===== */
 .footer { text-align: center; margin-top: 28px; font-size: 0.72rem; font-weight: 700; color: var(--text-dim); }
@@ -515,7 +496,7 @@ body {
   <a href="subanshu-dashboard.html" class="back-btn">← Captain's Log</a>
   <div class="header-title">
     <h1>📺 Training <span>Hub</span></h1>
-    <p id="hub-subtitle">Excel · Power BI · R Programming — tick off as you go</p>
+    <p id="hub-subtitle">Loading tracks…</p>
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
     <button class="populate-btn" onclick="showPopulateModal()">
@@ -529,7 +510,7 @@ body {
 <div class="pop-overlay" id="pop-overlay" onclick="if(event.target===this)closePopulateModal()">
   <div class="pop-modal">
     <div class="pop-title">🚀 Populate Now</div>
-    <div class="pop-sub">Run the training pipeline immediately — detects new goals from your brain dump and adds them to this hub.</div>
+    <div class="pop-sub">Runs the injection pipeline immediately — picks up any goals already in your learning list and adds new tracks to this hub.</div>
     <ol class="pop-steps">
       <li class="pop-step">
         <div class="pop-step-num">1</div>
@@ -541,7 +522,7 @@ body {
       </li>
       <li class="pop-step">
         <div class="pop-step-num">3</div>
-        <div class="pop-step-text">Paste and send — I'll run the full pipeline right away 🎓</div>
+        <div class="pop-step-text">Paste and send — I'll research videos and inject the new track right away 🎓</div>
       </li>
     </ol>
     <div class="pop-copy-row">
@@ -932,7 +913,6 @@ TH_DOC.onSnapshot(doc => {
       try { localStorage.setItem('th_' + k, JSON.stringify(data[k])); } catch(e) {}
     });
     checked = load('checked', {});
-    customVideos = load('custom_videos', {});
     renderAll();
   }
 }, () => setSyncBadge('offline'));
@@ -940,7 +920,6 @@ TH_DOC.onSnapshot(doc => {
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 let checked = load('checked', {});
-let customVideos = load('custom_videos', {});
 
 // ===== DATE =====
 (function() {
@@ -985,19 +964,7 @@ function buildTabsAndPanels() {
         <span>${meta.label}: <span id="${track}-done-count">0</span> / <span id="${track}-total-count">0</span> videos complete</span>
         <span id="${track}-next-label" style="color:${meta.accentColor}">${meta.startLabel}</span>
       </div>
-      <div id="${track}-modules"></div>
-      <div class="add-video-section">
-        <div class="add-video-title">➕ Add Your Own Resource</div>
-        <div class="add-video-grid">
-          <input class="add-input" id="add-${track}-title" placeholder="Video / resource title" />
-          <input class="add-input" id="add-${track}-url"   placeholder="https://youtube.com/watch?v=..." />
-        </div>
-        <div class="add-video-grid">
-          <input class="add-input" id="add-${track}-channel"  placeholder="Channel / source name" />
-          <input class="add-input" id="add-${track}-duration" placeholder="Duration (e.g. 45m)" />
-        </div>
-        <button class="add-video-btn" onclick="addCustomVideo('${track}')">+ Add to ${meta.label} Track</button>
-      </div>`;
+      <div id="${track}-modules"></div>`;
     container.appendChild(panel);
   });
 }
@@ -1066,11 +1033,8 @@ function renderAll() {
 }
 
 function getAllVideos(track) {
-  const modules = CURRICULUM[track];
-  const custom = customVideos[track] || [];
   let all = [];
-  modules.forEach(m => { all = all.concat(m.videos); });
-  all = all.concat(custom);
+  CURRICULUM[track].forEach(m => { all = all.concat(m.videos); });
   return all;
 }
 
@@ -1102,7 +1066,7 @@ function renderTrack(track) {
   const archivedMods = modules.filter(m => archivedModules.has(m.id));
 
   function renderModBlock(mod, idx, isArchived) {
-    const modVids = [...mod.videos, ...(customVideos[track] || []).filter(v => v.moduleId === mod.id)];
+    const modVids = [...mod.videos];
     const modDone = modVids.filter(v => checked[v.id]).length;
     const modPct  = modVids.length ? Math.round(modDone / modVids.length * 100) : 0;
     const allDone = modDone === modVids.length && modVids.length > 0;
@@ -1131,7 +1095,7 @@ function renderTrack(track) {
           <div class="module-chevron${isOpen ? ' open' : ''}" id="chev-${mod.id}">▼</div>
         </div>
         <div class="module-body${isOpen ? ' open' : ''}" id="mb-${mod.id}">
-          ${modVids.map(v => renderVideoRow(v, false, track)).join('')}
+          ${modVids.map(v => renderVideoRow(v)).join('')}
         </div>
       </div>`;
   }
@@ -1149,36 +1113,24 @@ function renderTrack(track) {
       </div>`;
   }
 
-  const orphanCustom = (customVideos[track] || []).filter(v => !v.moduleId);
-  if (orphanCustom.length) {
-    const customId = 'custom-' + track;
-    // Default open the first time custom section appears
-    if (!openModules.has(customId)) openModules.add(customId);
-    const custOpen = openModules.has(customId);
-    container.innerHTML += `
-      <div class="module-block">
-        <div class="module-head${custOpen ? ' open' : ''}" id="mh-${customId}" onclick="toggleModule('${customId}')">
-          <div class="module-num ${numClass}">+</div>
-          <div class="module-head-info">
-            <div class="module-head-title">My Custom Resources</div>
-            <div class="module-head-sub">Videos & links you've added</div>
-          </div>
-          <div class="module-chevron${custOpen ? ' open' : ''}" id="chev-${customId}">▼</div>
+  // Show celebration banner when track is 100% complete
+  if (total > 0 && done === total) {
+    const meta = TRACK_META[track];
+    container.innerHTML = `
+      <div class="track-complete-banner">
+        <div class="tcb-emoji">🏆</div>
+        <div class="tcb-text">
+          <div class="tcb-title">${meta.label} — Track Complete!</div>
+          <div class="tcb-sub">All ${total} videos done. Outstanding work 🎉</div>
         </div>
-        <div class="module-body${custOpen ? ' open' : ''}" id="mb-${customId}">
-          ${orphanCustom.map(v => renderVideoRow(v, true, track)).join('')}
-        </div>
-      </div>`;
+      </div>` + container.innerHTML;
   }
 }
 
-function renderVideoRow(v, canDelete = false, track = '') {
+function renderVideoRow(v) {
   const isDone = !!checked[v.id];
   const linkBtn = v.url && v.url.startsWith('http')
     ? `<a class="${v.url.includes('youtube') || v.url.includes('youtu.be') ? 'yt-btn' : 'resource-btn'}" href="${v.url}" target="_blank" rel="noopener">${v.url.includes('youtube') || v.url.includes('youtu.be') ? '▶ Watch' : '🔗 Open'}</a>`
-    : '';
-  const delBtn = canDelete
-    ? `<button style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-weight:900;font-size:0.72rem;padding:6px;font-family:inherit;" onclick="deleteCustomVideo('${v.id}','${track || currentTab}')" title="Remove">✕</button>`
     : '';
   const typeTag = v.type ? `<span class="type-tag tag-${v.type}">${v.type}</span>` : '';
   return `
@@ -1193,7 +1145,6 @@ function renderVideoRow(v, canDelete = false, track = '') {
         </div>
       </div>
       ${linkBtn}
-      ${delBtn}
     </div>`;
 }
 
@@ -1217,32 +1168,6 @@ function updateStats() {
   if (totalPctEl) totalPctEl.textContent = totalVids ? Math.round(totalDone / totalVids * 100) + '%' : '0%';
 }
 
-// ===== ADD CUSTOM VIDEO =====
-function addCustomVideo(track) {
-  const title = document.getElementById(`add-${track}-title`).value.trim();
-  const url = document.getElementById(`add-${track}-url`).value.trim();
-  const channel = document.getElementById(`add-${track}-channel`).value.trim() || 'My Resource';
-  const dur = document.getElementById(`add-${track}-duration`).value.trim();
-  if (!title) {
-    const inp = document.getElementById(`add-${track}-title`);
-    inp.style.borderColor = 'var(--red)';
-    inp.placeholder = 'Title required!';
-    setTimeout(() => { inp.style.borderColor = ''; inp.placeholder = 'Video / resource title'; }, 2000);
-    return;
-  }
-  const newVid = { id: 'custom-' + Date.now(), title, channel, badge: 'badge-custom', dur, url, type: 'video' };
-  if (!customVideos[track]) customVideos[track] = [];
-  customVideos[track].push(newVid);
-  save('custom_videos', customVideos);
-  ['title','url','channel','duration'].forEach(f => { document.getElementById(`add-${track}-${f}`).value = ''; });
-  renderAll();
-}
-
-function deleteCustomVideo(id, track) {
-  customVideos[track] = customVideos[track].filter(v => v.id !== id);
-  save('custom_videos', customVideos);
-  renderAll();
-}
 
 // ===== POPULATE NOW MODAL =====
 function showPopulateModal() {
