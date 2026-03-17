@@ -33,6 +33,7 @@
   --pbi: #f2c811; --pbi-dark: #e8a500; --pbi-light: #fffbeb;
   --r-blue: #276DC3; --r-blue-dark: #1a5299; --r-light: #eef4fc;
   --dmaic: #2E7D32; --dmaic-dark: #1B5E20; --dmaic-light: #E8F5E9;
+  --sc: #0077B6; --sc-dark: #005F8E; --sc-light: #E0F4FF;
   --text: #2c1810; --text-muted: #8b6e5a; --text-dim: #c9b09a;
   --radius: 14px; --radius-sm: 9px;
   --shadow: 0 2px 12px rgba(44,24,16,0.07);
@@ -150,6 +151,11 @@ body {
   color: white;
   box-shadow: 0 3px 10px rgba(46,125,50,0.35);
 }
+.tab-btn.active-sc {
+  background: var(--sc);
+  color: white;
+  box-shadow: 0 3px 10px rgba(0,119,182,0.35);
+}
 /* Generic active state for dynamically added tabs */
 .tab-btn.active-new {
   background: var(--navy);
@@ -180,6 +186,7 @@ body {
 .excel-fill { background: linear-gradient(90deg, #1a5c38, var(--excel)); }
 .r-fill     { background: linear-gradient(90deg, var(--r-blue-dark), var(--r-blue)); }
 .dmaic-fill { background: linear-gradient(90deg, var(--dmaic-dark), var(--dmaic)); }
+.sc-fill    { background: linear-gradient(90deg, var(--sc-dark), var(--sc)); }
 .track-stats {
   display: flex;
   justify-content: space-between;
@@ -381,6 +388,7 @@ body {
 .excel-num  { background: var(--excel-light); color: var(--excel); border: 2px solid #a8d5b5; }
 .r-num      { background: var(--r-light); color: var(--r-blue-dark); border: 2px solid var(--r-blue); }
 .dmaic-num  { background: var(--dmaic-light); color: var(--dmaic-dark); border: 2px solid var(--dmaic); }
+.sc-num     { background: var(--sc-light); color: var(--sc-dark); border: 2px solid var(--sc); }
 
 /* Channel badge colours */
 .badge-giac { background: #fef3c7; color: #92400e; }
@@ -774,6 +782,43 @@ const CURRICULUM = {
       ]
     },
   ]
+  ,supply_chain: [
+    {
+      id: 'sc-m1', title: 'Supply Chain Fundamentals', sub: 'What is supply chain · end-to-end flow · key functions',
+      videos: [
+        { id:'sc-v1', title:'Supply Chain Management In 6 Minutes', channel:'Simplilearn', badge:'badge-custom', dur:'6m', type:'video', url:'https://www.youtube.com/watch?v=Lpp9bHtPAN0' },
+        { id:'sc-v2', title:'What is Supply Chain Management? Definition and Introduction', channel:'AIMS Education', badge:'badge-custom', dur:'12m', type:'video', url:'https://www.youtube.com/watch?v=lZPO5RclZEo' },
+      ]
+    },
+    {
+      id: 'sc-m2', title: 'Supply Chain Deep Dive', sub: 'Procurement · operations · logistics · demand planning',
+      videos: [
+        { id:'sc-v3', title:'Supply Chain Management - Full Course', channel:'Leaders Talk', badge:'badge-custom', dur:'18m', type:'video', url:'https://www.youtube.com/watch?v=qYac28pJ_hc' },
+        { id:'sc-v4', title:'Supply Chain Management Full Course', channel:'Digital Transformation', badge:'badge-custom', dur:'1h 52m', type:'video', url:'https://www.youtube.com/watch?v=sANREcJ8Mhs' },
+      ]
+    },
+    {
+      id: 'sc-m3', title: 'Key Terms & Career Paths', sub: 'Supply chain terminology · roles · industry overview',
+      videos: [
+        { id:'sc-v5', title:'Supply Chain Explained | Key Terms & Concepts', channel:'Digital Transformation', badge:'badge-custom', dur:'14m', type:'video', url:'https://www.youtube.com/watch?v=XnxtKuAtjAc' },
+        { id:'sc-v6', title:'Supply Chain Career Paths Explained', channel:'Leaders Talk', badge:'badge-custom', dur:'15m', type:'video', url:'https://www.youtube.com/watch?v=sfJyR_8o8R4' },
+      ]
+    },
+    {
+      id: 'sc-m4', title: 'Sales & Operations Planning (S&OP)', sub: 'S&OP process · demand vs supply balancing · forecasting',
+      videos: [
+        { id:'sc-v7', title:'What is S&OP? Sales and Operations Planning in 3 Minutes', channel:'Lokad', badge:'badge-custom', dur:'3m', type:'video', url:'https://www.youtube.com/watch?v=cEO_n2TQ7EY' },
+        { id:'sc-v8', title:'S&OP Process Step by Step', channel:'DBM Systems', badge:'badge-custom', dur:'15m', type:'video', url:'https://www.youtube.com/watch?v=lpnHNd6l-2M' },
+      ]
+    },
+    {
+      id: 'sc-m5', title: 'KPIs & Supply Chain Metrics', sub: 'OTIF · inventory turns · fill rate · cycle time',
+      videos: [
+        { id:'sc-v9', title:'Top Supply Chain KPIs You Must Know', channel:'10 Min Supply Chain', badge:'badge-custom', dur:'8m', type:'video', url:'https://www.youtube.com/watch?v=YkxnOlF30us' },
+        { id:'sc-v10', title:'Supply Chain Metrics & KPIs Masterclass', channel:'Supply Chain Now', badge:'badge-custom', dur:'40m', type:'video', url:'https://www.youtube.com/watch?v=PQO1MZcg-YA' },
+      ]
+    },
+  ]
 };
 
 // To add a new course: add an entry to CURRICULUM AND to TRACK_META below.
@@ -805,6 +850,13 @@ const TRACK_META = {
     activeClass: 'active-dmaic', fillClass: 'dmaic-fill',
     numClass: 'dmaic-num', accentColor: 'var(--dmaic)',
     fillColor: 'var(--dmaic)', statPctId: 'stat-dmaic-pct',
+    startLabel: '→ Start with Module 1'
+  },
+  supply_chain: {
+    label: 'Supply Chain', icon: '🚚',
+    activeClass: 'active-sc', fillClass: 'sc-fill',
+    numClass: 'sc-num', accentColor: 'var(--sc)',
+    fillColor: 'var(--sc)', statPctId: 'stat-sc-pct',
     startLabel: '→ Start with Module 1'
   }
   // ── Add new courses here, e.g.: ──
